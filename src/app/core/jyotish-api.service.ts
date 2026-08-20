@@ -48,6 +48,63 @@ export interface PlaceSuggestion {
   timeZone: string;
 }
 
+export type AppointmentStatus =
+  | 'SCHEDULED'
+  | 'CONFIRMED'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW';
+
+export type PaymentStatus = 'UNPAID' | 'PENDING' | 'PAID' | 'WAIVED';
+
+export interface JyotishClient {
+  id: number;
+  name: string;
+  mobile: string | null;
+  email: string | null;
+  notes: string | null;
+  birthProfileIds: number[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertClientRequest {
+  name: string;
+  mobile?: string | null;
+  email?: string | null;
+  notes?: string | null;
+  birthProfileIds?: number[];
+}
+
+export interface JyotishAppointment {
+  id: number;
+  clientId: number;
+  clientName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  consultationType: string;
+  status: AppointmentStatus | string;
+  paymentStatus: PaymentStatus | string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertAppointmentRequest {
+  clientId: number;
+  appointmentDate: string;
+  appointmentTime: string;
+  consultationType: string;
+  status?: AppointmentStatus | string | null;
+  paymentStatus?: PaymentStatus | string | null;
+  notes?: string | null;
+}
+
+export interface CrmDashboard {
+  totalClients: number;
+  todaysAppointments: number;
+}
+
 export interface UpsertProfileRequest {
   displayName: string;
   gender?: string | null;
@@ -96,6 +153,264 @@ export interface HouseDto {
 export interface ComingSoonFeature {
   code: string;
   label: string;
+}
+
+export interface ChartCatalogItem {
+  vargaCode: string;
+  displayName: string;
+  divisions: number;
+  implemented: boolean;
+  computed: boolean;
+  status: string;
+}
+
+export interface VargaChartResponse {
+  kundaliId: number;
+  chartId: number | null;
+  vargaCode: string;
+  displayName: string;
+  calculationEngineVersion: string;
+  houseSystem: string;
+  ascendant: PlanetDto | null;
+  planets: PlanetDto[];
+  houses: HouseDto[];
+  notes: string | null;
+  comingSoon: boolean;
+  createdAt: string;
+}
+
+export interface DashaCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface DashaPeriodDto {
+  level: string;
+  lordCode: string;
+  lordName: string;
+  mahaLordCode: string | null;
+  antarLordCode: string | null;
+  pratyantarLordCode: string | null;
+  startAt: string;
+  endAt: string;
+  remainingDays: number | null;
+  current: boolean;
+  children: DashaPeriodDto[];
+}
+
+export interface DashaCurrentDto {
+  maha: DashaPeriodDto | null;
+  antar: DashaPeriodDto | null;
+  pratyantar: DashaPeriodDto | null;
+}
+
+export interface DashaResponse {
+  kundaliId: number;
+  systemCode: string;
+  displayName: string;
+  calculationEngineVersion: string;
+  moonNakshatraIndex: number;
+  moonNakshatraName: string;
+  birthMahadashaLord: string;
+  balanceAtBirthYears: number;
+  elapsedAtBirthYears: number;
+  current: DashaCurrentDto;
+  timeline: DashaPeriodDto[];
+  catalog: DashaCatalogItem[];
+  notes: string | null;
+  interpretationPlaceholder: string;
+  asOf: string;
+}
+
+export interface YogaCatalogItem {
+  yogaCode: string;
+  displayName: string;
+  categoryCode: string;
+  categoryName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface YogaDto {
+  yogaCode: string;
+  displayName: string;
+  categoryCode: string;
+  categoryName: string;
+  present: boolean;
+  strengthCode: string | null;
+  strengthLabel: string | null;
+  planets: string[];
+  houses: number[];
+  explanation: string;
+  ruleId: string;
+}
+
+export interface YogaListResponse {
+  kundaliId: number;
+  calculationEngineVersion: string;
+  categoryFilter: string | null;
+  yogas: YogaDto[];
+  catalog: YogaCatalogItem[];
+  notes: string | null;
+  disclaimer: string;
+}
+
+export interface TransitCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface TransitComingSoon {
+  code: string;
+  label: string;
+}
+
+export interface TransitPlanetDto {
+  planetCode: string;
+  planetName: string;
+  longitudeDeg: number;
+  signIndex: number;
+  signName: string;
+  degreeInSign: number;
+  house: number;
+  nakshatraIndex: number;
+  nakshatraName: string;
+  pada: number;
+  retrograde: boolean;
+  speedDegPerDay: number | null;
+  natalLongitudeDeg: number | null;
+  natalSignIndex: number | null;
+  natalSignName: string | null;
+  natalHouse: number | null;
+  signChanged: boolean;
+  houseChanged: boolean;
+}
+
+export interface TransitResponse {
+  id: number;
+  kundaliId: number;
+  transitDate: string;
+  transitTime: string;
+  timeZone: string;
+  systemCode: string;
+  systemDisplayName: string;
+  calculationEngineVersion: string;
+  ayanamsaCode: string;
+  ayanamsaDeg: number;
+  julianDayUt: number;
+  natalLagnaSignIndex: number;
+  planets: TransitPlanetDto[];
+  catalog: TransitCatalogItem[];
+  comingSoon: TransitComingSoon[];
+  notes: string | null;
+  disclaimer: string;
+  createdAt: string;
+}
+
+export interface MatchingPersonSummary {
+  profileId: number;
+  displayName: string;
+  kundaliId: number | null;
+  moonSignIndex: number;
+  moonSignName: string;
+  moonNakshatraIndex: number;
+  moonNakshatraName: string;
+}
+
+export interface KootaScoreDto {
+  kootaCode: string;
+  displayName: string;
+  obtained: number;
+  maxPoints: number;
+  explanation: string;
+  ruleId: string;
+}
+
+export interface ManglikDto {
+  status: string;
+  statusLabel: string;
+  present: boolean;
+  marsHouse: number;
+  marsSignIndex: number;
+  marsSignName: string;
+  relevantHouses: number[];
+  reasoning: string;
+  cancellationsComingSoon: boolean;
+  cancellationsNote: string;
+}
+
+export interface MatchingCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface MatchingResponse {
+  id: number;
+  personA: MatchingPersonSummary;
+  personB: MatchingPersonSummary;
+  kootas: KootaScoreDto[];
+  totalScore: number;
+  maxScore: number;
+  percentage: number;
+  manglikA: ManglikDto;
+  manglikB: ManglikDto;
+  summary: string;
+  notes: string;
+  disclaimer: string;
+  calculationEngineVersion: string;
+  catalog: MatchingCatalogItem[];
+  createdAt: string;
+}
+
+export type ReportType = 'BASIC_KUNDALI' | 'MATCHING' | 'DASHA_SUMMARY' | 'TRANSIT';
+
+export interface ReportResponse {
+  id: number;
+  type: ReportType | string;
+  kundaliId: number | null;
+  matchingId: number | null;
+  displayTitle: string;
+  storagePath: string;
+  fileSizeBytes: number;
+  contentType: string;
+  calculationEngineVersion: string;
+  generatedAt: string;
+  downloadPath: string;
+}
+
+export type AiTopic =
+  | 'general'
+  | 'career'
+  | 'marriage'
+  | 'finance'
+  | 'health'
+  | 'education'
+  | 'family'
+  | 'spirituality';
+
+export interface AiAskRequest {
+  kundaliId: number;
+  question: string;
+  topic?: AiTopic | string | null;
+}
+
+export interface AiAskResponse {
+  kundaliId: number;
+  topic: string;
+  question: string;
+  answer: string;
+  findings: string[];
+  contextUsed: Record<string, unknown>;
+  aiGenerated: boolean;
+  providerCode: string;
+  disclaimer: string;
+  askId: number | null;
 }
 
 export interface KundaliResponse {
@@ -179,5 +494,160 @@ export class JyotishApiService {
 
   getKundali(id: number): Observable<KundaliResponse> {
     return this.http.get<KundaliResponse>(`/api/v1/jyotish/kundali/${id}`);
+  }
+
+  listCharts(kundaliId: number): Observable<{ kundaliId: number; charts: ChartCatalogItem[] }> {
+    return this.http.get<{ kundaliId: number; charts: ChartCatalogItem[] }>(
+      `/api/v1/jyotish/kundali/${kundaliId}/charts`
+    );
+  }
+
+  getChart(kundaliId: number, varga: string): Observable<VargaChartResponse> {
+    return this.http.get<VargaChartResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/charts/${varga}`
+    );
+  }
+
+  getDasha(kundaliId: number, system = 'VIMSHOTTARI'): Observable<DashaResponse> {
+    return this.http.get<DashaResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/dasha/${system}`
+    );
+  }
+
+  getYogas(kundaliId: number, category?: string): Observable<YogaListResponse> {
+    let params = new HttpParams();
+    if (category) {
+      params = params.set('category', category);
+    }
+    return this.http.get<YogaListResponse>(`/api/v1/jyotish/kundali/${kundaliId}/yogas`, {
+      params,
+    });
+  }
+
+  getTransit(
+    kundaliId: number,
+    date?: string,
+    time?: string
+  ): Observable<TransitResponse> {
+    let params = new HttpParams();
+    if (date) {
+      params = params.set('date', date);
+    }
+    if (time) {
+      params = params.set('time', time);
+    }
+    return this.http.get<TransitResponse>(`/api/v1/jyotish/kundali/${kundaliId}/transit`, {
+      params,
+    });
+  }
+
+  createTransit(body: {
+    kundaliId: number;
+    date?: string;
+    time?: string;
+  }): Observable<TransitResponse> {
+    return this.http.post<TransitResponse>('/api/v1/jyotish/transit', body);
+  }
+
+  createMatching(profileIdA: number, profileIdB: number): Observable<MatchingResponse> {
+    return this.http.post<MatchingResponse>('/api/v1/jyotish/matching', {
+      profileIdA,
+      profileIdB,
+    });
+  }
+
+  getMatching(id: number): Observable<MatchingResponse> {
+    return this.http.get<MatchingResponse>(`/api/v1/jyotish/matching/${id}`);
+  }
+
+  createReport(body: {
+    type: ReportType | string;
+    kundaliId?: number;
+    matchingId?: number;
+  }): Observable<ReportResponse> {
+    return this.http.post<ReportResponse>('/api/v1/jyotish/reports', body);
+  }
+
+  getReport(id: number): Observable<ReportResponse> {
+    return this.http.get<ReportResponse>(`/api/v1/jyotish/reports/${id}`);
+  }
+
+  /** Returns PDF blob for browser download. */
+  downloadReport(id: number): Observable<Blob> {
+    return this.http.get(`/api/v1/jyotish/reports/${id}/download`, {
+      responseType: 'blob',
+    });
+  }
+
+  crmDashboard(): Observable<CrmDashboard> {
+    return this.http.get<CrmDashboard>('/api/v1/jyotish/clients/dashboard');
+  }
+
+  listClients(q?: string): Observable<{ items: JyotishClient[] }> {
+    let params = new HttpParams();
+    if (q) {
+      params = params.set('q', q);
+    }
+    return this.http.get<{ items: JyotishClient[] }>('/api/v1/jyotish/clients', { params });
+  }
+
+  getClient(id: number): Observable<JyotishClient> {
+    return this.http.get<JyotishClient>(`/api/v1/jyotish/clients/${id}`);
+  }
+
+  createClient(body: UpsertClientRequest): Observable<JyotishClient> {
+    return this.http.post<JyotishClient>('/api/v1/jyotish/clients', body);
+  }
+
+  updateClient(id: number, body: UpsertClientRequest): Observable<JyotishClient> {
+    return this.http.put<JyotishClient>(`/api/v1/jyotish/clients/${id}`, body);
+  }
+
+  deleteClient(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/v1/jyotish/clients/${id}`);
+  }
+
+  listAppointments(opts?: {
+    clientId?: number;
+    fromDate?: string;
+    toDate?: string;
+    status?: string;
+  }): Observable<{ items: JyotishAppointment[] }> {
+    let params = new HttpParams();
+    if (opts?.clientId != null) {
+      params = params.set('clientId', String(opts.clientId));
+    }
+    if (opts?.fromDate) {
+      params = params.set('fromDate', opts.fromDate);
+    }
+    if (opts?.toDate) {
+      params = params.set('toDate', opts.toDate);
+    }
+    if (opts?.status) {
+      params = params.set('status', opts.status);
+    }
+    return this.http.get<{ items: JyotishAppointment[] }>('/api/v1/jyotish/appointments', {
+      params,
+    });
+  }
+
+  getAppointment(id: number): Observable<JyotishAppointment> {
+    return this.http.get<JyotishAppointment>(`/api/v1/jyotish/appointments/${id}`);
+  }
+
+  createAppointment(body: UpsertAppointmentRequest): Observable<JyotishAppointment> {
+    return this.http.post<JyotishAppointment>('/api/v1/jyotish/appointments', body);
+  }
+
+  updateAppointment(id: number, body: UpsertAppointmentRequest): Observable<JyotishAppointment> {
+    return this.http.put<JyotishAppointment>(`/api/v1/jyotish/appointments/${id}`, body);
+  }
+
+  deleteAppointment(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/v1/jyotish/appointments/${id}`);
+  }
+
+  askAi(body: AiAskRequest): Observable<AiAskResponse> {
+    return this.http.post<AiAskResponse>('/api/v1/jyotish/ai/ask', body);
   }
 }

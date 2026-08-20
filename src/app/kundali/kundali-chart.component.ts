@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { HouseDto, PlanetDto } from '../core/jyotish-api.service';
+import { HouseDto, PlanetDto, TransitPlanetDto } from '../core/jyotish-api.service';
 
 /** North-Indian style diamond chart rendered from API planet/house data (not a static image). */
 @Component({
@@ -11,6 +11,8 @@ export class KundaliChartComponent {
   @Input() planets: PlanetDto[] = [];
   @Input() houses: HouseDto[] = [];
   @Input() ascendant: PlanetDto | null = null;
+  /** Optional Gochar overlay — shown with a distinct style in natal houses. */
+  @Input() transitPlanets: TransitPlanetDto[] = [];
 
   /** Map house number → abbreviated planet labels in that house. */
   labelsForHouse(house: number): string[] {
@@ -19,6 +21,16 @@ export class KundaliChartComponent {
       labels.push('As');
     }
     for (const p of this.planets) {
+      if (p.house === house) {
+        labels.push(this.abbrev(p.planetCode) + (p.retrograde ? 'ᵣ' : ''));
+      }
+    }
+    return labels;
+  }
+
+  transitLabelsForHouse(house: number): string[] {
+    const labels: string[] = [];
+    for (const p of this.transitPlanets || []) {
       if (p.house === house) {
         labels.push(this.abbrev(p.planetCode) + (p.retrograde ? 'ᵣ' : ''));
       }

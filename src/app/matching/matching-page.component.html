@@ -1,0 +1,116 @@
+<p class="flash ok" *ngIf="message">{{ message }}</p>
+<p class="flash err" *ngIf="error">{{ error }}</p>
+
+<section class="panel">
+  <div class="row between">
+    <h2>Kundali matching</h2>
+    <a routerLink="/" class="btn ghost">Profiles</a>
+  </div>
+  <p class="hint">
+    Select two birth profiles. Person A is the classical groom-side orientation for directional
+    kootas (Varna, Vashya, Tara); Person B is the bride-side. Scores are traditional indicators —
+    not predictions.
+  </p>
+
+  <div class="form-grid match-pick">
+    <label>
+      Person A
+      <select [(ngModel)]="profileIdA" name="profileIdA">
+        <option [ngValue]="null">— select —</option>
+        <option *ngFor="let p of profiles" [ngValue]="p.id">{{ p.displayName }}</option>
+      </select>
+    </label>
+    <label>
+      Person B
+      <select [(ngModel)]="profileIdB" name="profileIdB">
+        <option [ngValue]="null">— select —</option>
+        <option *ngFor="let p of profiles" [ngValue]="p.id">{{ p.displayName }}</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn" [disabled]="busy" (click)="runMatch()">
+      {{ busy ? 'Matching…' : 'Run Ashta Koota + Manglik' }}
+    </button>
+    <button type="button" class="btn ghost" *ngIf="result" (click)="clearResult()">New match</button>
+  </div>
+</section>
+
+<section class="panel" *ngIf="result as r">
+  <div class="row between">
+    <h2>Result #{{ r.id }}</h2>
+    <div class="result-actions">
+      <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadPdf()">
+        {{ reportBusy ? 'Generating…' : 'Download PDF' }}
+      </button>
+      <span class="meta">engine {{ r.calculationEngineVersion }}</span>
+    </div>
+  </div>
+
+  <div class="pair">
+    <div>
+      <h3>{{ r.personA.displayName }}</h3>
+      <p class="sub">
+        Moon {{ r.personA.moonSignName || '—' }} · {{ r.personA.moonNakshatraName || '—' }}
+      </p>
+    </div>
+    <div>
+      <h3>{{ r.personB.displayName }}</h3>
+      <p class="sub">
+        Moon {{ r.personB.moonSignName || '—' }} · {{ r.personB.moonNakshatraName || '—' }}
+      </p>
+    </div>
+  </div>
+
+  <div class="total">
+    <span class="score">{{ r.totalScore }} / {{ r.maxScore }}</span>
+    <span class="pct">{{ r.percentage | number: '1.0-1' }}%</span>
+  </div>
+  <p class="summary">{{ r.summary }}</p>
+
+  <table class="table koota">
+    <thead>
+      <tr>
+        <th>Koota</th>
+        <th>Score</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let k of r.kootas">
+        <td>{{ k.displayName }}</td>
+        <td>{{ k.obtained }} / {{ k.maxPoints }}</td>
+        <td class="expl">{{ k.explanation }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3 class="mt">Manglik comparison</h3>
+  <div class="manglik-grid">
+    <article>
+      <h4>{{ r.personA.displayName }} — {{ r.manglikA.statusLabel }}</h4>
+      <p class="sub">Mars house {{ r.manglikA.marsHouse }}</p>
+      <p>{{ r.manglikA.reasoning }}</p>
+      <p class="soon" *ngIf="r.manglikA.cancellationsComingSoon">
+        {{ r.manglikA.cancellationsNote }}
+      </p>
+    </article>
+    <article>
+      <h4>{{ r.personB.displayName }} — {{ r.manglikB.statusLabel }}</h4>
+      <p class="sub">Mars house {{ r.manglikB.marsHouse }}</p>
+      <p>{{ r.manglikB.reasoning }}</p>
+      <p class="soon" *ngIf="r.manglikB.cancellationsComingSoon">
+        {{ r.manglikB.cancellationsNote }}
+      </p>
+    </article>
+  </div>
+
+  <p class="disclaimer">{{ r.disclaimer }}</p>
+
+  <div class="catalog" *ngIf="r.catalog?.length">
+    <span *ngFor="let c of r.catalog" [class.soon]="!c.implemented">
+      {{ c.displayName }} · {{ c.status }}
+    </span>
+  </div>
+</section>

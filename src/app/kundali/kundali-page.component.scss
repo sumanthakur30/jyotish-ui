@@ -49,6 +49,13 @@
   border-color: var(--ink);
 }
 
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
 .overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
@@ -72,8 +79,418 @@
   font-size: 0.9rem;
 }
 
+.varga-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.varga-switcher button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0.3rem;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.varga-switcher button .v-name {
+  opacity: 0.65;
+  font-size: 0.75rem;
+}
+
+.varga-switcher button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  border-color: var(--ink);
+}
+
+.varga-switcher button.soon {
+  opacity: 0.55;
+}
+
+.varga-switcher .badge {
+  font-size: 0.65rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.table.compact {
+  margin-top: 0.75rem;
+  font-size: 0.88rem;
+}
+
+.dasha-current {
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.dasha-current h2,
+.timeline-h {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.current-line {
+  margin: 0.15rem 0;
+  font-size: 1.1rem;
+}
+
+.dasha-catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.5rem 0 1rem;
+  font-size: 0.8rem;
+}
+
+.dasha-catalog .sys {
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.dasha-catalog .sys.soon {
+  opacity: 0.55;
+}
+
+.dasha-tree,
+.dasha-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.dasha-tree .nested {
+  margin-left: 1rem;
+  border-left: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+  padding-left: 0.35rem;
+}
+
+.dasha-tree .row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2rem minmax(4rem, 6rem) minmax(5rem, 7rem) 1fr auto auto;
+  gap: 0.4rem;
+  align-items: center;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  padding: 0.35rem 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.dasha-tree .row:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.dasha-tree li.current > .row {
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+  font-weight: 600;
+}
+
+.dasha-tree .lvl {
+  opacity: 0.55;
+  font-size: 0.75rem;
+}
+
+.dasha-tree .dates {
+  opacity: 0.75;
+  font-size: 0.8rem;
+}
+
+.dasha-tree .badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+}
+
+.dasha-tree .linkish {
+  opacity: 0.5;
+  font-size: 0.85rem;
+}
+
+.dasha-tree .chev.pad {
+  visibility: hidden;
+}
+
+.interp {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in srgb, #000 35%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  padding: 1rem;
+}
+
+.interp-card {
+  background: var(--bg, #f7f1e6);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 1.1rem 1.25rem;
+  max-width: 22rem;
+  width: 100%;
+}
+
+.interp-card h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.05rem;
+}
+
+.interp-card .coming {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.disclaimer {
+  margin: 0 0 0.5rem;
+}
+
+.yoga-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.yoga-filters button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.yoga-filters button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  border-color: var(--ink);
+}
+
+.yoga-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.yoga-list.quiet .yoga-row {
+  opacity: 0.85;
+}
+
+.yoga-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2rem minmax(8rem, 1.4fr) minmax(5rem, 0.8fr) auto auto;
+  gap: 0.4rem;
+  align-items: center;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.yoga-row:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.yoga-list .present > .yoga-row {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.yoga-row .cat {
+  opacity: 0.55;
+  font-size: 0.75rem;
+}
+
+.yoga-row .badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.yoga-row .badge.dim {
+  opacity: 0.55;
+}
+
+.yoga-row .str {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.yoga-row .str.muted {
+  opacity: 0.5;
+}
+
+.yoga-detail {
+  padding: 0 0.5rem 0.75rem 1.6rem;
+}
+
+.yoga-detail .meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.yoga-detail .expl {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.soon .cat {
+  opacity: 0.55;
+  font-size: 0.85rem;
+}
+
+.transit-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 0.85rem;
+}
+
+.transit-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.transit-controls input[type='date'] {
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.55rem;
+  font: inherit;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.chart-legend {
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.table tr.changed td {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
 @media (max-width: 700px) {
   .overview-grid {
     grid-template-columns: 1fr;
   }
+
+  .dasha-tree .row {
+    grid-template-columns: 1.2rem minmax(3.5rem, 5rem) 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .dasha-tree .lvl {
+    display: none;
+  }
+
+  .dasha-tree .dates {
+    grid-column: 2 / -1;
+  }
+
+  .yoga-row {
+    grid-template-columns: 1.2rem 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .yoga-row .cat {
+    grid-column: 2;
+  }
+}
+
+.ask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 40rem;
+  margin: 1rem 0;
+}
+
+.ask-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.ask-form select,
+.ask-form textarea {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--ink);
+}
+
+.ask-reply {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.ai-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  margin: 0 0 0.5rem;
+}
+
+.ask-answer {
+  white-space: pre-wrap;
+  font: inherit;
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+
+.ask-findings {
+  margin: 0.35rem 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.ask-findings li {
+  margin: 0.25rem 0;
+}
+
+.ask-history {
+  margin-top: 1.25rem;
+}
+
+.ask-history details {
+  margin: 0.4rem 0;
+}
+
+.ask-history summary {
+  cursor: pointer;
 }

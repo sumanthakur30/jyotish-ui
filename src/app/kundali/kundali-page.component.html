@@ -24,6 +24,18 @@
       Planets
     </button>
     <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">Houses</button>
+    <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">Charts</button>
+    <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">Dasha</button>
+    <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">Yogas</button>
+    <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
+      Transit
+    </button>
+    <button type="button" [class.active]="tab === 'reports'" (click)="openReports()">
+      Reports
+    </button>
+    <button type="button" [class.active]="tab === 'ask'" (click)="openAsk()">
+      Ask Sugam Jyotish
+    </button>
   </nav>
 
   <section class="panel" *ngIf="tab === 'overview'">
@@ -101,6 +113,430 @@
         </tr>
       </tbody>
     </table>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'charts'">
+    <div class="varga-switcher" role="list">
+      <button
+        type="button"
+        *ngFor="let c of chartCatalog"
+        role="listitem"
+        [class.active]="selectedVarga === c.vargaCode"
+        [class.soon]="!c.implemented"
+        (click)="selectVarga(c.vargaCode, c.implemented)"
+        [attr.title]="c.implemented ? c.displayName : c.displayName + ' — Coming Soon'"
+      >
+        {{ c.vargaCode }}
+        <span class="v-name">{{ c.displayName }}</span>
+        <span class="badge" *ngIf="!c.implemented">Soon</span>
+      </button>
+    </div>
+
+    <p class="flash err" *ngIf="chartError">{{ chartError }}</p>
+    <p class="hint" *ngIf="chartBusy">Loading chart…</p>
+
+    <div class="overview-grid" *ngIf="vargaChart as vc">
+      <app-kundali-chart
+        [planets]="vc.planets"
+        [houses]="vc.houses"
+        [ascendant]="vc.ascendant"
+      ></app-kundali-chart>
+      <div class="lagna">
+        <h2>{{ vc.vargaCode }} · {{ vc.displayName }}</h2>
+        <p *ngIf="vc.ascendant as a">
+          Varga Lagna {{ a.signName }} {{ fmtDeg(a.degreeInSign) }} · {{ a.nakshatraName }} pada
+          {{ a.pada }}
+        </p>
+        <p class="sub">
+          {{ vc.houseSystem }} · engine {{ vc.calculationEngineVersion }}
+          <span *ngIf="vc.chartId"> · chart #{{ vc.chartId }}</span>
+        </p>
+        <h2>Notes</h2>
+        <p class="hint">{{ vc.notes }}</p>
+        <table class="table compact">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>House</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of vc.planets">
+              <td>{{ p.planetName }}</td>
+              <td>{{ p.signName }}</td>
+              <td>{{ fmtDeg(p.degreeInSign) }}</td>
+              <td>{{ p.house }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'dasha'">
+    <p class="flash err" *ngIf="dashaError">{{ dashaError }}</p>
+    <p class="hint" *ngIf="dashaBusy">Loading Vimshottari…</p>
+
+    <ng-container *ngIf="dasha as d">
+      <div class="dasha-current" *ngIf="d.current?.maha as maha">
+        <h2>Current Mahadasha</h2>
+        <p class="current-line">
+          <strong>{{ maha.lordName }}</strong>
+          <span *ngIf="d.current.antar as antar"> → {{ antar.lordName }}</span>
+          <span *ngIf="d.current.pratyantar as pr"> → {{ pr.lordName }}</span>
+        </p>
+        <p class="sub">
+          {{ fmtWhen(maha.startAt) }} – {{ fmtWhen(maha.endAt) }}
+          <span *ngIf="maha.remainingDays != null"> · {{ maha.remainingDays }} days remaining</span>
+        </p>
+        <p class="hint">
+          Moon {{ d.moonNakshatraName }} · birth balance
+          {{ d.balanceAtBirthYears | number: '1.2-4' }} y ({{ d.birthMahadashaLord }}) · engine
+          {{ d.calculationEngineVersion }}
+        </p>
+      </div>
+
+      <div class="dasha-catalog" *ngIf="d.catalog?.length">
+        <span *ngFor="let c of d.catalog" [class.soon]="!c.implemented" class="sys">
+          {{ c.displayName }}
+          <span *ngIf="!c.implemented">Soon</span>
+        </span>
+      </div>
+
+      <h2 class="timeline-h">Timeline</h2>
+      <ul class="dasha-tree">
+        <li *ngFor="let m of d.timeline" [class.current]="m.current">
+          <button
+            type="button"
+            class="row maha"
+            (click)="toggleMaha(periodKey(m))"
+            (dblclick)="selectPeriod(m, $event)"
+          >
+            <span class="chev">{{ expandedMaha.has(periodKey(m)) ? '▾' : '▸' }}</span>
+            <span class="lord">{{ m.lordName }}</span>
+            <span class="lvl">Mahadasha</span>
+            <span class="dates">{{ fmtWhen(m.startAt) }} – {{ fmtWhen(m.endAt) }}</span>
+            <span class="badge" *ngIf="m.current">Now</span>
+            <span
+              class="linkish"
+              (click)="selectPeriod(m, $event)"
+              title="Interpretation"
+              >ⓘ</span
+            >
+          </button>
+          <ul class="nested" *ngIf="expandedMaha.has(periodKey(m))">
+            <li *ngFor="let a of m.children" [class.current]="a.current">
+              <button
+                type="button"
+                class="row antar"
+                (click)="toggleAntar(periodKey(a))"
+              >
+                <span class="chev">{{ expandedAntar.has(periodKey(a)) ? '▾' : '▸' }}</span>
+                <span class="lord">{{ a.lordName }}</span>
+                <span class="lvl">Antardasha</span>
+                <span class="dates">{{ fmtWhen(a.startAt) }} – {{ fmtWhen(a.endAt) }}</span>
+                <span class="badge" *ngIf="a.current">Now</span>
+                <span class="linkish" (click)="selectPeriod(a, $event)">ⓘ</span>
+              </button>
+              <ul class="nested" *ngIf="expandedAntar.has(periodKey(a))">
+                <li *ngFor="let p of a.children" [class.current]="p.current">
+                  <button type="button" class="row praty" (click)="selectPeriod(p)">
+                    <span class="chev pad"></span>
+                    <span class="lord">{{ p.lordName }}</span>
+                    <span class="lvl">Pratyantar</span>
+                    <span class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</span>
+                    <span class="badge" *ngIf="p.current">Now</span>
+                  </button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="hint">{{ d.notes }}</p>
+    </ng-container>
+
+    <div class="interp" *ngIf="showInterpretation && selectedPeriod as sp">
+      <div class="interp-card">
+        <h3>{{ sp.lordName }} · {{ sp.level }}</h3>
+        <p class="sub">{{ fmtWhen(sp.startAt) }} – {{ fmtWhen(sp.endAt) }}</p>
+        <p class="coming">Coming Soon</p>
+        <p class="hint">Interpretations are not generated — no placeholder predictions.</p>
+        <button type="button" class="btn ghost" (click)="closeInterpretation()">Close</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'yogas'">
+    <p class="flash err" *ngIf="yogaError">{{ yogaError }}</p>
+    <p class="hint" *ngIf="yogaBusy">Loading yogas…</p>
+
+    <ng-container *ngIf="yogas as y">
+      <p class="hint disclaimer">{{ y.disclaimer }}</p>
+      <p class="sub">
+        Engine {{ y.calculationEngineVersion }}
+        <span *ngIf="y.categoryFilter"> · filter {{ y.categoryFilter }}</span>
+      </p>
+
+      <div class="yoga-filters">
+        <button
+          type="button"
+          [class.active]="yogaCategory === null"
+          (click)="selectYogaCategory(null)"
+        >
+          All
+        </button>
+        <button
+          type="button"
+          [class.active]="yogaCategory === 'CHANDRA'"
+          (click)="selectYogaCategory('CHANDRA')"
+        >
+          Chandra
+        </button>
+        <button
+          type="button"
+          [class.active]="yogaCategory === 'RAJA'"
+          (click)="selectYogaCategory('RAJA')"
+        >
+          Raja
+        </button>
+        <button
+          type="button"
+          [class.active]="yogaCategory === 'DHANA'"
+          (click)="selectYogaCategory('DHANA')"
+        >
+          Dhana
+        </button>
+        <button
+          type="button"
+          [class.active]="yogaCategory === 'MAHAPURUSHA'"
+          (click)="selectYogaCategory('MAHAPURUSHA')"
+        >
+          Mahapurusha
+        </button>
+      </div>
+
+      <h2 class="timeline-h">Present</h2>
+      <p class="hint" *ngIf="!presentYogas().length">No implemented yogas present under this filter.</p>
+      <ul class="yoga-list">
+        <li *ngFor="let yoga of presentYogas()" class="present">
+          <button type="button" class="yoga-row" (click)="toggleYoga(yoga.yogaCode)">
+            <span class="chev">{{ expandedYoga.has(yoga.yogaCode) ? '▾' : '▸' }}</span>
+            <span class="name">{{ yoga.displayName }}</span>
+            <span class="cat">{{ yoga.categoryName }}</span>
+            <span class="badge">Present</span>
+            <span class="str" *ngIf="yoga.strengthCode">{{ yoga.strengthCode }}</span>
+            <span class="str muted" *ngIf="!yoga.strengthCode">Strength: Coming Soon</span>
+          </button>
+          <div class="yoga-detail" *ngIf="expandedYoga.has(yoga.yogaCode)">
+            <p class="meta">
+              Planets: {{ yoga.planets.join(', ') || '—' }} · Houses:
+              {{ yoga.houses.join(', ') || '—' }}
+            </p>
+            <p class="expl">{{ yoga.explanation }}</p>
+            <p class="sub">Rule {{ yoga.ruleId }}</p>
+          </div>
+        </li>
+      </ul>
+
+      <h2 class="timeline-h">Checked (not present)</h2>
+      <ul class="yoga-list quiet">
+        <li *ngFor="let yoga of absentImplemented()">
+          <button type="button" class="yoga-row" (click)="toggleYoga(yoga.yogaCode)">
+            <span class="chev">{{ expandedYoga.has(yoga.yogaCode) ? '▾' : '▸' }}</span>
+            <span class="name">{{ yoga.displayName }}</span>
+            <span class="cat">{{ yoga.categoryName }}</span>
+            <span class="badge dim">Not present</span>
+          </button>
+          <div class="yoga-detail" *ngIf="expandedYoga.has(yoga.yogaCode)">
+            <p class="expl">{{ yoga.explanation }}</p>
+          </div>
+        </li>
+      </ul>
+
+      <h2 class="timeline-h">Coming Soon</h2>
+      <ul class="soon">
+        <li *ngFor="let c of comingSoonCatalog()">
+          {{ c.displayName }}
+          <span class="cat">({{ c.categoryName }})</span>
+        </li>
+      </ul>
+
+      <p class="hint">{{ y.notes }}</p>
+    </ng-container>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'transit'">
+    <div class="transit-controls">
+      <label>
+        Transit date
+        <input type="date" [(ngModel)]="transitDate" name="transitDate" />
+      </label>
+      <button type="button" class="btn" (click)="applyTransitDate()" [disabled]="transitBusy">
+        Apply
+      </button>
+    </div>
+
+    <p class="flash err" *ngIf="transitError">{{ transitError }}</p>
+    <p class="hint" *ngIf="transitBusy">Loading Gochar…</p>
+
+    <ng-container *ngIf="transit as t">
+      <p class="hint disclaimer">{{ t.disclaimer }}</p>
+      <p class="sub">
+        {{ t.systemDisplayName }} · {{ t.transitDate }} {{ t.transitTime }} ({{ t.timeZone }}) ·
+        {{ t.ayanamsaCode }} {{ fmtDeg(t.ayanamsaDeg) }} · engine {{ t.calculationEngineVersion }}
+      </p>
+
+      <div class="overview-grid">
+        <div>
+          <app-kundali-chart
+            [planets]="k.planets"
+            [houses]="k.houses"
+            [ascendant]="k.ascendant"
+            [transitPlanets]="t.planets"
+          ></app-kundali-chart>
+          <p class="hint chart-legend">
+            Natal labels · <em>italic dotted</em> = transit (Gochar) in natal houses
+          </p>
+        </div>
+        <div class="lagna">
+          <h2>Coming soon</h2>
+          <ul class="soon">
+            <li *ngFor="let c of t.comingSoon">{{ c.label }}</li>
+          </ul>
+          <div class="dasha-catalog" *ngIf="t.catalog?.length">
+            <span *ngFor="let c of t.catalog" [class.soon]="!c.implemented" class="sys">
+              {{ c.displayName }}
+              <span *ngIf="!c.implemented">Soon</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="timeline-h">Natal vs transit</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Planet</th>
+            <th>Natal sign</th>
+            <th>Natal house</th>
+            <th>Transit sign</th>
+            <th>Transit house</th>
+            <th>Transit deg</th>
+            <th>Δ</th>
+            <th>R</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let p of t.planets"
+            [class.changed]="p.signChanged || p.houseChanged"
+          >
+            <td>{{ p.planetName }}</td>
+            <td>{{ p.natalSignName || '—' }}</td>
+            <td>{{ p.natalHouse != null ? p.natalHouse : '—' }}</td>
+            <td>{{ p.signName }}</td>
+            <td>{{ p.house }}</td>
+            <td>{{ fmtDeg(p.degreeInSign) }}</td>
+            <td>
+              <span *ngIf="p.signChanged">sign</span>
+              <span *ngIf="p.signChanged && p.houseChanged"> · </span>
+              <span *ngIf="p.houseChanged">house</span>
+              <span *ngIf="!p.signChanged && !p.houseChanged">—</span>
+            </td>
+            <td>{{ p.retrograde ? 'R' : '' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="hint">{{ t.notes }}</p>
+    </ng-container>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'reports'">
+    <h2>PDF reports</h2>
+    <p class="hint">
+      Generates a professional PDF from this stored snapshot (no recalculation). Includes birth
+      details, D1 planet table, engine version, and disclaimer. Dasha / transit pages are included
+      when that data already exists.
+    </p>
+    <div class="actions report-actions">
+      <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadBasicPdf()">
+        {{ reportBusy ? 'Generating…' : 'Download Basic Kundali PDF' }}
+      </button>
+      <button type="button" class="btn ghost" [disabled]="reportBusy" (click)="downloadDashaPdf()">
+        Dasha summary PDF
+      </button>
+      <button
+        type="button"
+        class="btn ghost"
+        [disabled]="reportBusy"
+        (click)="downloadTransitPdf()"
+      >
+        Transit PDF
+      </button>
+    </div>
+    <p class="flash ok" *ngIf="reportMessage">{{ reportMessage }}</p>
+    <p class="flash err" *ngIf="reportError">{{ reportError }}</p>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'ask'">
+    <h2>Ask Sugam Jyotish</h2>
+    <p class="hint">
+      AI-assisted interpretation grounded only in this kundali’s stored planets, houses, current
+      dasha, present yogas, and optional transit. Planetary positions and dasha dates are never
+      invented.
+    </p>
+
+    <div class="ask-form">
+      <label>
+        Topic
+        <select [(ngModel)]="aiTopic">
+          <option *ngFor="let t of aiTopics" [ngValue]="t.code">{{ t.label }}</option>
+        </select>
+      </label>
+      <label class="ask-q">
+        Question
+        <textarea
+          rows="3"
+          [(ngModel)]="aiQuestion"
+          placeholder="e.g. What does the current dasha suggest for career focus?"
+        ></textarea>
+      </label>
+      <button type="button" class="btn" [disabled]="aiBusy" (click)="submitAsk()">
+        {{ aiBusy ? 'Asking…' : 'Ask' }}
+      </button>
+    </div>
+
+    <p class="flash err" *ngIf="aiError">{{ aiError }}</p>
+
+    <article class="ask-reply" *ngIf="aiReply as r">
+      <p class="ai-badge">AI-assisted · provider {{ r.providerCode }}</p>
+      <pre class="ask-answer">{{ r.answer }}</pre>
+      <h3>Findings (verified context)</h3>
+      <ul class="ask-findings">
+        <li *ngFor="let f of r.findings">{{ f }}</li>
+      </ul>
+      <p class="hint disclaimer">{{ r.disclaimer }}</p>
+      <p class="sub" *ngIf="r.contextUsed as c">
+        Context used: {{ c['planetCount'] }} planets · yogas
+        {{ c['yogasPresentCount'] }} · dasha
+        {{ c['dashaAvailable'] ? 'yes' : 'no' }}
+        <span *ngIf="c['currentMahaLord']"> · MD {{ c['currentMahaLord'] }}</span>
+        · transit {{ c['transitIncluded'] ? 'included' : 'none' }}
+      </p>
+    </article>
+
+    <div class="ask-history" *ngIf="aiHistory.length > 1">
+      <h3>Earlier answers</h3>
+      <details *ngFor="let h of aiHistory.slice(1)">
+        <summary>{{ h.topic }} — {{ h.question }}</summary>
+        <pre class="ask-answer">{{ h.answer }}</pre>
+      </details>
+    </div>
   </section>
 </div>
 
