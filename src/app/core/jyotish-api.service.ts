@@ -167,6 +167,150 @@ export interface DashaResponse {
   asOf: string;
 }
 
+export interface YogaCatalogItem {
+  yogaCode: string;
+  displayName: string;
+  categoryCode: string;
+  categoryName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface YogaDto {
+  yogaCode: string;
+  displayName: string;
+  categoryCode: string;
+  categoryName: string;
+  present: boolean;
+  strengthCode: string | null;
+  strengthLabel: string | null;
+  planets: string[];
+  houses: number[];
+  explanation: string;
+  ruleId: string;
+}
+
+export interface YogaListResponse {
+  kundaliId: number;
+  calculationEngineVersion: string;
+  categoryFilter: string | null;
+  yogas: YogaDto[];
+  catalog: YogaCatalogItem[];
+  notes: string | null;
+  disclaimer: string;
+}
+
+export interface TransitCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface TransitComingSoon {
+  code: string;
+  label: string;
+}
+
+export interface TransitPlanetDto {
+  planetCode: string;
+  planetName: string;
+  longitudeDeg: number;
+  signIndex: number;
+  signName: string;
+  degreeInSign: number;
+  house: number;
+  nakshatraIndex: number;
+  nakshatraName: string;
+  pada: number;
+  retrograde: boolean;
+  speedDegPerDay: number | null;
+  natalLongitudeDeg: number | null;
+  natalSignIndex: number | null;
+  natalSignName: string | null;
+  natalHouse: number | null;
+  signChanged: boolean;
+  houseChanged: boolean;
+}
+
+export interface TransitResponse {
+  id: number;
+  kundaliId: number;
+  transitDate: string;
+  transitTime: string;
+  timeZone: string;
+  systemCode: string;
+  systemDisplayName: string;
+  calculationEngineVersion: string;
+  ayanamsaCode: string;
+  ayanamsaDeg: number;
+  julianDayUt: number;
+  natalLagnaSignIndex: number;
+  planets: TransitPlanetDto[];
+  catalog: TransitCatalogItem[];
+  comingSoon: TransitComingSoon[];
+  notes: string | null;
+  disclaimer: string;
+  createdAt: string;
+}
+
+export interface MatchingPersonSummary {
+  profileId: number;
+  displayName: string;
+  kundaliId: number | null;
+  moonSignIndex: number;
+  moonSignName: string;
+  moonNakshatraIndex: number;
+  moonNakshatraName: string;
+}
+
+export interface KootaScoreDto {
+  kootaCode: string;
+  displayName: string;
+  obtained: number;
+  maxPoints: number;
+  explanation: string;
+  ruleId: string;
+}
+
+export interface ManglikDto {
+  status: string;
+  statusLabel: string;
+  present: boolean;
+  marsHouse: number;
+  marsSignIndex: number;
+  marsSignName: string;
+  relevantHouses: number[];
+  reasoning: string;
+  cancellationsComingSoon: boolean;
+  cancellationsNote: string;
+}
+
+export interface MatchingCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface MatchingResponse {
+  id: number;
+  personA: MatchingPersonSummary;
+  personB: MatchingPersonSummary;
+  kootas: KootaScoreDto[];
+  totalScore: number;
+  maxScore: number;
+  percentage: number;
+  manglikA: ManglikDto;
+  manglikB: ManglikDto;
+  summary: string;
+  notes: string;
+  disclaimer: string;
+  calculationEngineVersion: string;
+  catalog: MatchingCatalogItem[];
+  createdAt: string;
+}
+
 export interface KundaliResponse {
   id: number;
   birthProfileId: number | null;
@@ -266,5 +410,51 @@ export class JyotishApiService {
     return this.http.get<DashaResponse>(
       `/api/v1/jyotish/kundali/${kundaliId}/dasha/${system}`
     );
+  }
+
+  getYogas(kundaliId: number, category?: string): Observable<YogaListResponse> {
+    let params = new HttpParams();
+    if (category) {
+      params = params.set('category', category);
+    }
+    return this.http.get<YogaListResponse>(`/api/v1/jyotish/kundali/${kundaliId}/yogas`, {
+      params,
+    });
+  }
+
+  getTransit(
+    kundaliId: number,
+    date?: string,
+    time?: string
+  ): Observable<TransitResponse> {
+    let params = new HttpParams();
+    if (date) {
+      params = params.set('date', date);
+    }
+    if (time) {
+      params = params.set('time', time);
+    }
+    return this.http.get<TransitResponse>(`/api/v1/jyotish/kundali/${kundaliId}/transit`, {
+      params,
+    });
+  }
+
+  createTransit(body: {
+    kundaliId: number;
+    date?: string;
+    time?: string;
+  }): Observable<TransitResponse> {
+    return this.http.post<TransitResponse>('/api/v1/jyotish/transit', body);
+  }
+
+  createMatching(profileIdA: number, profileIdB: number): Observable<MatchingResponse> {
+    return this.http.post<MatchingResponse>('/api/v1/jyotish/matching', {
+      profileIdA,
+      profileIdB,
+    });
+  }
+
+  getMatching(id: number): Observable<MatchingResponse> {
+    return this.http.get<MatchingResponse>(`/api/v1/jyotish/matching/${id}`);
   }
 }

@@ -252,6 +252,147 @@
   font-weight: 600;
 }
 
+.disclaimer {
+  margin: 0 0 0.5rem;
+}
+
+.yoga-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.yoga-filters button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0.3rem;
+  padding: 0.3rem 0.65rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.yoga-filters button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  border-color: var(--ink);
+}
+
+.yoga-list {
+  list-style: none;
+  margin: 0 0 1.25rem;
+  padding: 0;
+}
+
+.yoga-list.quiet .yoga-row {
+  opacity: 0.85;
+}
+
+.yoga-row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.2rem minmax(8rem, 1.4fr) minmax(5rem, 0.8fr) auto auto;
+  gap: 0.4rem;
+  align-items: center;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.25rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+}
+
+.yoga-row:hover {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
+.yoga-list .present > .yoga-row {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.yoga-row .cat {
+  opacity: 0.55;
+  font-size: 0.75rem;
+}
+
+.yoga-row .badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.yoga-row .badge.dim {
+  opacity: 0.55;
+}
+
+.yoga-row .str {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.yoga-row .str.muted {
+  opacity: 0.5;
+}
+
+.yoga-detail {
+  padding: 0 0.5rem 0.75rem 1.6rem;
+}
+
+.yoga-detail .meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.yoga-detail .expl {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.soon .cat {
+  opacity: 0.55;
+  font-size: 0.85rem;
+}
+
+.transit-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-bottom: 0.85rem;
+}
+
+.transit-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.transit-controls input[type='date'] {
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.55rem;
+  font: inherit;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+.chart-legend {
+  text-align: center;
+  margin-top: 0.35rem;
+}
+
+.table tr.changed td {
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+
 @media (max-width: 700px) {
   .overview-grid {
     grid-template-columns: 1fr;
@@ -268,5 +409,14 @@
 
   .dasha-tree .dates {
     grid-column: 2 / -1;
+  }
+
+  .yoga-row {
+    grid-template-columns: 1.2rem 1fr auto;
+    grid-template-rows: auto auto;
+  }
+
+  .yoga-row .cat {
+    grid-column: 2;
   }
 }

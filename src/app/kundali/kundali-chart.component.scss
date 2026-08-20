@@ -35,6 +35,13 @@
   font-weight: 600;
 }
 
+.body.transit {
+  font-weight: 500;
+  opacity: 0.72;
+  font-style: italic;
+  border-bottom: 1px dotted color-mix(in srgb, var(--ink) 45%, transparent);
+}
+
 /* Classical North Indian house placement on diamond */
 .h1 {
   left: 25%;

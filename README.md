@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-Open http://localhost:4600 — set tenant, manage birth profiles, click **Kundali** for D1 Overview / Planets / Houses, **Charts** for Vargas (D9 first), and **Dasha** for Vimshottari timeline (expand maha → antar → pratyantar; period info shows Coming Soon — no fake predictions).
+Open http://localhost:4600 — set tenant, manage birth profiles, open **Kundali** for D1 / Charts / Dasha / Yogas / **Transit** (Gochar date picker + natal vs transit), and **Matching** to pick two profiles for Ashta Koota + Manglik (disclaimer included; Manglik cancellations and Sade Sati show Coming Soon).

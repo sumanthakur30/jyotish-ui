@@ -6,7 +6,11 @@ import {
   DashaResponse,
   JyotishApiService,
   KundaliResponse,
+  TransitResponse,
   VargaChartResponse,
+  YogaCatalogItem,
+  YogaDto,
+  YogaListResponse,
 } from '../core/jyotish-api.service';
 
 @Component({
@@ -16,7 +20,7 @@ import {
 })
 export class KundaliPageComponent implements OnInit {
   kundali: KundaliResponse | null = null;
-  tab: 'overview' | 'planets' | 'houses' | 'charts' | 'dasha' = 'overview';
+  tab: 'overview' | 'planets' | 'houses' | 'charts' | 'dasha' | 'yogas' | 'transit' = 'overview';
   error = '';
   busy = false;
 
@@ -33,6 +37,17 @@ export class KundaliPageComponent implements OnInit {
   expandedAntar = new Set<string>();
   selectedPeriod: DashaPeriodDto | null = null;
   showInterpretation = false;
+
+  yogas: YogaListResponse | null = null;
+  yogaBusy = false;
+  yogaError = '';
+  yogaCategory: string | null = null;
+  expandedYoga = new Set<string>();
+
+  transit: TransitResponse | null = null;
+  transitBusy = false;
+  transitError = '';
+  transitDate = '';
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -79,6 +94,60 @@ export class KundaliPageComponent implements OnInit {
     if (!this.dasha) {
       this.loadDasha();
     }
+  }
+
+  openYogas(): void {
+    this.tab = 'yogas';
+    if (!this.kundali) {
+      return;
+    }
+    if (!this.yogas) {
+      this.loadYogas();
+    }
+  }
+
+  openTransit(): void {
+    this.tab = 'transit';
+    if (!this.kundali) {
+      return;
+    }
+    if (!this.transitDate) {
+      this.transitDate = this.todayIso();
+    }
+    if (!this.transit) {
+      this.loadTransit();
+    }
+  }
+
+  applyTransitDate(): void {
+    this.transit = null;
+    this.loadTransit();
+  }
+
+  selectYogaCategory(code: string | null): void {
+    this.yogaCategory = code;
+    this.yogas = null;
+    this.loadYogas();
+  }
+
+  toggleYoga(code: string): void {
+    if (this.expandedYoga.has(code)) {
+      this.expandedYoga.delete(code);
+    } else {
+      this.expandedYoga.add(code);
+    }
+  }
+
+  presentYogas(): YogaDto[] {
+    return (this.yogas?.yogas || []).filter((y) => y.present);
+  }
+
+  absentImplemented(): YogaDto[] {
+    return (this.yogas?.yogas || []).filter((y) => !y.present);
+  }
+
+  comingSoonCatalog(): YogaCatalogItem[] {
+    return (this.yogas?.catalog || []).filter((c) => !c.implemented);
   }
 
   selectVarga(code: string, implemented: boolean): void {
@@ -206,6 +275,56 @@ export class KundaliPageComponent implements OnInit {
         this.dashaError = err?.error?.message || 'Could not load dasha.';
       },
     });
+  }
+
+  private loadYogas(): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.yogaBusy = true;
+    this.yogaError = '';
+    this.api.getYogas(this.kundali.id, this.yogaCategory || undefined).subscribe({
+      next: (y) => {
+        this.yogas = y;
+        this.yogaBusy = false;
+        for (const hit of y.yogas.filter((x) => x.present)) {
+          this.expandedYoga.add(hit.yogaCode);
+        }
+      },
+      error: (err) => {
+        this.yogaBusy = false;
+        this.yogas = null;
+        this.yogaError = err?.error?.message || 'Could not load yogas.';
+      },
+    });
+  }
+
+  private loadTransit(): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.transitBusy = true;
+    this.transitError = '';
+    this.api.getTransit(this.kundali.id, this.transitDate || undefined).subscribe({
+      next: (t) => {
+        this.transit = t;
+        this.transitDate = t.transitDate;
+        this.transitBusy = false;
+      },
+      error: (err) => {
+        this.transitBusy = false;
+        this.transit = null;
+        this.transitError = err?.error?.message || 'Could not load transit.';
+      },
+    });
+  }
+
+  private todayIso(): string {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   fmtDeg(v: number | null | undefined): string {
