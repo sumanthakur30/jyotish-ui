@@ -1,0 +1,31 @@
+<header class="top">
+  <div class="brand">
+    <span class="mark">SJ</span>
+    <div>
+      <h1>Sugam Jyotish</h1>
+      <p class="tag">Phase 2 · Kundali D1</p>
+    </div>
+  </div>
+  <div class="tenant-bar">
+    <label for="tenant">Tenant</label>
+    <input
+      id="tenant"
+      [(ngModel)]="tenantDraft"
+      name="tenant"
+      placeholder="JYOTISH-DEMO-01"
+    />
+    <button type="button" class="btn" (click)="saveTenant()">Set</button>
+    <button type="button" class="btn ghost" (click)="refreshStatus()">Ping</button>
+  </div>
+</header>
+
+<main class="shell">
+  <p class="flash ok" *ngIf="message">{{ message }}</p>
+  <p class="flash err" *ngIf="error">{{ error }}</p>
+  <section class="panel compact" *ngIf="status as s">
+    <span>{{ s.service }}</span>
+    <span>· {{ s.phase }}</span>
+    <span>· engine {{ s.engineVersion }}</span>
+  </section>
+  <router-outlet></router-outlet>
+</main>

@@ -1,0 +1,181 @@
+<p class="flash ok" *ngIf="message">{{ message }}</p>
+<p class="flash err" *ngIf="error">{{ error }}</p>
+
+<section class="panel">
+  <div class="row between">
+    <h2>{{ editingId ? 'Edit birth profile' : 'New birth profile' }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+  </div>
+
+  <div class="form-grid">
+    <label>
+      Name
+      <input [(ngModel)]="displayName" name="displayName" placeholder="Ravi Kumar" />
+    </label>
+    <label>
+      Gender
+      <select [(ngModel)]="gender" name="gender">
+        <option value="">—</option>
+        <option value="MALE">Male</option>
+        <option value="FEMALE">Female</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </label>
+    <label>
+      Date of birth
+      <input type="date" [(ngModel)]="birthDate" name="birthDate" />
+    </label>
+    <label>
+      Time of birth
+      <input
+        type="time"
+        [(ngModel)]="birthTime"
+        name="birthTime"
+        [disabled]="birthTimeUnknown"
+        step="60"
+      />
+    </label>
+    <label class="check">
+      <input type="checkbox" [(ngModel)]="birthTimeUnknown" name="birthTimeUnknown" />
+      Birth time unknown
+    </label>
+    <label class="check">
+      <input type="checkbox" [(ngModel)]="dstObserved" name="dstObserved" />
+      DST observed
+    </label>
+  </div>
+
+  <div class="form-grid">
+    <label class="wide">
+      Birth place search
+      <div class="row">
+        <input
+          [(ngModel)]="placeQuery"
+          name="placeQuery"
+          placeholder="Delhi, Mumbai…"
+          (keyup.enter)="searchPlaces()"
+        />
+        <button type="button" class="btn" (click)="searchPlaces()">Search</button>
+      </div>
+    </label>
+  </div>
+  <ul class="hits" *ngIf="placeHits.length">
+    <li *ngFor="let p of placeHits">
+      <button type="button" class="linkish" (click)="pickPlace(p)">
+        {{ p.placeName }} · {{ p.latitude }}, {{ p.longitude }} · {{ p.timeZone }}
+      </button>
+    </li>
+  </ul>
+
+  <div class="form-grid">
+    <label class="wide">
+      Place
+      <input [(ngModel)]="placeName" name="placeName" readonly />
+    </label>
+    <label>
+      Latitude
+      <input
+        type="number"
+        step="0.0000001"
+        [(ngModel)]="latitude"
+        name="latitude"
+        (ngModelChange)="coordsManual = true"
+      />
+    </label>
+    <label>
+      Longitude
+      <input
+        type="number"
+        step="0.0000001"
+        [(ngModel)]="longitude"
+        name="longitude"
+        (ngModelChange)="coordsManual = true"
+      />
+    </label>
+    <label>
+      Time zone
+      <input [(ngModel)]="timeZone" name="timeZone" />
+    </label>
+    <label class="wide">
+      Notes
+      <textarea [(ngModel)]="notes" name="notes" rows="2"></textarea>
+    </label>
+  </div>
+
+  <div class="row">
+    <button type="button" class="btn primary" [disabled]="busy" (click)="saveProfile()">
+      {{ editingId ? 'Update profile' : 'Save profile' }}
+    </button>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="row between wrap">
+    <h2>Birth profiles</h2>
+    <div class="row wrap">
+      <input
+        [(ngModel)]="searchQ"
+        name="searchQ"
+        placeholder="Search name"
+        (keyup.enter)="reloadProfiles()"
+      />
+      <label class="check">
+        <input
+          type="checkbox"
+          [(ngModel)]="includeArchived"
+          name="includeArchived"
+          (change)="reloadProfiles()"
+        />
+        Include archived
+      </label>
+      <button type="button" class="btn" [disabled]="busy" (click)="reloadProfiles()">Refresh</button>
+    </div>
+  </div>
+
+  <table class="table" *ngIf="profiles.length; else empty">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>DOB</th>
+        <th>Place</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of profiles">
+        <td>{{ p.displayName }}</td>
+        <td>
+          {{ p.details.birthDate }}
+          <span *ngIf="p.details.birthTime"> · {{ p.details.birthTime }}</span>
+        </td>
+        <td>{{ p.location.placeName }}</td>
+        <td>{{ p.status }}</td>
+        <td class="actions">
+          <button
+            type="button"
+            class="btn primary"
+            [disabled]="generatingId === p.id"
+            (click)="generateKundali(p)"
+          >
+            {{ generatingId === p.id ? 'Generating…' : 'Kundali' }}
+          </button>
+          <button type="button" class="btn ghost" (click)="edit(p)">Edit</button>
+          <button type="button" class="btn ghost" (click)="duplicate(p)">Duplicate</button>
+          <button
+            type="button"
+            class="btn ghost"
+            *ngIf="p.status === 'ACTIVE'"
+            (click)="archive(p)"
+          >
+            Archive
+          </button>
+          <button type="button" class="btn ghost" (click)="remove(p)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #empty>
+    <p class="hint">No profiles yet. Enter birth details above and save.</p>
+  </ng-template>
+</section>

@@ -1,0 +1,110 @@
+<div class="page" *ngIf="kundali as k; else loading">
+  <header class="k-header">
+    <button type="button" class="btn ghost" (click)="back()">← Profiles</button>
+    <div class="meta">
+      <h1>{{ k.displayName }}</h1>
+      <p>
+        {{ k.birthDate }}
+        <span *ngIf="k.birthTime"> · {{ k.birthTime }}</span>
+        <span *ngIf="k.birthTimeUnknown"> · time unknown</span>
+        · {{ k.placeName }}
+      </p>
+      <p class="sub">
+        {{ k.ayanamsaCode }} {{ fmtDeg(k.ayanamsaDeg) }} · {{ k.houseSystem }} · engine
+        {{ k.calculationEngineVersion }}
+      </p>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button type="button" [class.active]="tab === 'overview'" (click)="tab = 'overview'">
+      Overview
+    </button>
+    <button type="button" [class.active]="tab === 'planets'" (click)="tab = 'planets'">
+      Planets
+    </button>
+    <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">Houses</button>
+  </nav>
+
+  <section class="panel" *ngIf="tab === 'overview'">
+    <div class="overview-grid">
+      <app-kundali-chart
+        [planets]="k.planets"
+        [houses]="k.houses"
+        [ascendant]="k.ascendant"
+      ></app-kundali-chart>
+      <div class="lagna">
+        <h2>Lagna</h2>
+        <p *ngIf="k.ascendant as a">
+          {{ a.signName }} {{ fmtDeg(a.degreeInSign) }} · {{ a.nakshatraName }} pada {{ a.pada }}
+        </p>
+        <h2>Notes</h2>
+        <p class="hint">{{ k.notes }}</p>
+        <h2>Coming soon</h2>
+        <ul class="soon">
+          <li *ngFor="let c of k.comingSoon">{{ c.label }}</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'planets'">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Planet</th>
+          <th>Sign</th>
+          <th>Degree</th>
+          <th>House</th>
+          <th>Nakshatra</th>
+          <th>Pada</th>
+          <th>R</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="k.ascendant as a">
+          <td>Ascendant</td>
+          <td>{{ a.signName }}</td>
+          <td>{{ fmtDeg(a.degreeInSign) }}</td>
+          <td>{{ a.house }}</td>
+          <td>{{ a.nakshatraName }}</td>
+          <td>{{ a.pada }}</td>
+          <td></td>
+        </tr>
+        <tr *ngFor="let p of k.planets">
+          <td>{{ p.planetName }}</td>
+          <td>{{ p.signName }}</td>
+          <td>{{ fmtDeg(p.degreeInSign) }}</td>
+          <td>{{ p.house }}</td>
+          <td>{{ p.nakshatraName }}</td>
+          <td>{{ p.pada }}</td>
+          <td>{{ p.retrograde ? 'R' : '' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'houses'">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>House</th>
+          <th>Sign</th>
+          <th>Cusp</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let h of k.houses">
+          <td>{{ h.house }}</td>
+          <td>{{ h.signName }}</td>
+          <td>{{ fmtDeg(h.cuspLongitudeDeg % 30) }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>
+
+<ng-template #loading>
+  <p class="flash err" *ngIf="error">{{ error }}</p>
+  <p class="hint" *ngIf="!error && busy">Loading kundali…</p>
+</ng-template>

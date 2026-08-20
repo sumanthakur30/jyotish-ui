@@ -1,0 +1,112 @@
+.ni-chart {
+  --chart-line: color-mix(in srgb, var(--ink) 35%, var(--line));
+  position: relative;
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin: 0.5rem auto;
+  border: 1px solid var(--chart-line);
+  background:
+    linear-gradient(135deg, transparent 49.5%, var(--chart-line) 49.5%, var(--chart-line) 50.5%, transparent 50.5%),
+    linear-gradient(45deg, transparent 49.5%, var(--chart-line) 49.5%, var(--chart-line) 50.5%, transparent 50.5%),
+    linear-gradient(to right, transparent 49.5%, var(--chart-line) 49.5%, var(--chart-line) 50.5%, transparent 50.5%),
+    linear-gradient(to bottom, transparent 49.5%, var(--chart-line) 49.5%, var(--chart-line) 50.5%, transparent 50.5%),
+    var(--panel);
+}
+
+.cell {
+  position: absolute;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.35rem;
+  align-content: flex-start;
+  padding: 0.35rem;
+  font-size: 0.72rem;
+  line-height: 1.15;
+}
+
+.sign {
+  width: 100%;
+  font-weight: 650;
+  opacity: 0.7;
+  font-size: 0.68rem;
+}
+
+.body {
+  font-weight: 600;
+}
+
+/* Classical North Indian house placement on diamond */
+.h1 {
+  left: 25%;
+  top: 0;
+  width: 50%;
+  height: 25%;
+  justify-content: center;
+  text-align: center;
+}
+.h2 {
+  left: 0;
+  top: 0;
+  width: 25%;
+  height: 25%;
+}
+.h3 {
+  left: 0;
+  top: 25%;
+  width: 25%;
+  height: 25%;
+}
+.h4 {
+  left: 0;
+  top: 50%;
+  width: 25%;
+  height: 25%;
+}
+.h5 {
+  left: 0;
+  top: 75%;
+  width: 25%;
+  height: 25%;
+}
+.h6 {
+  left: 25%;
+  top: 75%;
+  width: 25%;
+  height: 25%;
+}
+.h7 {
+  left: 50%;
+  top: 75%;
+  width: 25%;
+  height: 25%;
+}
+.h8 {
+  left: 75%;
+  top: 75%;
+  width: 25%;
+  height: 25%;
+}
+.h9 {
+  left: 75%;
+  top: 50%;
+  width: 25%;
+  height: 25%;
+}
+.h10 {
+  left: 75%;
+  top: 25%;
+  width: 25%;
+  height: 25%;
+}
+.h11 {
+  left: 75%;
+  top: 0;
+  width: 25%;
+  height: 25%;
+}
+.h12 {
+  left: 50%;
+  top: 0;
+  width: 25%;
+  height: 25%;
+}

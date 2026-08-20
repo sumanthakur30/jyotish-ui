@@ -1,0 +1,79 @@
+.page {
+  /* Nested under .shell — avoid double max-width padding */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.k-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.meta h1 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.meta p {
+  margin: 0.25rem 0 0;
+}
+
+.meta .sub {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin: 0.75rem 0 0;
+}
+
+.tabs button {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  border-radius: 0.3rem;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.tabs button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  border-color: var(--ink);
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.lagna h2 {
+  margin: 0.85rem 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.lagna h2:first-child {
+  margin-top: 0;
+}
+
+.soon {
+  margin: 0.25rem 0 0;
+  padding-left: 1.1rem;
+  color: color-mix(in srgb, var(--ink) 70%, transparent);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
