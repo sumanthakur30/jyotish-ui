@@ -40,7 +40,12 @@
 <section class="panel" *ngIf="result as r">
   <div class="row between">
     <h2>Result #{{ r.id }}</h2>
-    <span class="meta">engine {{ r.calculationEngineVersion }}</span>
+    <div class="result-actions">
+      <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadPdf()">
+        {{ reportBusy ? 'Generating…' : 'Download PDF' }}
+      </button>
+      <span class="meta">engine {{ r.calculationEngineVersion }}</span>
+    </div>
   </div>
 
   <div class="pair">

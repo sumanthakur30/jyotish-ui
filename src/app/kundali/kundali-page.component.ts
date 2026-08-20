@@ -20,7 +20,8 @@ import {
 })
 export class KundaliPageComponent implements OnInit {
   kundali: KundaliResponse | null = null;
-  tab: 'overview' | 'planets' | 'houses' | 'charts' | 'dasha' | 'yogas' | 'transit' = 'overview';
+  tab: 'overview' | 'planets' | 'houses' | 'charts' | 'dasha' | 'yogas' | 'transit' | 'reports' =
+    'overview';
   error = '';
   busy = false;
 
@@ -48,6 +49,10 @@ export class KundaliPageComponent implements OnInit {
   transitBusy = false;
   transitError = '';
   transitDate = '';
+
+  reportBusy = false;
+  reportMessage = '';
+  reportError = '';
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -117,6 +122,61 @@ export class KundaliPageComponent implements OnInit {
     if (!this.transit) {
       this.loadTransit();
     }
+  }
+
+  openReports(): void {
+    this.tab = 'reports';
+    this.reportMessage = '';
+    this.reportError = '';
+  }
+
+  downloadBasicPdf(): void {
+    this.downloadReport('BASIC_KUNDALI');
+  }
+
+  downloadDashaPdf(): void {
+    this.downloadReport('DASHA_SUMMARY');
+  }
+
+  downloadTransitPdf(): void {
+    this.downloadReport('TRANSIT');
+  }
+
+  private downloadReport(type: 'BASIC_KUNDALI' | 'DASHA_SUMMARY' | 'TRANSIT'): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.reportBusy = true;
+    this.reportError = '';
+    this.reportMessage = '';
+    this.api.createReport({ type, kundaliId: this.kundali.id }).subscribe({
+      next: (meta) => {
+        this.api.downloadReport(meta.id).subscribe({
+          next: (blob) => {
+            this.saveBlob(blob, `jyotish-${type.toLowerCase()}-${this.kundali!.id}.pdf`);
+            this.reportBusy = false;
+            this.reportMessage = `Downloaded ${meta.displayTitle} (${meta.fileSizeBytes} bytes).`;
+          },
+          error: (err) => {
+            this.reportBusy = false;
+            this.reportError = err?.error?.message || 'Could not download PDF.';
+          },
+        });
+      },
+      error: (err) => {
+        this.reportBusy = false;
+        this.reportError = err?.error?.message || 'Could not generate PDF.';
+      },
+    });
+  }
+
+  private saveBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   applyTransitDate(): void {

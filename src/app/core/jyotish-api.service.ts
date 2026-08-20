@@ -311,6 +311,22 @@ export interface MatchingResponse {
   createdAt: string;
 }
 
+export type ReportType = 'BASIC_KUNDALI' | 'MATCHING' | 'DASHA_SUMMARY' | 'TRANSIT';
+
+export interface ReportResponse {
+  id: number;
+  type: ReportType | string;
+  kundaliId: number | null;
+  matchingId: number | null;
+  displayTitle: string;
+  storagePath: string;
+  fileSizeBytes: number;
+  contentType: string;
+  calculationEngineVersion: string;
+  generatedAt: string;
+  downloadPath: string;
+}
+
 export interface KundaliResponse {
   id: number;
   birthProfileId: number | null;
@@ -456,5 +472,24 @@ export class JyotishApiService {
 
   getMatching(id: number): Observable<MatchingResponse> {
     return this.http.get<MatchingResponse>(`/api/v1/jyotish/matching/${id}`);
+  }
+
+  createReport(body: {
+    type: ReportType | string;
+    kundaliId?: number;
+    matchingId?: number;
+  }): Observable<ReportResponse> {
+    return this.http.post<ReportResponse>('/api/v1/jyotish/reports', body);
+  }
+
+  getReport(id: number): Observable<ReportResponse> {
+    return this.http.get<ReportResponse>(`/api/v1/jyotish/reports/${id}`);
+  }
+
+  /** Returns PDF blob for browser download. */
+  downloadReport(id: number): Observable<Blob> {
+    return this.http.get(`/api/v1/jyotish/reports/${id}/download`, {
+      responseType: 'blob',
+    });
   }
 }

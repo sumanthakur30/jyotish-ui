@@ -30,6 +30,9 @@
     <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
       Transit
     </button>
+    <button type="button" [class.active]="tab === 'reports'" (click)="openReports()">
+      Reports
+    </button>
   </nav>
 
   <section class="panel" *ngIf="tab === 'overview'">
@@ -448,6 +451,33 @@
 
       <p class="hint">{{ t.notes }}</p>
     </ng-container>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'reports'">
+    <h2>PDF reports</h2>
+    <p class="hint">
+      Generates a professional PDF from this stored snapshot (no recalculation). Includes birth
+      details, D1 planet table, engine version, and disclaimer. Dasha / transit pages are included
+      when that data already exists.
+    </p>
+    <div class="actions report-actions">
+      <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadBasicPdf()">
+        {{ reportBusy ? 'Generating…' : 'Download Basic Kundali PDF' }}
+      </button>
+      <button type="button" class="btn ghost" [disabled]="reportBusy" (click)="downloadDashaPdf()">
+        Dasha summary PDF
+      </button>
+      <button
+        type="button"
+        class="btn ghost"
+        [disabled]="reportBusy"
+        (click)="downloadTransitPdf()"
+      >
+        Transit PDF
+      </button>
+    </div>
+    <p class="flash ok" *ngIf="reportMessage">{{ reportMessage }}</p>
+    <p class="flash err" *ngIf="reportError">{{ reportError }}</p>
   </section>
 </div>
 
