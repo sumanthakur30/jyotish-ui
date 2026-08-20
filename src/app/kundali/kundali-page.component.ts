@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
+  AiAskResponse,
+  AiTopic,
   ChartCatalogItem,
   DashaPeriodDto,
   DashaResponse,
@@ -20,8 +22,16 @@ import {
 })
 export class KundaliPageComponent implements OnInit {
   kundali: KundaliResponse | null = null;
-  tab: 'overview' | 'planets' | 'houses' | 'charts' | 'dasha' | 'yogas' | 'transit' | 'reports' =
-    'overview';
+  tab:
+    | 'overview'
+    | 'planets'
+    | 'houses'
+    | 'charts'
+    | 'dasha'
+    | 'yogas'
+    | 'transit'
+    | 'reports'
+    | 'ask' = 'overview';
   error = '';
   busy = false;
 
@@ -53,6 +63,23 @@ export class KundaliPageComponent implements OnInit {
   reportBusy = false;
   reportMessage = '';
   reportError = '';
+
+  aiTopics: { code: AiTopic; label: string }[] = [
+    { code: 'general', label: 'General' },
+    { code: 'career', label: 'Career' },
+    { code: 'marriage', label: 'Marriage' },
+    { code: 'finance', label: 'Finance' },
+    { code: 'health', label: 'Health' },
+    { code: 'education', label: 'Education' },
+    { code: 'family', label: 'Family' },
+    { code: 'spirituality', label: 'Spirituality' },
+  ];
+  aiTopic: AiTopic = 'general';
+  aiQuestion = '';
+  aiBusy = false;
+  aiError = '';
+  aiReply: AiAskResponse | null = null;
+  aiHistory: AiAskResponse[] = [];
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -128,6 +155,39 @@ export class KundaliPageComponent implements OnInit {
     this.tab = 'reports';
     this.reportMessage = '';
     this.reportError = '';
+  }
+
+  openAsk(): void {
+    this.tab = 'ask';
+    this.aiError = '';
+  }
+
+  submitAsk(): void {
+    if (!this.kundali) {
+      return;
+    }
+    const q = (this.aiQuestion || '').trim();
+    if (!q) {
+      this.aiError = 'Enter a question.';
+      return;
+    }
+    this.aiBusy = true;
+    this.aiError = '';
+    this.api
+      .askAi({ kundaliId: this.kundali.id, question: q, topic: this.aiTopic })
+      .subscribe({
+        next: (res) => {
+          this.aiReply = res;
+          this.aiHistory = [res, ...this.aiHistory].slice(0, 8);
+          this.aiBusy = false;
+        },
+        error: (err) => {
+          this.aiBusy = false;
+          this.aiReply = null;
+          this.aiError =
+            err?.error?.message || err?.error?.detail || 'Could not get AI answer.';
+        },
+      });
   }
 
   downloadBasicPdf(): void {

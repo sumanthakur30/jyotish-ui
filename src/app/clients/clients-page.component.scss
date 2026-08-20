@@ -1,0 +1,62 @@
+:host {
+  display: block;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 8rem;
+}
+
+.stat .label {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.stat strong {
+  font-size: 1.5rem;
+}
+
+.link-block {
+  margin: 0.75rem 0 1rem;
+}
+
+.link-block h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.detail {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+}
+
+.detail > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.5rem;
+}
+
+.detail dt {
+  margin: 0;
+  opacity: 0.7;
+  font-weight: 600;
+}
+
+.detail dd {
+  margin: 0;
+}

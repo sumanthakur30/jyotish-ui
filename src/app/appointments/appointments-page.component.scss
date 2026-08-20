@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 8rem;
+}
+
+.stat .label {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.stat strong {
+  font-size: 1.5rem;
+}

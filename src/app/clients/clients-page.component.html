@@ -1,0 +1,123 @@
+<p class="flash ok" *ngIf="message">{{ message }}</p>
+<p class="flash err" *ngIf="error">{{ error }}</p>
+
+<section class="panel compact cards">
+  <div class="stat">
+    <span class="label">Clients</span>
+    <strong>{{ totalClients }}</strong>
+  </div>
+  <div class="stat">
+    <span class="label">Today’s appointments</span>
+    <strong>{{ todaysAppointments }}</strong>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="row between">
+    <h2>{{ editingId ? 'Edit client' : 'New client' }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+  </div>
+
+  <div class="form-grid">
+    <label>
+      Name
+      <input [(ngModel)]="name" name="clientName" placeholder="Anita Sharma" />
+    </label>
+    <label>
+      Mobile
+      <input [(ngModel)]="mobile" name="mobile" placeholder="9876543210" />
+    </label>
+    <label>
+      Email
+      <input [(ngModel)]="email" name="email" type="email" placeholder="anita@example.com" />
+    </label>
+    <label class="wide">
+      Notes
+      <textarea [(ngModel)]="notes" name="clientNotes" rows="2"></textarea>
+    </label>
+  </div>
+
+  <div class="link-block" *ngIf="profiles.length">
+    <h3>Linked birth profiles</h3>
+    <div class="checks">
+      <label class="check" *ngFor="let p of profiles">
+        <input
+          type="checkbox"
+          [checked]="isProfileSelected(p.id)"
+          (change)="toggleProfile(p.id, $any($event.target).checked)"
+        />
+        {{ p.displayName }}
+      </label>
+    </div>
+  </div>
+  <p class="hint" *ngIf="!profiles.length">No birth profiles yet — create one under Profiles first.</p>
+
+  <div class="row">
+    <button type="button" class="btn primary" [disabled]="busy" (click)="saveClient()">
+      {{ editingId ? 'Update client' : 'Save client' }}
+    </button>
+  </div>
+</section>
+
+<section class="panel" *ngIf="detail as d">
+  <h2>Client detail</h2>
+  <dl class="detail">
+    <div><dt>Name</dt><dd>{{ d.name }}</dd></div>
+    <div><dt>Mobile</dt><dd>{{ d.mobile || '—' }}</dd></div>
+    <div><dt>Email</dt><dd>{{ d.email || '—' }}</dd></div>
+    <div><dt>Notes</dt><dd>{{ d.notes || '—' }}</dd></div>
+    <div>
+      <dt>Birth profiles</dt>
+      <dd>
+        <span *ngIf="!d.birthProfileIds.length">—</span>
+        <span *ngFor="let id of d.birthProfileIds; let last = last">
+          {{ profileLabel(id) }}<span *ngIf="!last">, </span>
+        </span>
+      </dd>
+    </div>
+  </dl>
+</section>
+
+<section class="panel">
+  <div class="row between wrap">
+    <h2>Clients</h2>
+    <div class="row wrap">
+      <input
+        [(ngModel)]="searchQ"
+        name="clientSearch"
+        placeholder="Search name or mobile"
+        (keyup.enter)="reloadClients()"
+      />
+      <button type="button" class="btn" [disabled]="busy" (click)="reloadClients()">Refresh</button>
+    </div>
+  </div>
+
+  <table class="table" *ngIf="clients.length; else empty">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Mobile</th>
+        <th>Email</th>
+        <th>Profiles</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let c of clients">
+        <td>
+          <button type="button" class="linkish" (click)="openDetail(c)">{{ c.name }}</button>
+        </td>
+        <td>{{ c.mobile || '—' }}</td>
+        <td>{{ c.email || '—' }}</td>
+        <td>{{ c.birthProfileIds.length || 0 }}</td>
+        <td class="actions">
+          <button type="button" class="btn ghost" (click)="edit(c)">Edit</button>
+          <button type="button" class="btn ghost" (click)="remove(c)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #empty>
+    <p class="hint">No clients yet. Add a client above to start CRM.</p>
+  </ng-template>
+</section>

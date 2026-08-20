@@ -33,6 +33,9 @@
     <button type="button" [class.active]="tab === 'reports'" (click)="openReports()">
       Reports
     </button>
+    <button type="button" [class.active]="tab === 'ask'" (click)="openAsk()">
+      Ask Sugam Jyotish
+    </button>
   </nav>
 
   <section class="panel" *ngIf="tab === 'overview'">
@@ -478,6 +481,62 @@
     </div>
     <p class="flash ok" *ngIf="reportMessage">{{ reportMessage }}</p>
     <p class="flash err" *ngIf="reportError">{{ reportError }}</p>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'ask'">
+    <h2>Ask Sugam Jyotish</h2>
+    <p class="hint">
+      AI-assisted interpretation grounded only in this kundali’s stored planets, houses, current
+      dasha, present yogas, and optional transit. Planetary positions and dasha dates are never
+      invented.
+    </p>
+
+    <div class="ask-form">
+      <label>
+        Topic
+        <select [(ngModel)]="aiTopic">
+          <option *ngFor="let t of aiTopics" [ngValue]="t.code">{{ t.label }}</option>
+        </select>
+      </label>
+      <label class="ask-q">
+        Question
+        <textarea
+          rows="3"
+          [(ngModel)]="aiQuestion"
+          placeholder="e.g. What does the current dasha suggest for career focus?"
+        ></textarea>
+      </label>
+      <button type="button" class="btn" [disabled]="aiBusy" (click)="submitAsk()">
+        {{ aiBusy ? 'Asking…' : 'Ask' }}
+      </button>
+    </div>
+
+    <p class="flash err" *ngIf="aiError">{{ aiError }}</p>
+
+    <article class="ask-reply" *ngIf="aiReply as r">
+      <p class="ai-badge">AI-assisted · provider {{ r.providerCode }}</p>
+      <pre class="ask-answer">{{ r.answer }}</pre>
+      <h3>Findings (verified context)</h3>
+      <ul class="ask-findings">
+        <li *ngFor="let f of r.findings">{{ f }}</li>
+      </ul>
+      <p class="hint disclaimer">{{ r.disclaimer }}</p>
+      <p class="sub" *ngIf="r.contextUsed as c">
+        Context used: {{ c['planetCount'] }} planets · yogas
+        {{ c['yogasPresentCount'] }} · dasha
+        {{ c['dashaAvailable'] ? 'yes' : 'no' }}
+        <span *ngIf="c['currentMahaLord']"> · MD {{ c['currentMahaLord'] }}</span>
+        · transit {{ c['transitIncluded'] ? 'included' : 'none' }}
+      </p>
+    </article>
+
+    <div class="ask-history" *ngIf="aiHistory.length > 1">
+      <h3>Earlier answers</h3>
+      <details *ngFor="let h of aiHistory.slice(1)">
+        <summary>{{ h.topic }} — {{ h.question }}</summary>
+        <pre class="ask-answer">{{ h.answer }}</pre>
+      </details>
+    </div>
   </section>
 </div>
 

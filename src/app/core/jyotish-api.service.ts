@@ -48,6 +48,63 @@ export interface PlaceSuggestion {
   timeZone: string;
 }
 
+export type AppointmentStatus =
+  | 'SCHEDULED'
+  | 'CONFIRMED'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'NO_SHOW';
+
+export type PaymentStatus = 'UNPAID' | 'PENDING' | 'PAID' | 'WAIVED';
+
+export interface JyotishClient {
+  id: number;
+  name: string;
+  mobile: string | null;
+  email: string | null;
+  notes: string | null;
+  birthProfileIds: number[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertClientRequest {
+  name: string;
+  mobile?: string | null;
+  email?: string | null;
+  notes?: string | null;
+  birthProfileIds?: number[];
+}
+
+export interface JyotishAppointment {
+  id: number;
+  clientId: number;
+  clientName: string;
+  appointmentDate: string;
+  appointmentTime: string;
+  consultationType: string;
+  status: AppointmentStatus | string;
+  paymentStatus: PaymentStatus | string | null;
+  notes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpsertAppointmentRequest {
+  clientId: number;
+  appointmentDate: string;
+  appointmentTime: string;
+  consultationType: string;
+  status?: AppointmentStatus | string | null;
+  paymentStatus?: PaymentStatus | string | null;
+  notes?: string | null;
+}
+
+export interface CrmDashboard {
+  totalClients: number;
+  todaysAppointments: number;
+}
+
 export interface UpsertProfileRequest {
   displayName: string;
   gender?: string | null;
@@ -327,6 +384,35 @@ export interface ReportResponse {
   downloadPath: string;
 }
 
+export type AiTopic =
+  | 'general'
+  | 'career'
+  | 'marriage'
+  | 'finance'
+  | 'health'
+  | 'education'
+  | 'family'
+  | 'spirituality';
+
+export interface AiAskRequest {
+  kundaliId: number;
+  question: string;
+  topic?: AiTopic | string | null;
+}
+
+export interface AiAskResponse {
+  kundaliId: number;
+  topic: string;
+  question: string;
+  answer: string;
+  findings: string[];
+  contextUsed: Record<string, unknown>;
+  aiGenerated: boolean;
+  providerCode: string;
+  disclaimer: string;
+  askId: number | null;
+}
+
 export interface KundaliResponse {
   id: number;
   birthProfileId: number | null;
@@ -491,5 +577,77 @@ export class JyotishApiService {
     return this.http.get(`/api/v1/jyotish/reports/${id}/download`, {
       responseType: 'blob',
     });
+  }
+
+  crmDashboard(): Observable<CrmDashboard> {
+    return this.http.get<CrmDashboard>('/api/v1/jyotish/clients/dashboard');
+  }
+
+  listClients(q?: string): Observable<{ items: JyotishClient[] }> {
+    let params = new HttpParams();
+    if (q) {
+      params = params.set('q', q);
+    }
+    return this.http.get<{ items: JyotishClient[] }>('/api/v1/jyotish/clients', { params });
+  }
+
+  getClient(id: number): Observable<JyotishClient> {
+    return this.http.get<JyotishClient>(`/api/v1/jyotish/clients/${id}`);
+  }
+
+  createClient(body: UpsertClientRequest): Observable<JyotishClient> {
+    return this.http.post<JyotishClient>('/api/v1/jyotish/clients', body);
+  }
+
+  updateClient(id: number, body: UpsertClientRequest): Observable<JyotishClient> {
+    return this.http.put<JyotishClient>(`/api/v1/jyotish/clients/${id}`, body);
+  }
+
+  deleteClient(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/v1/jyotish/clients/${id}`);
+  }
+
+  listAppointments(opts?: {
+    clientId?: number;
+    fromDate?: string;
+    toDate?: string;
+    status?: string;
+  }): Observable<{ items: JyotishAppointment[] }> {
+    let params = new HttpParams();
+    if (opts?.clientId != null) {
+      params = params.set('clientId', String(opts.clientId));
+    }
+    if (opts?.fromDate) {
+      params = params.set('fromDate', opts.fromDate);
+    }
+    if (opts?.toDate) {
+      params = params.set('toDate', opts.toDate);
+    }
+    if (opts?.status) {
+      params = params.set('status', opts.status);
+    }
+    return this.http.get<{ items: JyotishAppointment[] }>('/api/v1/jyotish/appointments', {
+      params,
+    });
+  }
+
+  getAppointment(id: number): Observable<JyotishAppointment> {
+    return this.http.get<JyotishAppointment>(`/api/v1/jyotish/appointments/${id}`);
+  }
+
+  createAppointment(body: UpsertAppointmentRequest): Observable<JyotishAppointment> {
+    return this.http.post<JyotishAppointment>('/api/v1/jyotish/appointments', body);
+  }
+
+  updateAppointment(id: number, body: UpsertAppointmentRequest): Observable<JyotishAppointment> {
+    return this.http.put<JyotishAppointment>(`/api/v1/jyotish/appointments/${id}`, body);
+  }
+
+  deleteAppointment(id: number): Observable<void> {
+    return this.http.delete<void>(`/api/v1/jyotish/appointments/${id}`);
+  }
+
+  askAi(body: AiAskRequest): Observable<AiAskResponse> {
+    return this.http.post<AiAskResponse>('/api/v1/jyotish/ai/ask', body);
   }
 }

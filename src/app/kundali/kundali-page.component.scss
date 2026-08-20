@@ -427,3 +427,70 @@
     grid-column: 2;
   }
 }
+
+.ask-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 40rem;
+  margin: 1rem 0;
+}
+
+.ask-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.ask-form select,
+.ask-form textarea {
+  font: inherit;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: transparent;
+  color: var(--ink);
+}
+
+.ask-reply {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+}
+
+.ai-badge {
+  display: inline-block;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  margin: 0 0 0.5rem;
+}
+
+.ask-answer {
+  white-space: pre-wrap;
+  font: inherit;
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+
+.ask-findings {
+  margin: 0.35rem 0 1rem;
+  padding-left: 1.2rem;
+}
+
+.ask-findings li {
+  margin: 0.25rem 0;
+}
+
+.ask-history {
+  margin-top: 1.25rem;
+}
+
+.ask-history details {
+  margin: 0.4rem 0;
+}
+
+.ask-history summary {
+  cursor: pointer;
+}

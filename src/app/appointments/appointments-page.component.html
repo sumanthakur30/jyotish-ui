@@ -1,0 +1,119 @@
+<p class="flash ok" *ngIf="message">{{ message }}</p>
+<p class="flash err" *ngIf="error">{{ error }}</p>
+
+<section class="panel compact cards">
+  <div class="stat">
+    <span class="label">Clients</span>
+    <strong>{{ totalClients }}</strong>
+  </div>
+  <div class="stat">
+    <span class="label">Today’s appointments</span>
+    <strong>{{ todaysAppointments }}</strong>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="row between">
+    <h2>{{ editingId ? 'Edit appointment' : 'New appointment' }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+  </div>
+
+  <div class="form-grid">
+    <label>
+      Client
+      <select [(ngModel)]="clientId" name="apptClient">
+        <option [ngValue]="null">— Select —</option>
+        <option *ngFor="let c of clients" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
+    </label>
+    <label>
+      Date
+      <input type="date" [(ngModel)]="appointmentDate" name="apptDate" />
+    </label>
+    <label>
+      Time
+      <input type="time" [(ngModel)]="appointmentTime" name="apptTime" step="60" />
+    </label>
+    <label>
+      Consultation type
+      <select [(ngModel)]="consultationType" name="consultationType">
+        <option *ngFor="let t of consultationTypes" [value]="t">{{ t }}</option>
+      </select>
+    </label>
+    <label>
+      Status
+      <select [(ngModel)]="status" name="apptStatus">
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+      </select>
+    </label>
+    <label>
+      Payment (stub)
+      <select [(ngModel)]="paymentStatus" name="paymentStatus">
+        <option value="">—</option>
+        <option value="UNPAID">UNPAID</option>
+        <option value="PENDING">PENDING</option>
+        <option value="PAID">PAID</option>
+        <option value="WAIVED">WAIVED</option>
+      </select>
+    </label>
+    <label class="wide">
+      Notes
+      <textarea [(ngModel)]="notes" name="apptNotes" rows="2"></textarea>
+    </label>
+  </div>
+
+  <div class="row">
+    <button type="button" class="btn primary" [disabled]="busy" (click)="saveAppointment()">
+      {{ editingId ? 'Update appointment' : 'Save appointment' }}
+    </button>
+  </div>
+  <p class="hint" *ngIf="!clients.length">
+    Create a client first under <a routerLink="/clients">Clients</a>.
+  </p>
+</section>
+
+<section class="panel">
+  <div class="row between wrap">
+    <h2>Appointments</h2>
+    <div class="row wrap">
+      <select [(ngModel)]="filterStatus" name="filterStatus" (change)="reloadAppointments()">
+        <option value="">All statuses</option>
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+      </select>
+      <button type="button" class="btn" [disabled]="busy" (click)="reloadAppointments()">
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  <table class="table" *ngIf="appointments.length; else empty">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Client</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Payment</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let a of appointments">
+        <td>{{ a.appointmentDate }}</td>
+        <td>{{ a.appointmentTime }}</td>
+        <td>{{ a.clientName }}</td>
+        <td>{{ a.consultationType }}</td>
+        <td>{{ a.status }}</td>
+        <td>{{ a.paymentStatus || '—' }}</td>
+        <td class="actions">
+          <button type="button" class="btn ghost" (click)="edit(a)">Edit</button>
+          <button type="button" class="btn ghost" (click)="remove(a)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <ng-template #empty>
+    <p class="hint">No appointments yet. Schedule one above.</p>
+  </ng-template>
+</section>
