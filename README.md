@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-Open http://localhost:4600 — set tenant, manage birth profiles, click **Kundali** to generate D1 and open Overview / Planets / Houses.
+Open http://localhost:4600 — set tenant, manage birth profiles, click **Kundali** for D1 Overview / Planets / Houses, **Charts** for Vargas (D9 first), and **Dasha** for Vimshottari timeline (expand maha → antar → pratyantar; period info shows Coming Soon — no fake predictions).

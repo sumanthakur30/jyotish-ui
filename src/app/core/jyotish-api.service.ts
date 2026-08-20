@@ -98,6 +98,75 @@ export interface ComingSoonFeature {
   label: string;
 }
 
+export interface ChartCatalogItem {
+  vargaCode: string;
+  displayName: string;
+  divisions: number;
+  implemented: boolean;
+  computed: boolean;
+  status: string;
+}
+
+export interface VargaChartResponse {
+  kundaliId: number;
+  chartId: number | null;
+  vargaCode: string;
+  displayName: string;
+  calculationEngineVersion: string;
+  houseSystem: string;
+  ascendant: PlanetDto | null;
+  planets: PlanetDto[];
+  houses: HouseDto[];
+  notes: string | null;
+  comingSoon: boolean;
+  createdAt: string;
+}
+
+export interface DashaCatalogItem {
+  systemCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface DashaPeriodDto {
+  level: string;
+  lordCode: string;
+  lordName: string;
+  mahaLordCode: string | null;
+  antarLordCode: string | null;
+  pratyantarLordCode: string | null;
+  startAt: string;
+  endAt: string;
+  remainingDays: number | null;
+  current: boolean;
+  children: DashaPeriodDto[];
+}
+
+export interface DashaCurrentDto {
+  maha: DashaPeriodDto | null;
+  antar: DashaPeriodDto | null;
+  pratyantar: DashaPeriodDto | null;
+}
+
+export interface DashaResponse {
+  kundaliId: number;
+  systemCode: string;
+  displayName: string;
+  calculationEngineVersion: string;
+  moonNakshatraIndex: number;
+  moonNakshatraName: string;
+  birthMahadashaLord: string;
+  balanceAtBirthYears: number;
+  elapsedAtBirthYears: number;
+  current: DashaCurrentDto;
+  timeline: DashaPeriodDto[];
+  catalog: DashaCatalogItem[];
+  notes: string | null;
+  interpretationPlaceholder: string;
+  asOf: string;
+}
+
 export interface KundaliResponse {
   id: number;
   birthProfileId: number | null;
@@ -179,5 +248,23 @@ export class JyotishApiService {
 
   getKundali(id: number): Observable<KundaliResponse> {
     return this.http.get<KundaliResponse>(`/api/v1/jyotish/kundali/${id}`);
+  }
+
+  listCharts(kundaliId: number): Observable<{ kundaliId: number; charts: ChartCatalogItem[] }> {
+    return this.http.get<{ kundaliId: number; charts: ChartCatalogItem[] }>(
+      `/api/v1/jyotish/kundali/${kundaliId}/charts`
+    );
+  }
+
+  getChart(kundaliId: number, varga: string): Observable<VargaChartResponse> {
+    return this.http.get<VargaChartResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/charts/${varga}`
+    );
+  }
+
+  getDasha(kundaliId: number, system = 'VIMSHOTTARI'): Observable<DashaResponse> {
+    return this.http.get<DashaResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/dasha/${system}`
+    );
   }
 }

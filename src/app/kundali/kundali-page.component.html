@@ -24,6 +24,8 @@
       Planets
     </button>
     <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">Houses</button>
+    <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">Charts</button>
+    <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">Dasha</button>
   </nav>
 
   <section class="panel" *ngIf="tab === 'overview'">
@@ -101,6 +103,161 @@
         </tr>
       </tbody>
     </table>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'charts'">
+    <div class="varga-switcher" role="list">
+      <button
+        type="button"
+        *ngFor="let c of chartCatalog"
+        role="listitem"
+        [class.active]="selectedVarga === c.vargaCode"
+        [class.soon]="!c.implemented"
+        (click)="selectVarga(c.vargaCode, c.implemented)"
+        [attr.title]="c.implemented ? c.displayName : c.displayName + ' — Coming Soon'"
+      >
+        {{ c.vargaCode }}
+        <span class="v-name">{{ c.displayName }}</span>
+        <span class="badge" *ngIf="!c.implemented">Soon</span>
+      </button>
+    </div>
+
+    <p class="flash err" *ngIf="chartError">{{ chartError }}</p>
+    <p class="hint" *ngIf="chartBusy">Loading chart…</p>
+
+    <div class="overview-grid" *ngIf="vargaChart as vc">
+      <app-kundali-chart
+        [planets]="vc.planets"
+        [houses]="vc.houses"
+        [ascendant]="vc.ascendant"
+      ></app-kundali-chart>
+      <div class="lagna">
+        <h2>{{ vc.vargaCode }} · {{ vc.displayName }}</h2>
+        <p *ngIf="vc.ascendant as a">
+          Varga Lagna {{ a.signName }} {{ fmtDeg(a.degreeInSign) }} · {{ a.nakshatraName }} pada
+          {{ a.pada }}
+        </p>
+        <p class="sub">
+          {{ vc.houseSystem }} · engine {{ vc.calculationEngineVersion }}
+          <span *ngIf="vc.chartId"> · chart #{{ vc.chartId }}</span>
+        </p>
+        <h2>Notes</h2>
+        <p class="hint">{{ vc.notes }}</p>
+        <table class="table compact">
+          <thead>
+            <tr>
+              <th>Planet</th>
+              <th>Sign</th>
+              <th>Degree</th>
+              <th>House</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of vc.planets">
+              <td>{{ p.planetName }}</td>
+              <td>{{ p.signName }}</td>
+              <td>{{ fmtDeg(p.degreeInSign) }}</td>
+              <td>{{ p.house }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'dasha'">
+    <p class="flash err" *ngIf="dashaError">{{ dashaError }}</p>
+    <p class="hint" *ngIf="dashaBusy">Loading Vimshottari…</p>
+
+    <ng-container *ngIf="dasha as d">
+      <div class="dasha-current" *ngIf="d.current?.maha as maha">
+        <h2>Current Mahadasha</h2>
+        <p class="current-line">
+          <strong>{{ maha.lordName }}</strong>
+          <span *ngIf="d.current.antar as antar"> → {{ antar.lordName }}</span>
+          <span *ngIf="d.current.pratyantar as pr"> → {{ pr.lordName }}</span>
+        </p>
+        <p class="sub">
+          {{ fmtWhen(maha.startAt) }} – {{ fmtWhen(maha.endAt) }}
+          <span *ngIf="maha.remainingDays != null"> · {{ maha.remainingDays }} days remaining</span>
+        </p>
+        <p class="hint">
+          Moon {{ d.moonNakshatraName }} · birth balance
+          {{ d.balanceAtBirthYears | number: '1.2-4' }} y ({{ d.birthMahadashaLord }}) · engine
+          {{ d.calculationEngineVersion }}
+        </p>
+      </div>
+
+      <div class="dasha-catalog" *ngIf="d.catalog?.length">
+        <span *ngFor="let c of d.catalog" [class.soon]="!c.implemented" class="sys">
+          {{ c.displayName }}
+          <span *ngIf="!c.implemented">Soon</span>
+        </span>
+      </div>
+
+      <h2 class="timeline-h">Timeline</h2>
+      <ul class="dasha-tree">
+        <li *ngFor="let m of d.timeline" [class.current]="m.current">
+          <button
+            type="button"
+            class="row maha"
+            (click)="toggleMaha(periodKey(m))"
+            (dblclick)="selectPeriod(m, $event)"
+          >
+            <span class="chev">{{ expandedMaha.has(periodKey(m)) ? '▾' : '▸' }}</span>
+            <span class="lord">{{ m.lordName }}</span>
+            <span class="lvl">Mahadasha</span>
+            <span class="dates">{{ fmtWhen(m.startAt) }} – {{ fmtWhen(m.endAt) }}</span>
+            <span class="badge" *ngIf="m.current">Now</span>
+            <span
+              class="linkish"
+              (click)="selectPeriod(m, $event)"
+              title="Interpretation"
+              >ⓘ</span
+            >
+          </button>
+          <ul class="nested" *ngIf="expandedMaha.has(periodKey(m))">
+            <li *ngFor="let a of m.children" [class.current]="a.current">
+              <button
+                type="button"
+                class="row antar"
+                (click)="toggleAntar(periodKey(a))"
+              >
+                <span class="chev">{{ expandedAntar.has(periodKey(a)) ? '▾' : '▸' }}</span>
+                <span class="lord">{{ a.lordName }}</span>
+                <span class="lvl">Antardasha</span>
+                <span class="dates">{{ fmtWhen(a.startAt) }} – {{ fmtWhen(a.endAt) }}</span>
+                <span class="badge" *ngIf="a.current">Now</span>
+                <span class="linkish" (click)="selectPeriod(a, $event)">ⓘ</span>
+              </button>
+              <ul class="nested" *ngIf="expandedAntar.has(periodKey(a))">
+                <li *ngFor="let p of a.children" [class.current]="p.current">
+                  <button type="button" class="row praty" (click)="selectPeriod(p)">
+                    <span class="chev pad"></span>
+                    <span class="lord">{{ p.lordName }}</span>
+                    <span class="lvl">Pratyantar</span>
+                    <span class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</span>
+                    <span class="badge" *ngIf="p.current">Now</span>
+                  </button>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <p class="hint">{{ d.notes }}</p>
+    </ng-container>
+
+    <div class="interp" *ngIf="showInterpretation && selectedPeriod as sp">
+      <div class="interp-card">
+        <h3>{{ sp.lordName }} · {{ sp.level }}</h3>
+        <p class="sub">{{ fmtWhen(sp.startAt) }} – {{ fmtWhen(sp.endAt) }}</p>
+        <p class="coming">Coming Soon</p>
+        <p class="hint">Interpretations are not generated — no placeholder predictions.</p>
+        <button type="button" class="btn ghost" (click)="closeInterpretation()">Close</button>
+      </div>
+    </div>
   </section>
 </div>
 
