@@ -19,6 +19,8 @@ export class KundaliChartComponent {
   @Input() signMode: 'number' | 'abbrev' = 'number';
   /** Chart cell planet labels: short abbrev or fuller Hindi/English. */
   @Input() planetLabelMode: 'abbrev' | 'full' = 'abbrev';
+  /** Compact size for 2×2 / 4×4 grids. */
+  @Input() compact = false;
 
   constructor(private readonly language: LanguageService) {}
 

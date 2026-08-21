@@ -226,7 +226,33 @@
   </section>
 
   <section class="panel" *ngIf="tab === 'charts'">
-    <div class="varga-switcher" role="list">
+    <div class="chart-toolbar">
+      <div class="view-toggle" role="group">
+        <button
+          type="button"
+          [class.active]="chartLayout === 'single'"
+          (click)="setChartLayout('single')"
+        >
+          {{ 'chart.layoutSingle' | t }}
+        </button>
+        <button
+          type="button"
+          [class.active]="chartLayout === 'grid2'"
+          (click)="setChartLayout('grid2')"
+        >
+          {{ 'chart.layout2x2' | t }}
+        </button>
+        <button
+          type="button"
+          [class.active]="chartLayout === 'grid4'"
+          (click)="setChartLayout('grid4')"
+        >
+          {{ 'chart.layout4x2' | t }}
+        </button>
+      </div>
+    </div>
+
+    <div class="varga-switcher" role="list" *ngIf="chartLayout === 'single'">
       <button
         type="button"
         *ngFor="let c of chartCatalog"
@@ -243,13 +269,27 @@
     </div>
 
     <p class="flash err" *ngIf="chartError">{{ chartError }}</p>
-    <p class="hint" *ngIf="chartBusy">Loading chart…</p>
+    <p class="hint" *ngIf="chartBusy || gridBusy">Loading chart…</p>
 
-    <div class="overview-grid" *ngIf="vargaChart as vc">
+    <div class="varga-grid" [class.g2]="chartLayout === 'grid2'" [class.g4]="chartLayout === 'grid4'" *ngIf="chartLayout !== 'single' && gridCharts.length">
+      <figure class="varga-tile" *ngFor="let g of gridCharts">
+        <figcaption>{{ g.code }} · {{ g.label }}</figcaption>
+        <app-kundali-chart
+          [planets]="g.chart.planets"
+          [houses]="g.chart.houses"
+          [ascendant]="g.chart.ascendant"
+          [signMode]="'number'"
+          [compact]="true"
+        ></app-kundali-chart>
+      </figure>
+    </div>
+
+    <div class="overview-grid" *ngIf="chartLayout === 'single' && vargaChart as vc">
       <app-kundali-chart
         [planets]="vc.planets"
         [houses]="vc.houses"
         [ascendant]="vc.ascendant"
+        [signMode]="'number'"
       ></app-kundali-chart>
       <div class="lagna">
         <h2>{{ vc.vargaCode }} · {{ vc.displayName }}</h2>

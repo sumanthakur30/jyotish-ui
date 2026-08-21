@@ -237,6 +237,9 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'chart.surya': 'Surya',
     'chart.signNumber': 'Sign numbers 1–12',
     'chart.signAbbrev': 'Sign names',
+    'chart.layoutSingle': 'Single',
+    'chart.layout2x2': '2×2 grid',
+    'chart.layout4x2': '4×2 grid',
     'report.detailed': 'Download detailed Kundli PDF',
 
     'life.title': 'Life Analysis',
@@ -531,6 +534,9 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'chart.surya': 'सूर्य',
     'chart.signNumber': 'राशि अंक 1–12',
     'chart.signAbbrev': 'राशि नाम',
+    'chart.layoutSingle': 'एक',
+    'chart.layout2x2': '2×2 ग्रिड',
+    'chart.layout4x2': '4×2 ग्रिड',
     'report.detailed': 'विस्तृत कुंडली पीडीएफ डाउनलोड',
 
     'life.title': 'जीवन विश्लेषण',

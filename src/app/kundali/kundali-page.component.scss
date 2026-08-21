@@ -106,6 +106,46 @@
   -webkit-overflow-scrolling: touch;
 }
 
+.varga-grid {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.varga-grid.g2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.varga-grid.g4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .varga-grid.g4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.varga-tile {
+  margin: 0;
+  text-align: center;
+}
+
+.varga-tile figcaption {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+@media print {
+  .varga-grid {
+    break-inside: avoid;
+  }
+  .varga-tile {
+    break-inside: avoid;
+  }
+}
+
 .overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(14rem, 0.85fr);

@@ -55,6 +55,10 @@ export class KundaliPageComponent implements OnInit {
   vargaChart: VargaChartResponse | null = null;
   chartBusy = false;
   chartError = '';
+  /** single | grid2 (2×2) | grid4 (4×2 / 8 charts) */
+  chartLayout: 'single' | 'grid2' | 'grid4' = 'single';
+  gridCharts: { code: string; label: string; chart: VargaChartResponse }[] = [];
+  gridBusy = false;
 
   dasha: DashaResponse | null = null;
   dashaBusy = false;
@@ -406,11 +410,68 @@ export class KundaliPageComponent implements OnInit {
     this.selectedVarga = code;
     this.vargaChart = null;
     this.chartError = '';
+    this.chartLayout = 'single';
     if (!implemented) {
       this.chartError = `${code} is Coming Soon.`;
       return;
     }
     this.loadVarga(code);
+  }
+
+  setChartLayout(layout: 'single' | 'grid2' | 'grid4'): void {
+    this.chartLayout = layout;
+    this.chartError = '';
+    if (layout === 'single') {
+      if (!this.vargaChart) {
+        this.loadVarga(this.selectedVarga);
+      }
+      return;
+    }
+    this.loadVargaGrid(layout);
+  }
+
+  private gridCodes(layout: 'grid2' | 'grid4'): string[] {
+    if (layout === 'grid2') {
+      return ['D1', 'D9', 'D2', 'D10'];
+    }
+    return ['D1', 'D9', 'D2', 'D10', 'D3', 'D4', 'D7', 'D12'];
+  }
+
+  private loadVargaGrid(layout: 'grid2' | 'grid4'): void {
+    if (!this.kundali) {
+      return;
+    }
+    const codes = this.gridCodes(layout);
+    this.gridBusy = true;
+    this.gridCharts = [];
+    let pending = codes.length;
+    const results: { code: string; label: string; chart: VargaChartResponse }[] = [];
+    for (const code of codes) {
+      this.api.getChart(this.kundali.id, code).subscribe({
+        next: (chart) => {
+          results.push({
+            code,
+            label: chart.displayName || code,
+            chart,
+          });
+          pending--;
+          if (pending === 0) {
+            const order = new Map(codes.map((c, i) => [c, i]));
+            results.sort((a, b) => (order.get(a.code) || 0) - (order.get(b.code) || 0));
+            this.gridCharts = results;
+            this.gridBusy = false;
+          }
+        },
+        error: (err) => {
+          pending--;
+          this.chartError = err?.error?.message || `Could not load ${code}.`;
+          if (pending === 0) {
+            this.gridBusy = false;
+            this.gridCharts = results;
+          }
+        },
+      });
+    }
   }
 
   toggleMaha(key: string): void {
