@@ -83,3 +83,15 @@
   margin: 0 auto;
   padding: 1.25rem 1.5rem 3rem;
 }
+
+.panel.upgrade {
+  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  background: color-mix(in srgb, var(--panel) 70%, #c4a574);
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.panel.upgrade p {
+  margin: 0;
+  font-size: 0.92rem;
+}
