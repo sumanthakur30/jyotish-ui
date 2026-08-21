@@ -640,6 +640,6 @@ export class KundaliPageComponent implements OnInit {
   }
 
   back(): void {
-    this.router.navigateByUrl('/');
+    this.router.navigateByUrl('/profiles');
   }
 }

@@ -1,0 +1,164 @@
+<div class="dash">
+  <header class="dash-head">
+    <div>
+      <h1>{{ 'dash.title' | t }}</h1>
+      <p class="sub">{{ todayLabel() }}</p>
+    </div>
+    <button type="button" class="btn ghost" (click)="refresh()" [disabled]="panchangBusy || apptBusy">
+      {{ 'common.refresh' | t }}
+    </button>
+  </header>
+
+  <p class="flash err" *ngIf="error">{{ error }}</p>
+
+  <div class="dash-grid">
+    <section class="panel dash-card panchang-card">
+      <div class="card-head">
+        <h2>{{ 'dash.panchangToday' | t }}</h2>
+        <a routerLink="/panchang" class="link">{{ 'dash.openPanchang' | t }}</a>
+      </div>
+      <p class="hint" *ngIf="panchangBusy">{{ 'dash.panchangLoading' | t }}</p>
+      <p class="flash err" *ngIf="panchangError">{{ panchangError }}</p>
+      <ng-container *ngIf="panchang as p">
+        <p class="place">{{ p.placeName || '—' }}</p>
+        <dl class="limbs">
+          <div>
+            <dt>{{ 'dash.tithi' | t }}</dt>
+            <dd>{{ limbName(p.tithi) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.vara' | t }}</dt>
+            <dd>{{ limbName(p.vara) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.nakshatra' | t }}</dt>
+            <dd>{{ limbName(p.nakshatra) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.yoga' | t }}</dt>
+            <dd>{{ limbName(p.yoga) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.karana' | t }}</dt>
+            <dd>{{ limbName(p.karana) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.sunrise' | t }}</dt>
+            <dd>{{ solarTime(p.sunrise) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.sunset' | t }}</dt>
+            <dd>{{ solarTime(p.sunset) }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.rahuKaal' | t }}</dt>
+            <dd>{{ muhuratRange('RAHU_KAAL') }}</dd>
+          </div>
+          <div>
+            <dt>{{ 'dash.abhijit' | t }}</dt>
+            <dd>{{ muhuratRange('ABHIJIT') }}</dd>
+          </div>
+        </dl>
+      </ng-container>
+    </section>
+
+    <section class="panel dash-card work-card">
+      <div class="card-head">
+        <h2>{{ 'dash.todayWork' | t }}</h2>
+        <a routerLink="/appointments" class="link">{{ 'dash.openAppts' | t }}</a>
+      </div>
+      <p class="hint" *ngIf="apptBusy">{{ 'dash.apptLoading' | t }}</p>
+      <p class="flash err" *ngIf="apptError">{{ apptError }}</p>
+
+      <div class="work-stats">
+        <div class="stat">
+          <span class="n">{{ todaysOpenAppointments().length }}</span>
+          <span class="l">{{ 'dash.apptsToday' | t }}</span>
+        </div>
+        <div class="stat">
+          <span class="n">{{ pendingPayments().length }}</span>
+          <span class="l">{{ 'dash.pendingPay' | t }}</span>
+        </div>
+        <div class="stat" *ngIf="clientCount != null">
+          <span class="n">{{ clientCount }}</span>
+          <span class="l">{{ 'dash.clients' | t }}</span>
+        </div>
+      </div>
+
+      <ul class="appt-list" *ngIf="todaysOpenAppointments().length; else noAppt">
+        <li *ngFor="let a of todaysOpenAppointments()">
+          <span class="time">{{ a.appointmentTime }}</span>
+          <span class="who">{{ a.clientName }}</span>
+          <span class="type">{{ a.consultationType }}</span>
+        </li>
+      </ul>
+      <ng-template #noAppt>
+        <p class="empty" *ngIf="!apptBusy">{{ 'dash.noAppts' | t }}</p>
+      </ng-template>
+    </section>
+
+    <section class="panel dash-card actions-card">
+      <h2>{{ 'dash.quickActions' | t }}</h2>
+      <div class="actions">
+        <button type="button" class="action" (click)="openProfiles()">
+          {{ 'dash.action.newKundli' | t }}
+        </button>
+        <button type="button" class="action" (click)="openClients()">
+          {{ 'dash.action.newClient' | t }}
+        </button>
+        <button type="button" class="action" (click)="openAppointments()">
+          {{ 'dash.action.newAppt' | t }}
+        </button>
+        <button
+          type="button"
+          class="action"
+          *ngIf="entitlements.can('matching')"
+          (click)="openMatching()"
+        >
+          {{ 'dash.action.milan' | t }}
+        </button>
+        <button type="button" class="action" (click)="openPanchang()">
+          {{ 'dash.action.panchang' | t }}
+        </button>
+        <button type="button" class="action" (click)="openPanchang()">
+          {{ 'dash.action.muhurat' | t }}
+        </button>
+      </div>
+    </section>
+
+    <section class="panel dash-card recent-card">
+      <div class="card-head">
+        <h2>{{ 'dash.recentKundli' | t }}</h2>
+        <a routerLink="/profiles" class="link">{{ 'dash.allProfiles' | t }}</a>
+      </div>
+      <p class="hint" *ngIf="recentBusy">{{ 'dash.recentLoading' | t }}</p>
+      <p class="flash err" *ngIf="recentError">{{ recentError }}</p>
+      <ul class="recent-list" *ngIf="recent.length; else noRecent">
+        <li *ngFor="let p of recent">
+          <div class="info">
+            <strong>{{ p.displayName }}</strong>
+            <span
+              >{{ p.details.birthDate }}
+              <span *ngIf="p.details.birthTime"> · {{ p.details.birthTime }}</span> ·
+              {{ p.location.placeName }}</span
+            >
+          </div>
+          <button
+            type="button"
+            class="btn primary"
+            (click)="openKundali(p)"
+            [disabled]="generatingId === p.id"
+          >
+            {{ generatingId === p.id ? ('common.busy' | t) : ('dash.openKundli' | t) }}
+          </button>
+        </li>
+      </ul>
+      <ng-template #noRecent>
+        <p class="empty" *ngIf="!recentBusy">
+          {{ 'dash.noRecent' | t }}
+          <a routerLink="/profiles">{{ 'dash.action.newKundli' | t }}</a>
+        </p>
+      </ng-template>
+    </section>
+  </div>
+</div>

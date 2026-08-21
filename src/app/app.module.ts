@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { TenantInterceptor } from './core/tenant.interceptor';
+import { DashboardPageComponent } from './dashboard/dashboard-page.component';
 import { ProfilesPageComponent } from './profiles/profiles-page.component';
 import { KundaliPageComponent } from './kundali/kundali-page.component';
 import { KundaliChartComponent } from './kundali/kundali-chart.component';
@@ -16,7 +17,8 @@ import { PanchangPageComponent } from './panchang/panchang-page.component';
 import { TranslatePipe } from './core/i18n/translate.pipe';
 
 const routes: Routes = [
-  { path: '', component: ProfilesPageComponent },
+  { path: '', component: DashboardPageComponent },
+  { path: 'profiles', component: ProfilesPageComponent },
   { path: 'kundali/:id', component: KundaliPageComponent },
   { path: 'matching', component: MatchingPageComponent },
   { path: 'matching/:id', component: MatchingPageComponent },
@@ -30,6 +32,7 @@ const routes: Routes = [
 @NgModule({
   declarations: [
     AppComponent,
+    DashboardPageComponent,
     ProfilesPageComponent,
     KundaliPageComponent,
     KundaliChartComponent,

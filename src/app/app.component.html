@@ -1,15 +1,18 @@
 <header class="top">
   <div class="brand">
-    <span class="mark">SJ</span>
-    <div>
-      <h1>Sugam Jyotish</h1>
-      <p class="tag">{{ 'app.tag' | t }}</p>
-    </div>
+    <a routerLink="/" class="brand-link" [attr.aria-label]="'nav.dashboard' | t">
+      <span class="mark">SJ</span>
+      <div>
+        <h1>Sugam Jyotish</h1>
+        <p class="tag">{{ 'app.tag' | t }}</p>
+      </div>
+    </a>
   </div>
-  <nav class="nav">
+  <nav class="nav" aria-label="Main">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{
-      'nav.profiles' | t
+      'nav.dashboard' | t
     }}</a>
+    <a routerLink="/profiles" routerLinkActive="active">{{ 'nav.profiles' | t }}</a>
     <a *ngIf="can('matching')" routerLink="/matching" routerLinkActive="active">{{
       'nav.matching' | t
     }}</a>
@@ -54,11 +57,14 @@
   <section class="panel upgrade" *ngIf="showUpgradeBanner">
     <p>{{ upgradeHint() }}</p>
   </section>
-  <section class="panel compact" *ngIf="status as s">
-    <span>{{ s.service }}</span>
-    <span>· {{ s.phase }}</span>
-    <span>· {{ 'status.engine' | t: { version: s.engineVersion } }}</span>
-    <span *ngIf="s.entitlementEnabled">· {{ 'status.entitlementsOn' | t }}</span>
-  </section>
+  <details class="status-strip" *ngIf="status as s">
+    <summary>
+      {{ s.service }} · {{ 'status.engine' | t: { version: s.engineVersion } }}
+    </summary>
+    <p>
+      {{ s.phase }}
+      <span *ngIf="s.entitlementEnabled"> · {{ 'status.entitlementsOn' | t }}</span>
+    </p>
+  </details>
   <router-outlet></router-outlet>
 </main>
