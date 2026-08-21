@@ -20,7 +20,8 @@ import {
 } from '../core/jyotish-api.service';
 import { EntitlementStateService } from '../core/entitlement-state.service';
 import { LanguageService } from '../core/i18n/language.service';
-import { planetFull, signFull, yogaCategoryLabel, yogaNameHi } from '../core/i18n/jyotish-labels';
+import { planetFull, signFull, signLordCode, nakshatraLordCode, yogaCategoryLabel, yogaNameHi } from '../core/i18n/jyotish-labels';
+import { buildChartView, ChartViewMode } from './chart-view.util';
 
 @Component({
   selector: 'app-kundali-page',
@@ -44,6 +45,9 @@ export class KundaliPageComponent implements OnInit {
     | 'ask' = 'overview';
   error = '';
   busy = false;
+
+  chartViewMode: ChartViewMode = 'LAGNA';
+  chartSignMode: 'number' | 'abbrev' = 'number';
 
   chartCatalog: ChartCatalogItem[] = [];
   selectedVarga = 'D9';
@@ -771,6 +775,51 @@ export class KundaliPageComponent implements OnInit {
     const span = max - min || 1;
     const w = ((new Date(m.endAt).getTime() - new Date(m.startAt).getTime()) / span) * 100;
     return Math.max(4, Math.min(40, w));
+  }
+
+  fmtDms(v: number | null | undefined): string {
+    if (v == null || Number.isNaN(Number(v))) {
+      return '—';
+    }
+    const n = Number(v);
+    const d = Math.floor(n);
+    const mf = (n - d) * 60;
+    const m = Math.floor(mf);
+    const s = Math.floor((mf - m) * 60);
+    return `${String(d).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+  }
+
+  motionLabel(retrograde: boolean | null | undefined): string {
+    return retrograde ? this.language.t('table.vakri') : this.language.t('table.margi');
+  }
+
+  rashiLord(signName: string): string {
+    const code = signLordCode(signName);
+    return code ? planetFull(code, this.language.lang) : '—';
+  }
+
+  nakLord(nakshatraIndex: number): string {
+    return planetFull(nakshatraLordCode(nakshatraIndex), this.language.lang);
+  }
+
+  overviewChart() {
+    if (!this.kundali) {
+      return null;
+    }
+    return buildChartView(
+      this.chartViewMode,
+      this.kundali.planets,
+      this.kundali.houses,
+      this.kundali.ascendant
+    );
+  }
+
+  setChartView(mode: ChartViewMode): void {
+    this.chartViewMode = mode;
+  }
+
+  toggleSignMode(): void {
+    this.chartSignMode = this.chartSignMode === 'number' ? 'abbrev' : 'number';
   }
 
   back(): void {

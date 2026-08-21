@@ -62,15 +62,45 @@
   </nav>
 
   <section class="panel overview-panel" *ngIf="tab === 'overview'">
-    <div class="overview-grid">
+    <div class="chart-toolbar">
+      <div class="view-toggle" role="group">
+        <button
+          type="button"
+          [class.active]="chartViewMode === 'LAGNA'"
+          (click)="setChartView('LAGNA')"
+        >
+          {{ 'chart.lagna' | t }}
+        </button>
+        <button
+          type="button"
+          [class.active]="chartViewMode === 'CHANDRA'"
+          (click)="setChartView('CHANDRA')"
+        >
+          {{ 'chart.chandra' | t }}
+        </button>
+        <button
+          type="button"
+          [class.active]="chartViewMode === 'SURYA'"
+          (click)="setChartView('SURYA')"
+        >
+          {{ 'chart.surya' | t }}
+        </button>
+      </div>
+      <button type="button" class="btn ghost" (click)="toggleSignMode()">
+        {{ chartSignMode === 'number' ? ('chart.signAbbrev' | t) : ('chart.signNumber' | t) }}
+      </button>
+    </div>
+    <div class="overview-grid" *ngIf="overviewChart() as cv">
       <app-kundali-chart
         class="chart-stage"
-        [planets]="k.planets"
-        [houses]="k.houses"
-        [ascendant]="k.ascendant"
+        [planets]="cv.planets"
+        [houses]="cv.houses"
+        [ascendant]="cv.ascendant"
+        [signMode]="chartSignMode"
+        [planetLabelMode]="language.lang === 'hi' ? 'full' : 'abbrev'"
       ></app-kundali-chart>
       <aside class="key-panel">
-        <h2>{{ 'kundali.keyPoints' | t }}</h2>
+        <h2>{{ 'kundali.keyPoints' | t }} · {{ cv.pivotLabel }}</h2>
         <dl class="facts">
           <div *ngIf="k.ascendant as a">
             <dt>{{ 'kundali.lagna' | t }}</dt>
@@ -125,39 +155,48 @@
   </section>
 
   <section class="panel" *ngIf="tab === 'planets'">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>{{ 'table.planet' | t }}</th>
-          <th>{{ 'table.sign' | t }}</th>
-          <th>{{ 'table.degree' | t }}</th>
-          <th>{{ 'table.house' | t }}</th>
-          <th>{{ 'table.nakshatra' | t }}</th>
-          <th>{{ 'table.pada' | t }}</th>
-          <th>{{ 'table.retro' | t }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngIf="k.ascendant as a">
-          <td>{{ 'table.ascendant' | t }}</td>
-          <td>{{ signLabel(a.signName) }}</td>
-          <td>{{ fmtDeg(a.degreeInSign) }}</td>
-          <td>{{ a.house }}</td>
-          <td>{{ a.nakshatraName }}</td>
-          <td>{{ a.pada }}</td>
-          <td></td>
-        </tr>
-        <tr *ngFor="let p of k.planets">
-          <td>{{ planetLabel(p.planetCode) }}</td>
-          <td>{{ signLabel(p.signName) }}</td>
-          <td>{{ fmtDeg(p.degreeInSign) }}</td>
-          <td>{{ p.house }}</td>
-          <td>{{ p.nakshatraName }}</td>
-          <td>{{ p.pada }}</td>
-          <td>{{ p.retrograde ? 'R' : '' }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <h2 class="timeline-h">{{ 'table.spashta' | t }}</h2>
+    <div class="table-scroll">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>{{ 'table.planet' | t }}</th>
+            <th>{{ 'table.sign' | t }}</th>
+            <th>{{ 'table.degree' | t }}</th>
+            <th>{{ 'table.motion' | t }}</th>
+            <th>{{ 'table.house' | t }}</th>
+            <th>{{ 'table.nakshatra' | t }}</th>
+            <th>{{ 'table.pada' | t }}</th>
+            <th>{{ 'table.rashiLord' | t }}</th>
+            <th>{{ 'table.nakLord' | t }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="k.ascendant as a">
+            <td>{{ 'table.ascendant' | t }}</td>
+            <td>{{ signLabel(a.signName) }}</td>
+            <td>{{ fmtDms(a.degreeInSign) }}</td>
+            <td>—</td>
+            <td>{{ a.house }}</td>
+            <td>{{ a.nakshatraName }}</td>
+            <td>{{ a.pada }}</td>
+            <td>{{ rashiLord(a.signName) }}</td>
+            <td>{{ nakLord(a.nakshatraIndex) }}</td>
+          </tr>
+          <tr *ngFor="let p of k.planets">
+            <td>{{ planetLabel(p.planetCode) }}</td>
+            <td>{{ signLabel(p.signName) }}</td>
+            <td>{{ fmtDms(p.degreeInSign) }}</td>
+            <td>{{ motionLabel(p.retrograde) }}</td>
+            <td>{{ p.house }}</td>
+            <td>{{ p.nakshatraName }}</td>
+            <td>{{ p.pada }}</td>
+            <td>{{ rashiLord(p.signName) }}</td>
+            <td>{{ nakLord(p.nakshatraIndex) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section class="panel" *ngIf="tab === 'houses'">
@@ -810,7 +849,7 @@
     </p>
     <div class="actions report-actions">
       <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadBasicPdf()">
-        {{ reportBusy ? 'Generating…' : 'Download Basic Kundali PDF' }}
+        {{ reportBusy ? 'Generating…' : ('report.detailed' | t) }}
       </button>
       <button type="button" class="btn ghost" [disabled]="reportBusy" (click)="downloadDashaPdf()">
         Dasha summary PDF

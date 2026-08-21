@@ -67,6 +67,45 @@
   padding-top: 1rem;
 }
 
+.chart-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.view-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  overflow: hidden;
+}
+
+.view-toggle button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.view-toggle button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  opacity: 1;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .overview-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(14rem, 0.85fr);

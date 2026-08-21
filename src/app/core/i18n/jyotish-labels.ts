@@ -159,3 +159,38 @@ export function yogaCategoryLabel(code: string, lang: Lang): string {
   const map = lang === 'hi' ? YOGA_CAT_HI : YOGA_CAT_EN;
   return map[code] || code;
 }
+
+const SIGN_LORD: Record<string, string> = {
+  Aries: 'MARS',
+  Taurus: 'VENUS',
+  Gemini: 'MERCURY',
+  Cancer: 'MOON',
+  Leo: 'SUN',
+  Virgo: 'MERCURY',
+  Libra: 'VENUS',
+  Scorpio: 'MARS',
+  Sagittarius: 'JUPITER',
+  Capricorn: 'SATURN',
+  Aquarius: 'SATURN',
+  Pisces: 'JUPITER',
+};
+
+const NAK_LORDS = [
+  'KETU',
+  'VENUS',
+  'SUN',
+  'MOON',
+  'MARS',
+  'RAHU',
+  'JUPITER',
+  'SATURN',
+  'MERCURY',
+];
+
+export function signLordCode(signName: string): string | null {
+  return SIGN_LORD[signName] || null;
+}
+
+export function nakshatraLordCode(nakshatraIndex: number): string {
+  return NAK_LORDS[((nakshatraIndex % 9) + 9) % 9];
+}
