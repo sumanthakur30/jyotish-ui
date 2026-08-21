@@ -34,13 +34,16 @@
         <input
           [(ngModel)]="placeQuery"
           name="placeQuery"
-          placeholder="Delhi, Mumbai…"
+          placeholder="Patna, Bihar, Delhi…"
           (keyup.enter)="searchPlaces()"
         />
         <button type="button" class="btn" (click)="searchPlaces()">Search</button>
       </div>
     </label>
   </div>
+  <p class="hint place-help">
+    Search a city (e.g. Patna), then click a result. Or type Place and enter Lat/Lon manually.
+  </p>
   <ul class="hits" *ngIf="placeHits.length">
     <li *ngFor="let p of placeHits">
       <button type="button" class="linkish" (click)="pickPlace(p)">

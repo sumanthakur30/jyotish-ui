@@ -2,3 +2,12 @@
 :host {
   display: block;
 }
+
+.place-help {
+  margin-top: 0.35rem;
+}
+
+.place-empty {
+  margin-top: 0.5rem;
+  color: color-mix(in srgb, #b45309 70%, var(--ink));
+}
