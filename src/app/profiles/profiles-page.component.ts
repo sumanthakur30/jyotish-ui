@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   JyotishApiService,
@@ -13,7 +13,7 @@ import { TenantService } from '../core/tenant.service';
   templateUrl: './profiles-page.component.html',
   styleUrls: ['./profiles-page.component.scss'],
 })
-export class ProfilesPageComponent implements OnInit {
+export class ProfilesPageComponent implements OnInit, OnDestroy {
   profiles: Profile[] = [];
   searchQ = '';
   includeArchived = false;
@@ -39,6 +39,9 @@ export class ProfilesPageComponent implements OnInit {
 
   placeQuery = '';
   placeHits: PlaceSuggestion[] = [];
+  placeSearchBusy = false;
+  placeSearchAttempted = false;
+  private placeSearchTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly api: JyotishApiService,
@@ -48,6 +51,12 @@ export class ProfilesPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.reloadProfiles();
+  }
+
+  ngOnDestroy(): void {
+    if (this.placeSearchTimer != null) {
+      clearTimeout(this.placeSearchTimer);
+    }
   }
 
   reloadProfiles(): void {
@@ -67,10 +76,27 @@ export class ProfilesPageComponent implements OnInit {
     });
   }
 
+  onPlaceQueryChange(): void {
+    if (this.placeSearchTimer != null) {
+      clearTimeout(this.placeSearchTimer);
+    }
+    this.placeSearchTimer = setTimeout(() => this.searchPlaces(), 250);
+  }
+
   searchPlaces(): void {
-    this.api.searchPlaces(this.placeQuery).subscribe({
-      next: (res) => (this.placeHits = res.items || []),
-      error: (err) => this.fail(err),
+    const q = (this.placeQuery || '').trim();
+    this.placeSearchAttempted = true;
+    this.placeSearchBusy = true;
+    this.api.searchPlaces(q).subscribe({
+      next: (res) => {
+        this.placeHits = res.items || [];
+        this.placeSearchBusy = false;
+      },
+      error: (err) => {
+        this.placeHits = [];
+        this.placeSearchBusy = false;
+        this.fail(err);
+      },
     });
   }
 
@@ -83,6 +109,12 @@ export class ProfilesPageComponent implements OnInit {
     this.coordsManual = false;
     this.placeHits = [];
     this.placeQuery = p.placeName;
+    this.placeSearchAttempted = false;
+    this.error = '';
+  }
+
+  onPlaceNameManualEdit(): void {
+    this.coordsManual = true;
   }
 
   startCreate(): void {
@@ -102,6 +134,8 @@ export class ProfilesPageComponent implements OnInit {
     this.notes = '';
     this.placeQuery = '';
     this.placeHits = [];
+    this.placeSearchAttempted = false;
+    this.placeSearchBusy = false;
   }
 
   edit(p: Profile): void {
@@ -120,6 +154,8 @@ export class ProfilesPageComponent implements OnInit {
     this.coordsManual = p.location.coordsManual;
     this.notes = p.notes || '';
     this.placeQuery = p.location.placeName;
+    this.placeHits = [];
+    this.placeSearchAttempted = false;
   }
 
   saveProfile(): void {
@@ -131,8 +167,18 @@ export class ProfilesPageComponent implements OnInit {
       this.error = 'Date of birth is required.';
       return;
     }
-    if (this.latitude == null || this.longitude == null || !this.placeName) {
-      this.error = 'Please select a valid birth location.';
+    if (!this.placeName.trim()) {
+      this.error =
+        'Place is required. Search a city (e.g. Patna), click a result, or type Place and Lat/Lon manually.';
+      return;
+    }
+    if (this.latitude == null || this.longitude == null) {
+      this.error =
+        'Latitude and longitude are required. Click a search result, or enter Lat/Lon manually.';
+      return;
+    }
+    if (!this.timeZone.trim()) {
+      this.error = 'Time zone is required (e.g. Asia/Kolkata).';
       return;
     }
     if (!this.birthTimeUnknown && !this.birthTime) {
@@ -151,11 +197,11 @@ export class ProfilesPageComponent implements OnInit {
         timeZone: this.timeZone,
       },
       location: {
-        placeName: this.placeName,
+        placeName: this.placeName.trim(),
         countryCode: this.countryCode || null,
         latitude: this.latitude,
         longitude: this.longitude,
-        timeZone: this.timeZone,
+        timeZone: this.timeZone.trim(),
         coordsManual: this.coordsManual,
       },
     };

@@ -52,13 +52,20 @@
         <input
           [(ngModel)]="placeQuery"
           name="placeQuery"
-          placeholder="Delhi, Mumbai…"
+          placeholder="Patna, Bihar, Delhi…"
+          (ngModelChange)="onPlaceQueryChange()"
           (keyup.enter)="searchPlaces()"
         />
-        <button type="button" class="btn" (click)="searchPlaces()">Search</button>
+        <button type="button" class="btn" [disabled]="placeSearchBusy" (click)="searchPlaces()">
+          {{ placeSearchBusy ? 'Searching…' : 'Search' }}
+        </button>
       </div>
     </label>
   </div>
+  <p class="hint place-help">
+    Search a city (e.g. Patna or Bihar), then click a result. Or type Place and enter Lat/Lon
+    manually.
+  </p>
   <ul class="hits" *ngIf="placeHits.length">
     <li *ngFor="let p of placeHits">
       <button type="button" class="linkish" (click)="pickPlace(p)">
@@ -66,11 +73,22 @@
       </button>
     </li>
   </ul>
+  <p
+    class="hint place-empty"
+    *ngIf="placeSearchAttempted && !placeSearchBusy && !placeHits.length"
+  >
+    No catalog matches. Try a city name (Patna, Gaya…), or fill Place + Lat/Lon below.
+  </p>
 
   <div class="form-grid">
     <label class="wide">
       Place
-      <input [(ngModel)]="placeName" name="placeName" readonly />
+      <input
+        [(ngModel)]="placeName"
+        name="placeName"
+        placeholder="City or district name"
+        (ngModelChange)="onPlaceNameManualEdit()"
+      />
     </label>
     <label>
       Latitude
@@ -79,6 +97,7 @@
         step="0.0000001"
         [(ngModel)]="latitude"
         name="latitude"
+        placeholder="e.g. 25.5941"
         (ngModelChange)="coordsManual = true"
       />
     </label>
@@ -89,12 +108,13 @@
         step="0.0000001"
         [(ngModel)]="longitude"
         name="longitude"
+        placeholder="e.g. 85.1376"
         (ngModelChange)="coordsManual = true"
       />
     </label>
     <label>
       Time zone
-      <input [(ngModel)]="timeZone" name="timeZone" />
+      <input [(ngModel)]="timeZone" name="timeZone" placeholder="Asia/Kolkata" />
     </label>
     <label class="wide">
       Notes
