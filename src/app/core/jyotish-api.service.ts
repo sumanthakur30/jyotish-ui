@@ -305,6 +305,19 @@ export interface TransitPlanetDto {
   houseChanged: boolean;
 }
 
+export interface SadeSatiDto {
+  phaseCode: string;
+  phaseLabel: string;
+  natalMoonSignIndex: number;
+  natalMoonSignName: string;
+  transitSaturnSignIndex: number;
+  transitSaturnSignName: string;
+  signsFromMoon: number;
+  houseFromMoon: number;
+  inSadeSati: boolean;
+  notes: string | null;
+}
+
 export interface TransitResponse {
   id: number;
   kundaliId: number;
@@ -319,6 +332,7 @@ export interface TransitResponse {
   julianDayUt: number;
   natalLagnaSignIndex: number;
   planets: TransitPlanetDto[];
+  sadeSati: SadeSatiDto | null;
   catalog: TransitCatalogItem[];
   comingSoon: TransitComingSoon[];
   notes: string | null;
@@ -349,11 +363,13 @@ export interface ManglikDto {
   status: string;
   statusLabel: string;
   present: boolean;
+  cancelled: boolean;
   marsHouse: number;
   marsSignIndex: number;
   marsSignName: string;
   relevantHouses: number[];
   reasoning: string;
+  appliedCancellations: string[];
   cancellationsComingSoon: boolean;
   cancellationsNote: string;
 }
@@ -463,6 +479,19 @@ export interface PanchangComingSoon {
   label: string;
 }
 
+export interface MuhuratPeriodDto {
+  code: string;
+  name: string;
+  start: string;
+  end: string;
+  quality: string | null;
+}
+
+export interface MuhuratBundleDto {
+  periods: MuhuratPeriodDto[];
+  notes: string | null;
+}
+
 export interface PanchangResponse {
   date: string;
   timeZone: string;
@@ -483,8 +512,54 @@ export interface PanchangResponse {
   sunset: PanchangSolarEvent;
   moonrise: PanchangLunarEvent;
   moonset: PanchangLunarEvent;
+  muhurat: MuhuratBundleDto | null;
   catalog: PanchangCatalogItem[];
   comingSoon: PanchangComingSoon[];
+  notes: string | null;
+  disclaimer: string;
+}
+
+export interface AshtakavargaPlanetDto {
+  planetCode: string;
+  planetName: string;
+  bindus: number[];
+}
+
+export interface AshtakavargaResponse {
+  kundaliId: number;
+  calculationEngineVersion: string;
+  bhinnashtakavarga: AshtakavargaPlanetDto[];
+  sarvashtakavarga: number[];
+  totalBindus: number;
+  notes: string | null;
+  disclaimer: string;
+}
+
+export interface ShadbalaComponentDto {
+  code: string;
+  displayName: string;
+  status: string;
+  virupas: number | null;
+  note: string | null;
+}
+
+export interface ShadbalaPlanetDto {
+  planetCode: string;
+  planetName: string;
+  signIndex: number;
+  house: number;
+  components: ShadbalaComponentDto[];
+  implementedComponents: string[];
+  comingSoonComponents: string[];
+  partialTotalVirupas: number;
+  notes: string | null;
+}
+
+export interface ShadbalaResponse {
+  kundaliId: number;
+  calculationEngineVersion: string;
+  completeness: string;
+  planets: ShadbalaPlanetDto[];
   notes: string | null;
   disclaimer: string;
 }
@@ -602,6 +677,16 @@ export class JyotishApiService {
     return this.http.get<YogaListResponse>(`/api/v1/jyotish/kundali/${kundaliId}/yogas`, {
       params,
     });
+  }
+
+  getAshtakavarga(kundaliId: number): Observable<AshtakavargaResponse> {
+    return this.http.get<AshtakavargaResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/ashtakavarga`
+    );
+  }
+
+  getShadbala(kundaliId: number): Observable<ShadbalaResponse> {
+    return this.http.get<ShadbalaResponse>(`/api/v1/jyotish/kundali/${kundaliId}/shadbala`);
   }
 
   getTransit(

@@ -3,11 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import {
   AiAskResponse,
   AiTopic,
+  AshtakavargaResponse,
   ChartCatalogItem,
   DashaPeriodDto,
   DashaResponse,
   JyotishApiService,
   KundaliResponse,
+  ShadbalaResponse,
   TransitResponse,
   VargaChartResponse,
   YogaCatalogItem,
@@ -30,6 +32,8 @@ export class KundaliPageComponent implements OnInit {
     | 'charts'
     | 'dasha'
     | 'yogas'
+    | 'ashtakavarga'
+    | 'shadbala'
     | 'transit'
     | 'reports'
     | 'ask' = 'overview';
@@ -60,6 +64,15 @@ export class KundaliPageComponent implements OnInit {
   transitBusy = false;
   transitError = '';
   transitDate = '';
+
+  ashtakavarga: AshtakavargaResponse | null = null;
+  ashtakaBusy = false;
+  ashtakaError = '';
+
+  shadbala: ShadbalaResponse | null = null;
+  shadbalaBusy = false;
+  shadbalaError = '';
+  expandedShadbala = new Set<string>();
 
   reportBusy = false;
   reportMessage = '';
@@ -150,6 +163,26 @@ export class KundaliPageComponent implements OnInit {
     }
     if (!this.transit) {
       this.loadTransit();
+    }
+  }
+
+  openAshtakavarga(): void {
+    this.tab = 'ashtakavarga';
+    if (!this.kundali) {
+      return;
+    }
+    if (!this.ashtakavarga) {
+      this.loadAshtakavarga();
+    }
+  }
+
+  openShadbala(): void {
+    this.tab = 'shadbala';
+    if (!this.kundali) {
+      return;
+    }
+    if (!this.shadbala) {
+      this.loadShadbala();
     }
   }
 
@@ -439,6 +472,70 @@ export class KundaliPageComponent implements OnInit {
         this.transitError = err?.error?.message || 'Could not load transit.';
       },
     });
+  }
+
+  private loadAshtakavarga(): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.ashtakaBusy = true;
+    this.ashtakaError = '';
+    this.api.getAshtakavarga(this.kundali.id).subscribe({
+      next: (a) => {
+        this.ashtakavarga = a;
+        this.ashtakaBusy = false;
+      },
+      error: (err) => {
+        this.ashtakaBusy = false;
+        this.ashtakavarga = null;
+        this.ashtakaError = err?.error?.message || 'Could not load Ashtakavarga.';
+      },
+    });
+  }
+
+  private loadShadbala(): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.shadbalaBusy = true;
+    this.shadbalaError = '';
+    this.api.getShadbala(this.kundali.id).subscribe({
+      next: (s) => {
+        this.shadbala = s;
+        this.shadbalaBusy = false;
+        for (const p of s.planets || []) {
+          this.expandedShadbala.add(p.planetCode);
+        }
+      },
+      error: (err) => {
+        this.shadbalaBusy = false;
+        this.shadbala = null;
+        this.shadbalaError = err?.error?.message || 'Could not load Shadbala.';
+      },
+    });
+  }
+
+  toggleShadbala(code: string): void {
+    if (this.expandedShadbala.has(code)) {
+      this.expandedShadbala.delete(code);
+    } else {
+      this.expandedShadbala.add(code);
+    }
+  }
+
+  houseLabels(): number[] {
+    return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  }
+
+  binduSum(bindus: number[] | null | undefined): number {
+    return (bindus || []).reduce((sum, b) => sum + (Number(b) || 0), 0);
+  }
+
+  fmtVirupa(v: number | null | undefined): string {
+    if (v == null || Number.isNaN(Number(v))) {
+      return '—';
+    }
+    return Number(v).toFixed(2);
   }
 
   private todayIso(): string {

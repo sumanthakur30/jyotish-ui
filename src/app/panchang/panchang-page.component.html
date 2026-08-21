@@ -7,8 +7,9 @@
     <span class="meta">Compute-only · Meeus + Lahiri</span>
   </div>
   <p class="hint">
-    Classical five limbs for a civil date and place. Limbs are evaluated at sunrise. Choghadiya,
-    Rahu Kaal, and moonrise/moonset are Coming Soon.
+    Classical five limbs for a civil date and place. Limbs are evaluated at sunrise. Rahu Kaal,
+    Yamaganda, Gulika, Choghadiya, Hora, and Abhijit are included when sunrise/sunset are available.
+    Moonrise/moonset remain Coming Soon.
   </p>
 
   <div class="form-grid">
@@ -96,11 +97,17 @@
     </div>
     <div>
       <span class="label">Moonrise</span>
-      <strong>Coming Soon</strong>
+      <strong>{{
+        r.moonrise.available && r.moonrise.localTime ? r.moonrise.localTime : 'Coming Soon'
+      }}</strong>
+      <span class="note" *ngIf="r.moonrise.note">{{ r.moonrise.note }}</span>
     </div>
     <div>
       <span class="label">Moonset</span>
-      <strong>Coming Soon</strong>
+      <strong>{{
+        r.moonset.available && r.moonset.localTime ? r.moonset.localTime : 'Coming Soon'
+      }}</strong>
+      <span class="note" *ngIf="r.moonset.note">{{ r.moonset.note }}</span>
     </div>
   </div>
 
@@ -132,6 +139,30 @@
       <p class="value">{{ r.karana.name }}</p>
       <p class="detail">{{ r.karana.detail }} · {{ pct(r.karana.progress) }} elapsed</p>
     </article>
+  </div>
+
+  <div class="muhurat" *ngIf="r.muhurat as m">
+    <h3>Muhurat periods</h3>
+    <p class="hint" *ngIf="m.notes">{{ m.notes }}</p>
+    <p class="hint" *ngIf="!m.periods?.length">No muhurat segments for this day/place.</p>
+    <table class="table" *ngIf="m.periods?.length">
+      <thead>
+        <tr>
+          <th>Period</th>
+          <th>Quality</th>
+          <th>Start</th>
+          <th>End</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of m.periods">
+          <td>{{ p.name }}</td>
+          <td>{{ p.quality || '—' }}</td>
+          <td>{{ fmtInstant(p.start) }}</td>
+          <td>{{ fmtInstant(p.end) }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div class="soon" *ngIf="r.comingSoon?.length">

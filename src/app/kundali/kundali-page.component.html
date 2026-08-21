@@ -27,6 +27,12 @@
     <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">Charts</button>
     <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">Dasha</button>
     <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">Yogas</button>
+    <button type="button" [class.active]="tab === 'ashtakavarga'" (click)="openAshtakavarga()">
+      Ashtakavarga
+    </button>
+    <button type="button" [class.active]="tab === 'shadbala'" (click)="openShadbala()">
+      Shadbala
+    </button>
     <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
       Transit
     </button>
@@ -379,6 +385,106 @@
     </ng-container>
   </section>
 
+  <section class="panel" *ngIf="tab === 'ashtakavarga'">
+    <p class="flash err" *ngIf="ashtakaError">{{ ashtakaError }}</p>
+    <p class="hint" *ngIf="ashtakaBusy">Loading Ashtakavarga…</p>
+
+    <ng-container *ngIf="ashtakavarga as a">
+      <p class="hint disclaimer">{{ a.disclaimer }}</p>
+      <p class="sub">
+        Engine {{ a.calculationEngineVersion }} · total bindus {{ a.totalBindus }}
+      </p>
+
+      <h2 class="timeline-h">Sarvashtakavarga (houses 1–12)</h2>
+      <table class="table compact">
+        <thead>
+          <tr>
+            <th *ngFor="let h of houseLabels()">H{{ h }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td *ngFor="let b of a.sarvashtakavarga">{{ b }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="timeline-h">Bhinnashtakavarga</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Planet</th>
+            <th *ngFor="let h of houseLabels()">H{{ h }}</th>
+            <th>Σ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of a.bhinnashtakavarga">
+            <td>{{ p.planetName }}</td>
+            <td *ngFor="let b of p.bindus">{{ b }}</td>
+            <td>{{ binduSum(p.bindus) }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="hint">{{ a.notes }}</p>
+    </ng-container>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'shadbala'">
+    <p class="flash err" *ngIf="shadbalaError">{{ shadbalaError }}</p>
+    <p class="hint" *ngIf="shadbalaBusy">Loading Shadbala…</p>
+
+    <ng-container *ngIf="shadbala as s">
+      <p class="hint disclaimer">{{ s.disclaimer }}</p>
+      <p class="sub">
+        Engine {{ s.calculationEngineVersion }} · completeness
+        <strong>{{ s.completeness }}</strong>
+      </p>
+      <p class="hint">
+        Partial totals sum only READY components (Naisargika, Dig, Sthana subset). Do not treat them
+        as classical full Shadbala.
+      </p>
+
+      <ul class="yoga-list">
+        <li *ngFor="let p of s.planets">
+          <button type="button" class="yoga-row" (click)="toggleShadbala(p.planetCode)">
+            <span class="chev">{{ expandedShadbala.has(p.planetCode) ? '▾' : '▸' }}</span>
+            <span class="name">{{ p.planetName }}</span>
+            <span class="cat">House {{ p.house }}</span>
+            <span class="badge">Partial {{ fmtVirupa(p.partialTotalVirupas) }}</span>
+          </button>
+          <div class="yoga-detail" *ngIf="expandedShadbala.has(p.planetCode)">
+            <table class="table compact">
+              <thead>
+                <tr>
+                  <th>Component</th>
+                  <th>Status</th>
+                  <th>Virupas</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let c of p.components" [class.soon-row]="c.status !== 'READY'">
+                  <td>{{ c.displayName }}</td>
+                  <td>
+                    <span class="badge" *ngIf="c.status === 'READY'">Ready</span>
+                    <span class="badge dim" *ngIf="c.status !== 'READY'">Coming Soon</span>
+                  </td>
+                  <td>{{ fmtVirupa(c.virupas) }}</td>
+                  <td class="expl">{{ c.note || '—' }}</td>
+                </tr>
+              </tbody>
+            </table>
+            <p class="sub" *ngIf="p.notes">{{ p.notes }}</p>
+          </div>
+        </li>
+      </ul>
+
+      <p class="hint">{{ s.notes }}</p>
+    </ng-container>
+  </section>
+
   <section class="panel" *ngIf="tab === 'transit'">
     <div class="transit-controls">
       <label>
@@ -413,6 +519,23 @@
           </p>
         </div>
         <div class="lagna">
+          <h2>Sade Sati</h2>
+          <ng-container *ngIf="t.sadeSati as ss; else noSade">
+            <p class="current-line">
+              <strong>{{ ss.phaseLabel }}</strong>
+              <span class="badge" *ngIf="ss.inSadeSati">Active</span>
+              <span class="badge dim" *ngIf="!ss.inSadeSati">Outside</span>
+            </p>
+            <p class="sub">
+              Natal Moon {{ ss.natalMoonSignName }} · Transit Saturn {{ ss.transitSaturnSignName }} ·
+              house from Moon {{ ss.houseFromMoon }} ({{ ss.signsFromMoon }} signs)
+            </p>
+            <p class="hint">{{ ss.notes }}</p>
+          </ng-container>
+          <ng-template #noSade>
+            <p class="hint">Sade Sati not returned for this transit.</p>
+          </ng-template>
+
           <h2>Coming soon</h2>
           <ul class="soon">
             <li *ngFor="let c of t.comingSoon">{{ c.label }}</li>

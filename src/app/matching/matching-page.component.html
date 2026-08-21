@@ -90,17 +90,41 @@
   <div class="manglik-grid">
     <article>
       <h4>{{ r.personA.displayName }} — {{ r.manglikA.statusLabel }}</h4>
-      <p class="sub">Mars house {{ r.manglikA.marsHouse }}</p>
+      <p class="sub">
+        Mars house {{ r.manglikA.marsHouse }} · {{ r.manglikA.marsSignName }}
+        <span *ngIf="r.manglikA.cancelled"> · cancelled</span>
+      </p>
       <p>{{ r.manglikA.reasoning }}</p>
+      <div *ngIf="r.manglikA.appliedCancellations?.length" class="cancel-list">
+        <h5>Applied cancellations</h5>
+        <ul>
+          <li *ngFor="let c of r.manglikA.appliedCancellations">{{ c }}</li>
+        </ul>
+      </div>
       <p class="soon" *ngIf="r.manglikA.cancellationsComingSoon">
+        {{ r.manglikA.cancellationsNote }}
+      </p>
+      <p class="hint" *ngIf="!r.manglikA.cancellationsComingSoon && r.manglikA.cancellationsNote">
         {{ r.manglikA.cancellationsNote }}
       </p>
     </article>
     <article>
       <h4>{{ r.personB.displayName }} — {{ r.manglikB.statusLabel }}</h4>
-      <p class="sub">Mars house {{ r.manglikB.marsHouse }}</p>
+      <p class="sub">
+        Mars house {{ r.manglikB.marsHouse }} · {{ r.manglikB.marsSignName }}
+        <span *ngIf="r.manglikB.cancelled"> · cancelled</span>
+      </p>
       <p>{{ r.manglikB.reasoning }}</p>
+      <div *ngIf="r.manglikB.appliedCancellations?.length" class="cancel-list">
+        <h5>Applied cancellations</h5>
+        <ul>
+          <li *ngFor="let c of r.manglikB.appliedCancellations">{{ c }}</li>
+        </ul>
+      </div>
       <p class="soon" *ngIf="r.manglikB.cancellationsComingSoon">
+        {{ r.manglikB.cancellationsNote }}
+      </p>
+      <p class="hint" *ngIf="!r.manglikB.cancellationsComingSoon && r.manglikB.cancellationsNote">
         {{ r.manglikB.cancellationsNote }}
       </p>
     </article>

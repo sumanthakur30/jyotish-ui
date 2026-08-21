@@ -95,6 +95,28 @@
   margin-top: 1.25rem;
 }
 
+.muhurat {
+  margin-top: 1.5rem;
+}
+
+.muhurat h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+}
+
+.muhurat .table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.muhurat .table th,
+.muhurat .table td {
+  text-align: left;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
 .soon h3 {
   margin: 0 0 0.35rem;
   font-size: 0.95rem;

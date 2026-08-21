@@ -94,4 +94,19 @@ export class PanchangPageComponent implements OnInit {
     }
     return Math.round(n * 100) + '%';
   }
+
+  fmtInstant(iso: string | null | undefined): string {
+    if (!iso) {
+      return '—';
+    }
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) {
+      return iso;
+    }
+    return d.toLocaleString(undefined, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
 }

@@ -494,3 +494,13 @@
 .ask-history summary {
   cursor: pointer;
 }
+
+tr.soon-row td {
+  opacity: 0.72;
+}
+
+.badge.dim {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: color-mix(in srgb, var(--ink) 65%, transparent);
+}
