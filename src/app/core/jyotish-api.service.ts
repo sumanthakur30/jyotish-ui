@@ -399,6 +399,7 @@ export interface MatchingResponse {
   createdAt: string;
 }
 
+/** Canonical report types. Server also accepts BASIC_KUNDALI aliases: KUNDALI_SUMMARY, KUNDALI, BASIC. */
 export type ReportType = 'BASIC_KUNDALI' | 'MATCHING' | 'DASHA_SUMMARY' | 'TRANSIT';
 
 export interface ReportResponse {
