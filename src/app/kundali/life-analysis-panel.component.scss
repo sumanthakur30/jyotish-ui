@@ -1,0 +1,249 @@
+.life-root {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.life-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.life-head h2 {
+  margin: 0 0 0.25rem;
+  font-size: 1.25rem;
+}
+
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.search-row input[type='search'] {
+  min-width: 12rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+}
+
+.life-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.75rem;
+}
+
+.life-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.life-card:hover {
+  border-color: color-mix(in srgb, var(--ink) 35%, var(--line));
+}
+
+.card-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.card-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.card-status[data-status='COMPLETED'] {
+  color: #1b6b3a;
+}
+
+.card-status[data-status='IN_PROGRESS'] {
+  color: #8a5a00;
+}
+
+.card-meta {
+  font-size: 0.72rem;
+  opacity: 0.55;
+}
+
+.detail-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  margin-bottom: 0.85rem;
+}
+
+.detail-toolbar h3 {
+  margin: 0;
+  flex: 1;
+  min-width: 8rem;
+}
+
+.status-pick {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.health-banner {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #b45309;
+  background: #fff7ed;
+  color: #7c2d12;
+  border-radius: 0.35rem;
+  font-size: 0.88rem;
+}
+
+.detail-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 900px) {
+  .detail-grid {
+    grid-template-columns: minmax(14rem, 0.9fr) minmax(0, 1.4fr);
+  }
+}
+
+.calc-panel,
+.notes-panel,
+.timeline-block,
+.history-block,
+.consult-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--panel) 92%, var(--ink));
+}
+
+.calc-panel h4,
+.notes-panel h4,
+.timeline-block h4 {
+  margin: 0 0 0.5rem;
+}
+
+.ind-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.ind-list dt {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.ind-list .src {
+  font-weight: 500;
+  opacity: 0.55;
+  margin-left: 0.35rem;
+}
+
+.ind-list dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.88rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.field textarea {
+  font: inherit;
+  font-weight: 400;
+  padding: 0.5rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: var(--panel);
+  color: inherit;
+  resize: vertical;
+}
+
+.chk {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.85rem;
+  margin: 0.35rem 0;
+}
+
+.period-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.period-form input,
+.period-form select {
+  font: inherit;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: 0.3rem;
+  background: var(--panel);
+  color: inherit;
+}
+
+.row-actions {
+  white-space: nowrap;
+}
+
+.search-hits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.search-hits button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: inherit;
+  font: inherit;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+
+.consult-card {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.muted {
+  opacity: 0.65;
+  font-size: 0.85rem;
+}
+
+.flash.ok {
+  color: #1b6b3a;
+}

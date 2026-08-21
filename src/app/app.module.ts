@@ -10,6 +10,7 @@ import { DashboardPageComponent } from './dashboard/dashboard-page.component';
 import { ProfilesPageComponent } from './profiles/profiles-page.component';
 import { KundaliPageComponent } from './kundali/kundali-page.component';
 import { KundaliChartComponent } from './kundali/kundali-chart.component';
+import { LifeAnalysisPanelComponent } from './kundali/life-analysis-panel.component';
 import { MatchingPageComponent } from './matching/matching-page.component';
 import { ClientsPageComponent } from './clients/clients-page.component';
 import { AppointmentsPageComponent } from './appointments/appointments-page.component';
@@ -36,6 +37,7 @@ const routes: Routes = [
     ProfilesPageComponent,
     KundaliPageComponent,
     KundaliChartComponent,
+    LifeAnalysisPanelComponent,
     MatchingPageComponent,
     ClientsPageComponent,
     AppointmentsPageComponent,

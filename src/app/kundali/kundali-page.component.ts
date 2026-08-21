@@ -41,6 +41,7 @@ export class KundaliPageComponent implements OnInit {
     | 'ashtakavarga'
     | 'shadbala'
     | 'transit'
+    | 'life'
     | 'reports'
     | 'ask' = 'overview';
   error = '';

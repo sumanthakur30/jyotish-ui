@@ -625,6 +625,141 @@ export interface KundaliResponse {
   createdAt: string;
 }
 
+export interface LifeCategorySummary {
+  category: string;
+  labelEn: string;
+  labelHi: string;
+  status: string;
+  updatedAt: string | null;
+  includeInReport: boolean;
+}
+
+export interface LifeAnalysisDashboard {
+  kundaliId: number;
+  categories: LifeCategorySummary[];
+}
+
+export interface LifeIndicatorItem {
+  code: string;
+  label: string;
+  value: string;
+  source: string;
+}
+
+export interface LifeAnalysisDetail {
+  id: number | null;
+  kundaliId: number;
+  category: string;
+  subCategory: string | null;
+  status: string;
+  pastNotes: string | null;
+  presentNotes: string | null;
+  futureNotes: string | null;
+  importantPeriodsNotes: string | null;
+  advice: string | null;
+  jyotishNotes: string | null;
+  sections: Record<string, string>;
+  includeInReport: boolean;
+  indicators: LifeIndicatorItem[];
+  healthDisclaimerEn: string | null;
+  healthDisclaimerHi: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+  updatedBy: string | null;
+}
+
+export interface UpsertLifeAnalysisRequest {
+  status?: string;
+  pastNotes?: string | null;
+  presentNotes?: string | null;
+  futureNotes?: string | null;
+  importantPeriodsNotes?: string | null;
+  advice?: string | null;
+  jyotishNotes?: string | null;
+  sections?: Record<string, string>;
+  includeInReport?: boolean;
+  updatedBy?: string;
+  recordConsultation?: boolean;
+  consultationObservation?: string;
+  consultationDashaSnapshot?: string;
+  consultationGocharSnapshot?: string;
+  consultationAdvice?: string;
+  followUpDate?: string | null;
+}
+
+export interface LifePeriodDto {
+  id: number;
+  category: string;
+  fromDate: string | null;
+  toDate: string | null;
+  topic: string;
+  observation: string | null;
+  calculationBasis: string | null;
+  status: string;
+  sortOrder: number;
+}
+
+export interface LifePeriodList {
+  kundaliId: number;
+  periods: LifePeriodDto[];
+}
+
+export interface UpsertLifePeriodRequest {
+  category: string;
+  fromDate?: string | null;
+  toDate?: string | null;
+  topic: string;
+  observation?: string | null;
+  calculationBasis?: string | null;
+  status?: string;
+  sortOrder?: number;
+  updatedBy?: string;
+}
+
+export interface LifeHistoryItem {
+  id: number;
+  fieldName: string;
+  oldValue: string | null;
+  newValue: string | null;
+  updatedBy: string | null;
+  createdAt: string;
+}
+
+export interface LifeHistoryList {
+  lifeAnalysisId: number | null;
+  items: LifeHistoryItem[];
+}
+
+export interface LifeConsultationItem {
+  id: number;
+  category: string;
+  observation: string | null;
+  dashaSnapshot: string | null;
+  gocharSnapshot: string | null;
+  advice: string | null;
+  followUpDate: string | null;
+  createdBy: string | null;
+  createdAt: string;
+}
+
+export interface LifeConsultationList {
+  kundaliId: number;
+  items: LifeConsultationItem[];
+}
+
+export interface LifeSearchHit {
+  category: string;
+  field: string;
+  snippet: string;
+  analysisId: number;
+}
+
+export interface LifeSearchResponse {
+  kundaliId: number;
+  query: string;
+  hits: LifeSearchHit[];
+}
+
 @Injectable({ providedIn: 'root' })
 export class JyotishApiService {
   constructor(private readonly http: HttpClient) {}
@@ -853,6 +988,84 @@ export class JyotishApiService {
 
   askAi(body: AiAskRequest): Observable<AiAskResponse> {
     return this.http.post<AiAskResponse>('/api/v1/jyotish/ai/ask', body);
+  }
+
+  getLifeAnalysisDashboard(kundaliId: number): Observable<LifeAnalysisDashboard> {
+    return this.http.get<LifeAnalysisDashboard>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis`
+    );
+  }
+
+  getLifeAnalysis(kundaliId: number, category: string): Observable<LifeAnalysisDetail> {
+    return this.http.get<LifeAnalysisDetail>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/${category}`
+    );
+  }
+
+  upsertLifeAnalysis(
+    kundaliId: number,
+    category: string,
+    body: UpsertLifeAnalysisRequest
+  ): Observable<LifeAnalysisDetail> {
+    return this.http.put<LifeAnalysisDetail>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/${category}`,
+      body
+    );
+  }
+
+  listLifePeriods(kundaliId: number, category?: string): Observable<LifePeriodList> {
+    let params = new HttpParams();
+    if (category) {
+      params = params.set('category', category);
+    }
+    return this.http.get<LifePeriodList>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/periods`,
+      { params }
+    );
+  }
+
+  createLifePeriod(kundaliId: number, body: UpsertLifePeriodRequest): Observable<LifePeriodDto> {
+    return this.http.post<LifePeriodDto>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/periods`,
+      body
+    );
+  }
+
+  updateLifePeriod(
+    kundaliId: number,
+    periodId: number,
+    body: UpsertLifePeriodRequest
+  ): Observable<LifePeriodDto> {
+    return this.http.put<LifePeriodDto>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/periods/${periodId}`,
+      body
+    );
+  }
+
+  deleteLifePeriod(kundaliId: number, periodId: number): Observable<void> {
+    return this.http.delete<void>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/periods/${periodId}`
+    );
+  }
+
+  getLifeHistory(kundaliId: number, category: string): Observable<LifeHistoryList> {
+    return this.http.get<LifeHistoryList>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/${category}/history`
+    );
+  }
+
+  getLifeConsultations(kundaliId: number): Observable<LifeConsultationList> {
+    return this.http.get<LifeConsultationList>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/consultations`
+    );
+  }
+
+  searchLifeAnalysis(kundaliId: number, q: string): Observable<LifeSearchResponse> {
+    const params = new HttpParams().set('q', q || '');
+    return this.http.get<LifeSearchResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/search`,
+      { params }
+    );
   }
 
   getPanchang(opts: {

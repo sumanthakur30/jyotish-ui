@@ -43,6 +43,9 @@
     <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
       {{ 'kundali.transit' | t }}
     </button>
+    <button type="button" [class.active]="tab === 'life'" (click)="tab = 'life'">
+      {{ 'life.title' | t }}
+    </button>
     <button
       *ngIf="entitlements.can('reports')"
       type="button"
@@ -838,6 +841,10 @@
 
       <p class="hint">{{ t.notes }}</p>
     </ng-container>
+  </section>
+
+  <section class="panel" *ngIf="tab === 'life' && kundali">
+    <app-life-analysis-panel [kundaliId]="kundali.id"></app-life-analysis-panel>
   </section>
 
   <section class="panel" *ngIf="tab === 'reports'">

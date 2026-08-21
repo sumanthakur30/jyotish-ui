@@ -1,0 +1,211 @@
+<section class="life-root">
+  <header class="life-head">
+    <div>
+      <h2>{{ 'life.title' | t }}</h2>
+      <p class="hint">{{ 'life.subtitle' | t }}</p>
+    </div>
+    <div class="search-row">
+      <input
+        type="search"
+        [(ngModel)]="searchQ"
+        [placeholder]="'life.searchPlaceholder' | t"
+        (keyup.enter)="runSearch()"
+      />
+      <button type="button" class="btn ghost" (click)="runSearch()">{{ 'life.search' | t }}</button>
+      <button type="button" class="btn ghost" (click)="toggleConsultations()">
+        {{ 'life.consultations' | t }}
+      </button>
+    </div>
+  </header>
+
+  <p class="flash err" *ngIf="error">{{ error }}</p>
+  <p class="flash ok" *ngIf="flash">{{ flash }}</p>
+  <p class="hint" *ngIf="busy">{{ 'life.loading' | t }}</p>
+
+  <ul class="search-hits" *ngIf="searchHits.length">
+    <li *ngFor="let h of searchHits">
+      <button type="button" (click)="openHit(h)">
+        <strong>{{ h.category }}</strong> · {{ h.field }} — {{ h.snippet }}
+      </button>
+    </li>
+  </ul>
+
+  <aside class="consult-panel" *ngIf="showConsultations">
+    <h3>{{ 'life.consultations' | t }}</h3>
+    <p class="hint" *ngIf="!consultations.length">{{ 'life.noConsultations' | t }}</p>
+    <article *ngFor="let c of consultations" class="consult-card">
+      <header>
+        <strong>{{ c.category }}</strong> · {{ fmtWhen(c.createdAt) }}
+      </header>
+      <p *ngIf="c.observation">{{ c.observation }}</p>
+      <p class="muted" *ngIf="c.dashaSnapshot">Dasha: {{ c.dashaSnapshot }}</p>
+      <p class="muted" *ngIf="c.advice">{{ c.advice }}</p>
+    </article>
+  </aside>
+
+  <!-- Dashboard cards -->
+  <div class="life-cards" *ngIf="!selected && dashboard as dash">
+    <button
+      type="button"
+      class="life-card"
+      *ngFor="let c of dash.categories"
+      (click)="openCategory(c.category)"
+      [attr.data-status]="c.status"
+    >
+      <span class="card-title">{{ label(c) }}</span>
+      <span class="card-status" [attr.data-status]="c.status">{{ statusLabel(c.status) }}</span>
+      <span class="card-meta">{{ c.updatedAt ? fmtWhen(c.updatedAt) : '—' }}</span>
+    </button>
+  </div>
+
+  <!-- Category detail -->
+  <div class="life-detail" *ngIf="selected && detail as d">
+    <div class="detail-toolbar">
+      <button type="button" class="btn ghost" (click)="backToDashboard()">← {{ 'life.back' | t }}</button>
+      <h3>{{ categoryTitle() }}</h3>
+      <label class="status-pick">
+        {{ 'life.status' | t }}
+        <select [(ngModel)]="draftStatus">
+          <option value="NOT_STARTED">{{ 'life.statusNotStarted' | t }}</option>
+          <option value="IN_PROGRESS">{{ 'life.statusInProgress' | t }}</option>
+          <option value="COMPLETED">{{ 'life.statusCompleted' | t }}</option>
+        </select>
+      </label>
+      <label class="chk">
+        <input type="checkbox" [(ngModel)]="includeInReport" />
+        {{ 'life.includeReport' | t }}
+      </label>
+      <button type="button" class="btn ghost" (click)="applyTemplate()">{{ 'life.template' | t }}</button>
+      <button type="button" class="btn ghost" (click)="toggleHistory()">{{ 'life.history' | t }}</button>
+      <button type="button" class="btn primary" [disabled]="saveBusy" (click)="save()">
+        {{ saveBusy ? ('life.saving' | t) : ('life.save' | t) }}
+      </button>
+    </div>
+
+    <p class="health-banner" *ngIf="d.healthDisclaimerEn">
+      {{ language.lang === 'hi' ? d.healthDisclaimerHi : d.healthDisclaimerEn }}
+    </p>
+
+    <div class="detail-grid">
+      <div class="calc-panel">
+        <h4>{{ 'life.indicators' | t }}</h4>
+        <p class="hint">{{ 'life.indicatorsHint' | t }}</p>
+        <dl class="ind-list">
+          <div *ngFor="let i of d.indicators">
+            <dt>{{ i.label }} <span class="src">{{ i.source }}</span></dt>
+            <dd>{{ i.value }}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="notes-panel">
+        <h4>{{ 'life.jyotishAnalysis' | t }}</h4>
+
+        <label class="field" *ngFor="let s of sectionDefs()">
+          <span>{{ sectionLabel(s) }}</span>
+          <textarea rows="3" [(ngModel)]="sections[s.key]"></textarea>
+        </label>
+
+        <label class="field">
+          <span>{{ 'life.past' | t }}</span>
+          <textarea rows="3" [(ngModel)]="pastNotes"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ 'life.present' | t }}</span>
+          <textarea rows="4" [(ngModel)]="presentNotes"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ 'life.future' | t }}</span>
+          <textarea rows="3" [(ngModel)]="futureNotes"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ 'life.importantPeriods' | t }}</span>
+          <textarea rows="3" [(ngModel)]="importantPeriodsNotes"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ 'life.advice' | t }}</span>
+          <textarea rows="3" [(ngModel)]="advice"></textarea>
+        </label>
+        <label class="field">
+          <span>{{ 'life.jyotishNotes' | t }}</span>
+          <textarea rows="4" [(ngModel)]="jyotishNotes"></textarea>
+        </label>
+
+        <label class="chk">
+          <input type="checkbox" [(ngModel)]="recordConsultation" />
+          {{ 'life.recordConsultation' | t }}
+        </label>
+      </div>
+    </div>
+
+    <div class="timeline-block">
+      <h4>{{ 'life.timeline' | t }}</h4>
+      <p class="hint">{{ 'life.timelineHint' | t }}</p>
+      <table class="table compact" *ngIf="periods.length">
+        <thead>
+          <tr>
+            <th>{{ 'life.from' | t }}</th>
+            <th>{{ 'life.to' | t }}</th>
+            <th>{{ 'life.topic' | t }}</th>
+            <th>{{ 'life.observation' | t }}</th>
+            <th>{{ 'life.basis' | t }}</th>
+            <th>{{ 'life.status' | t }}</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of periods">
+            <td>{{ p.fromDate || '—' }}</td>
+            <td>{{ p.toDate || '—' }}</td>
+            <td>{{ p.topic }}</td>
+            <td>{{ p.observation || '—' }}</td>
+            <td>{{ p.calculationBasis || '—' }}</td>
+            <td>{{ p.status }}</td>
+            <td class="row-actions">
+              <button type="button" class="btn ghost" (click)="editPeriod(p)">{{ 'life.edit' | t }}</button>
+              <button type="button" class="btn ghost" (click)="deletePeriod(p)">{{ 'life.delete' | t }}</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="period-form">
+        <input type="date" [(ngModel)]="periodForm.fromDate" />
+        <input type="date" [(ngModel)]="periodForm.toDate" />
+        <input type="text" [(ngModel)]="periodForm.topic" [placeholder]="'life.topic' | t" />
+        <input
+          type="text"
+          [(ngModel)]="periodForm.observation"
+          [placeholder]="'life.observation' | t"
+        />
+        <input
+          type="text"
+          [(ngModel)]="periodForm.calculationBasis"
+          [placeholder]="'life.basis' | t"
+        />
+        <select [(ngModel)]="periodForm.status">
+          <option value="PLANNED">Planned</option>
+          <option value="ACTIVE">Active</option>
+          <option value="DONE">Done</option>
+        </select>
+        <button type="button" class="btn primary" (click)="savePeriod()">
+          {{ editingPeriodId ? ('life.updatePeriod' | t) : ('life.addPeriod' | t) }}
+        </button>
+        <button type="button" class="btn ghost" *ngIf="editingPeriodId" (click)="resetPeriodForm()">
+          {{ 'life.cancel' | t }}
+        </button>
+      </div>
+    </div>
+
+    <div class="history-block" *ngIf="showHistory">
+      <h4>{{ 'life.history' | t }}</h4>
+      <p class="hint" *ngIf="!history.length">{{ 'life.noHistory' | t }}</p>
+      <ul>
+        <li *ngFor="let h of history">
+          <strong>{{ h.fieldName }}</strong> · {{ fmtWhen(h.createdAt) }}
+          <div class="muted">{{ h.oldValue || '—' }} → {{ h.newValue || '—' }}</div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
