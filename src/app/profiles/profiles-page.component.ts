@@ -27,7 +27,8 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
   gender = '';
   birthDate = '';
   birthTime = '';
-  birthTimeUnknown = false;
+  birthTimeAccuracy: 'EXACT' | 'APPROXIMATE' | 'UNKNOWN' = 'EXACT';
+  uncertaintyMinutes: number = 15;
   dstObserved = false;
   timeZone = 'Asia/Kolkata';
   placeName = '';
@@ -74,6 +75,15 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
         this.fail(err);
       },
     });
+  }
+
+  onAccuracyChange(): void {
+    if (this.birthTimeAccuracy === 'UNKNOWN') {
+      this.birthTime = '';
+    }
+    if (this.birthTimeAccuracy === 'APPROXIMATE' && !this.uncertaintyMinutes) {
+      this.uncertaintyMinutes = 15;
+    }
   }
 
   onPlaceQueryChange(): void {
@@ -123,7 +133,8 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     this.gender = '';
     this.birthDate = '';
     this.birthTime = '';
-    this.birthTimeUnknown = false;
+    this.birthTimeAccuracy = 'EXACT';
+    this.uncertaintyMinutes = 15;
     this.dstObserved = false;
     this.timeZone = 'Asia/Kolkata';
     this.placeName = '';
@@ -144,7 +155,13 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     this.gender = p.gender || '';
     this.birthDate = p.details.birthDate;
     this.birthTime = p.details.birthTime || '';
-    this.birthTimeUnknown = p.details.birthTimeUnknown;
+    const acc = (p.details.birthTimeAccuracy || '').toUpperCase();
+    if (acc === 'APPROXIMATE' || acc === 'UNKNOWN' || acc === 'EXACT') {
+      this.birthTimeAccuracy = acc;
+    } else {
+      this.birthTimeAccuracy = p.details.birthTimeUnknown ? 'UNKNOWN' : 'EXACT';
+    }
+    this.uncertaintyMinutes = p.details.uncertaintyMinutes || 15;
     this.dstObserved = p.details.dstObserved;
     this.timeZone = p.details.timeZone;
     this.placeName = p.location.placeName;
@@ -181,18 +198,26 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
       this.error = 'Time zone is required (e.g. Asia/Kolkata).';
       return;
     }
-    if (!this.birthTimeUnknown && !this.birthTime) {
+    if (this.birthTimeAccuracy !== 'UNKNOWN' && !this.birthTime) {
       this.error = 'Birth time is required (or mark birth time unknown).';
       return;
     }
+    if (this.birthTimeAccuracy === 'APPROXIMATE' && !this.uncertaintyMinutes) {
+      this.error = 'Select uncertainty (± minutes) for approximate birth time.';
+      return;
+    }
+    const unknown = this.birthTimeAccuracy === 'UNKNOWN';
     const body: UpsertProfileRequest = {
       displayName: this.displayName.trim(),
       gender: this.gender || null,
       notes: this.notes || null,
       details: {
         birthDate: this.birthDate,
-        birthTime: this.birthTimeUnknown ? null : this.birthTime || null,
-        birthTimeUnknown: this.birthTimeUnknown,
+        birthTime: unknown ? null : this.birthTime || null,
+        birthTimeUnknown: unknown,
+        birthTimeAccuracy: this.birthTimeAccuracy,
+        uncertaintyMinutes:
+          this.birthTimeAccuracy === 'APPROXIMATE' ? this.uncertaintyMinutes : null,
         dstObserved: this.dstObserved,
         timeZone: this.timeZone,
       },

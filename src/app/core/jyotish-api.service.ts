@@ -29,6 +29,8 @@ export interface BirthDetails {
   birthDate: string;
   birthTime: string | null;
   birthTimeUnknown: boolean;
+  birthTimeAccuracy?: string | null;
+  uncertaintyMinutes?: number | null;
   dstObserved: boolean;
   timeZone: string;
 }
@@ -129,6 +131,8 @@ export interface UpsertProfileRequest {
     birthDate: string;
     birthTime?: string | null;
     birthTimeUnknown?: boolean;
+    birthTimeAccuracy?: string | null;
+    uncertaintyMinutes?: number | null;
     dstObserved?: boolean;
     timeZone: string;
   };
@@ -268,6 +272,36 @@ export interface YogaListResponse {
   categoryFilter: string | null;
   yogas: YogaDto[];
   catalog: YogaCatalogItem[];
+  notes: string | null;
+  disclaimer: string;
+}
+
+export interface DoshaDto {
+  doshaCode: string;
+  displayName: string;
+  displayNameHi: string;
+  status: string;
+  severityCode: string | null;
+  planets: string[];
+  houses: number[];
+  conditions: string[];
+  explanation: string;
+  ruleId: string;
+  implemented: boolean;
+}
+
+export interface DoshaCatalogItem {
+  doshaCode: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface DoshaListResponse {
+  kundaliId: number;
+  calculationEngineVersion: string;
+  doshas: DoshaDto[];
+  catalog: DoshaCatalogItem[];
   notes: string | null;
   disclaimer: string;
 }
@@ -678,6 +712,10 @@ export class JyotishApiService {
     return this.http.get<YogaListResponse>(`/api/v1/jyotish/kundali/${kundaliId}/yogas`, {
       params,
     });
+  }
+
+  getDoshas(kundaliId: number): Observable<DoshaListResponse> {
+    return this.http.get<DoshaListResponse>(`/api/v1/jyotish/kundali/${kundaliId}/doshas`);
   }
 
   getAshtakavarga(kundaliId: number): Observable<AshtakavargaResponse> {

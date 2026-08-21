@@ -31,6 +31,9 @@
     <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">
       {{ 'kundali.yogas' | t }}
     </button>
+    <button type="button" [class.active]="tab === 'doshas'" (click)="openDoshas()">
+      {{ 'kundali.doshas' | t }}
+    </button>
     <button type="button" [class.active]="tab === 'ashtakavarga'" (click)="openAshtakavarga()">
       {{ 'kundali.ashtakavarga' | t }}
     </button>
@@ -94,6 +97,18 @@
           </div>
         </dl>
 
+        <div class="nak-block" *ngIf="planetOf('MOON') as mo">
+          <h2>{{ 'overview.nakshatraTitle' | t }}</h2>
+          <p>
+            <strong>{{ mo.nakshatraName }}</strong>
+            · {{ 'kundali.pada' | t }} {{ mo.pada }}
+          </p>
+          <p class="muted">
+            {{ 'overview.nakshatraLord' | t }}: {{ nakshatraLordLabel() }} ·
+            {{ 'yoga.rashi' | t }} {{ signLabel(mo.signName) }}
+          </p>
+        </div>
+
         <details class="tech">
           <summary>{{ 'kundali.techDetails' | t }}</summary>
           <p class="hint">
@@ -113,19 +128,19 @@
     <table class="table">
       <thead>
         <tr>
-          <th>Planet</th>
-          <th>Sign</th>
-          <th>Degree</th>
-          <th>House</th>
-          <th>Nakshatra</th>
-          <th>Pada</th>
-          <th>R</th>
+          <th>{{ 'table.planet' | t }}</th>
+          <th>{{ 'table.sign' | t }}</th>
+          <th>{{ 'table.degree' | t }}</th>
+          <th>{{ 'table.house' | t }}</th>
+          <th>{{ 'table.nakshatra' | t }}</th>
+          <th>{{ 'table.pada' | t }}</th>
+          <th>{{ 'table.retro' | t }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngIf="k.ascendant as a">
-          <td>Ascendant</td>
-          <td>{{ a.signName }}</td>
+          <td>{{ 'table.ascendant' | t }}</td>
+          <td>{{ signLabel(a.signName) }}</td>
           <td>{{ fmtDeg(a.degreeInSign) }}</td>
           <td>{{ a.house }}</td>
           <td>{{ a.nakshatraName }}</td>
@@ -133,8 +148,8 @@
           <td></td>
         </tr>
         <tr *ngFor="let p of k.planets">
-          <td>{{ p.planetName }}</td>
-          <td>{{ p.signName }}</td>
+          <td>{{ planetLabel(p.planetCode) }}</td>
+          <td>{{ signLabel(p.signName) }}</td>
           <td>{{ fmtDeg(p.degreeInSign) }}</td>
           <td>{{ p.house }}</td>
           <td>{{ p.nakshatraName }}</td>
@@ -149,15 +164,19 @@
     <table class="table">
       <thead>
         <tr>
-          <th>House</th>
-          <th>Sign</th>
-          <th>Cusp</th>
+          <th>{{ 'table.house' | t }}</th>
+          <th>{{ 'table.sign' | t }}</th>
+          <th>{{ 'table.lord' | t }}</th>
+          <th>{{ 'table.occupants' | t }}</th>
+          <th>{{ 'table.cusp' | t }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let h of k.houses">
           <td>{{ h.house }}</td>
-          <td>{{ h.signName }}</td>
+          <td>{{ signLabel(h.signName) }}</td>
+          <td>{{ houseLord(h.signName) }}</td>
+          <td>{{ occupants(h.house) }}</td>
           <td>{{ fmtDeg(h.cuspLongitudeDeg % 30) }}</td>
         </tr>
       </tbody>
@@ -230,7 +249,7 @@
 
     <ng-container *ngIf="dasha as d">
       <div class="dasha-current" *ngIf="d.current?.maha as maha">
-        <h2>Current Mahadasha</h2>
+        <h2>{{ 'dasha.current' | t }}</h2>
         <p class="current-line">
           <strong>{{ maha.lordName }}</strong>
           <span *ngIf="d.current.antar as antar"> → {{ antar.lordName }}</span>
@@ -245,6 +264,21 @@
           {{ d.balanceAtBirthYears | number: '1.2-4' }} y ({{ d.birthMahadashaLord }}) · engine
           {{ d.calculationEngineVersion }}
         </p>
+      </div>
+
+      <h2 class="timeline-h">{{ 'dasha.timeline' | t }}</h2>
+      <div class="dasha-bar" *ngIf="d.timeline?.length">
+        <button
+          type="button"
+          class="seg"
+          *ngFor="let m of d.timeline"
+          [class.current]="m.current"
+          [style.flexGrow]="mahaWidthPct(m)"
+          (click)="toggleMaha(periodKey(m))"
+          [attr.title]="m.lordName"
+        >
+          {{ m.lordName }}
+        </button>
       </div>
 
       <div class="dasha-catalog" *ngIf="d.catalog?.length">
@@ -494,6 +528,69 @@
               {{ language.lang === 'hi' ? yogaTitle(c) : c.displayName }}
               <span class="cat">({{ yogaCatLabel(c.categoryCode) }})</span>
             </li>
+          </ul>
+        </ng-container>
+      </details>
+    </ng-container>
+  </section>
+
+  <section class="panel yoga-panel" *ngIf="tab === 'doshas'">
+    <p class="flash err" *ngIf="doshaError">{{ doshaError }}</p>
+    <p class="hint" *ngIf="doshaBusy">{{ 'dosha.loading' | t }}</p>
+
+    <ng-container *ngIf="doshas as d">
+      <p class="yoga-disclaimer">{{ d.disclaimer }}</p>
+      <p class="yoga-empty" *ngIf="!d.doshas?.length">{{ 'dosha.empty' | t }}</p>
+
+      <div class="yoga-cards">
+        <article
+          *ngFor="let dosha of d.doshas"
+          class="yoga-card"
+          [class.present]="dosha.status === 'PRESENT'"
+          [class.absent]="dosha.status !== 'PRESENT'"
+        >
+          <header class="yoga-card-head">
+            <div>
+              <h4>
+                {{ language.lang === 'hi' ? dosha.displayNameHi : dosha.displayName }}
+              </h4>
+              <p class="yoga-subname">
+                {{ language.lang === 'hi' ? dosha.displayName : dosha.displayNameHi }}
+              </p>
+            </div>
+            <span
+              class="badge"
+              [class.ok]="dosha.status === 'PRESENT'"
+              [class.dim]="dosha.status !== 'PRESENT'"
+              >{{ doshaStatusLabel(dosha.status) }}</span
+            >
+          </header>
+          <p class="yoga-expl">{{ dosha.explanation }}</p>
+          <button type="button" class="btn ghost yoga-toggle" (click)="toggleDosha(dosha.doshaCode)">
+            {{
+              expandedDosha.has(dosha.doshaCode)
+                ? ('yoga.hideDetails' | t)
+                : ('yoga.viewDetails' | t)
+            }}
+          </button>
+          <div class="yoga-detail" *ngIf="expandedDosha.has(dosha.doshaCode)">
+            <h5>{{ 'dosha.conditions' | t }}</h5>
+            <ul class="soon">
+              <li *ngFor="let c of dosha.conditions">{{ c }}</li>
+            </ul>
+            <p class="sub">{{ 'yoga.rule' | t }}: {{ dosha.ruleId }}</p>
+          </div>
+        </article>
+      </div>
+
+      <details class="tech yoga-tech">
+        <summary>{{ 'dosha.tech' | t }}</summary>
+        <p class="hint">Engine {{ d.calculationEngineVersion }}</p>
+        <p class="hint" *ngIf="d.notes">{{ d.notes }}</p>
+        <ng-container *ngIf="doshaComingSoon().length">
+          <p class="hint">{{ 'dosha.roadmap' | t }}</p>
+          <ul class="soon">
+            <li *ngFor="let c of doshaComingSoon()">{{ c.displayName }}</li>
           </ul>
         </ng-container>
       </details>

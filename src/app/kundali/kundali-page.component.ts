@@ -7,6 +7,7 @@ import {
   ChartCatalogItem,
   DashaPeriodDto,
   DashaResponse,
+  DoshaListResponse,
   JyotishApiService,
   KundaliResponse,
   PlanetDto,
@@ -35,6 +36,7 @@ export class KundaliPageComponent implements OnInit {
     | 'charts'
     | 'dasha'
     | 'yogas'
+    | 'doshas'
     | 'ashtakavarga'
     | 'shadbala'
     | 'transit'
@@ -62,6 +64,11 @@ export class KundaliPageComponent implements OnInit {
   yogaError = '';
   yogaCategory: string | null = null;
   expandedYoga = new Set<string>();
+
+  doshas: DoshaListResponse | null = null;
+  doshaBusy = false;
+  doshaError = '';
+  expandedDosha = new Set<string>();
 
   transit: TransitResponse | null = null;
   transitBusy = false;
@@ -154,6 +161,16 @@ export class KundaliPageComponent implements OnInit {
     }
     if (!this.yogas) {
       this.loadYogas();
+    }
+  }
+
+  openDoshas(): void {
+    this.tab = 'doshas';
+    if (!this.kundali) {
+      return;
+    }
+    if (!this.doshas) {
+      this.loadDoshas();
     }
   }
 
@@ -529,6 +546,28 @@ export class KundaliPageComponent implements OnInit {
     });
   }
 
+  private loadDoshas(): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.doshaBusy = true;
+    this.doshaError = '';
+    this.api.getDoshas(this.kundali.id).subscribe({
+      next: (d) => {
+        this.doshas = d;
+        this.doshaBusy = false;
+        for (const hit of d.doshas.filter((x) => x.status === 'PRESENT' || x.status === 'CANCELLED')) {
+          this.expandedDosha.add(hit.doshaCode);
+        }
+      },
+      error: (err) => {
+        this.doshaBusy = false;
+        this.doshas = null;
+        this.doshaError = err?.error?.message || this.language.t('dosha.loadError');
+      },
+    });
+  }
+
   private loadTransit(): void {
     if (!this.kundali) {
       return;
@@ -637,6 +676,101 @@ export class KundaliPageComponent implements OnInit {
 
   signLabel(name: string): string {
     return signFull(name, this.language.lang);
+  }
+
+  nakshatraLordLabel(): string {
+    const mo = this.planetOf('MOON');
+    if (!mo) {
+      return '—';
+    }
+    const lords = [
+      'KETU',
+      'VENUS',
+      'SUN',
+      'MOON',
+      'MARS',
+      'RAHU',
+      'JUPITER',
+      'SATURN',
+      'MERCURY',
+    ];
+    const code = lords[((mo.nakshatraIndex % 9) + 9) % 9];
+    return planetFull(code, this.language.lang);
+  }
+
+  houseLord(signName: string): string {
+    const lords: Record<string, string> = {
+      Aries: 'MARS',
+      Taurus: 'VENUS',
+      Gemini: 'MERCURY',
+      Cancer: 'MOON',
+      Leo: 'SUN',
+      Virgo: 'MERCURY',
+      Libra: 'VENUS',
+      Scorpio: 'MARS',
+      Sagittarius: 'JUPITER',
+      Capricorn: 'SATURN',
+      Aquarius: 'SATURN',
+      Pisces: 'JUPITER',
+    };
+    const code = lords[signName];
+    return code ? planetFull(code, this.language.lang) : '—';
+  }
+
+  occupants(house: number): string {
+    if (!this.kundali) {
+      return '—';
+    }
+    const labels: string[] = [];
+    if (this.kundali.ascendant?.house === house) {
+      labels.push(planetFull('ASCENDANT', this.language.lang));
+    }
+    for (const p of this.kundali.planets || []) {
+      if (p.house === house) {
+        labels.push(planetFull(p.planetCode, this.language.lang) + (p.retrograde ? 'ᵣ' : ''));
+      }
+    }
+    return labels.length ? labels.join(', ') : '—';
+  }
+
+  planetLabel(code: string): string {
+    return planetFull(code, this.language.lang);
+  }
+
+  toggleDosha(code: string): void {
+    if (this.expandedDosha.has(code)) {
+      this.expandedDosha.delete(code);
+    } else {
+      this.expandedDosha.add(code);
+    }
+  }
+
+  doshaStatusLabel(status: string): string {
+    const s = (status || '').toUpperCase();
+    if (s === 'PRESENT') {
+      return this.language.t('dosha.present');
+    }
+    if (s === 'CANCELLED') {
+      return this.language.t('dosha.cancelled');
+    }
+    return this.language.t('dosha.absent');
+  }
+
+  doshaComingSoon(): { doshaCode: string; displayName: string }[] {
+    return (this.doshas?.catalog || []).filter((c) => !c.implemented);
+  }
+
+  mahaWidthPct(m: DashaPeriodDto): number {
+    if (!this.dasha?.timeline?.length) {
+      return 8;
+    }
+    const starts = this.dasha.timeline.map((x) => new Date(x.startAt).getTime());
+    const ends = this.dasha.timeline.map((x) => new Date(x.endAt).getTime());
+    const min = Math.min(...starts);
+    const max = Math.max(...ends);
+    const span = max - min || 1;
+    const w = ((new Date(m.endAt).getTime() - new Date(m.startAt).getTime()) / span) * 100;
+    return Math.max(4, Math.min(40, w));
   }
 
   back(): void {

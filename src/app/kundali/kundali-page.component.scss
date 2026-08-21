@@ -88,6 +88,53 @@
   font-size: 1.05rem;
 }
 
+.nak-block {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--line);
+}
+
+.nak-block h2 {
+  margin: 0 0 0.35rem;
+}
+
+.nak-block p {
+  margin: 0.2rem 0;
+  font-size: 0.92rem;
+}
+
+.nak-block .muted {
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+.dasha-bar {
+  display: flex;
+  gap: 0.2rem;
+  margin: 0 0 1rem;
+  overflow-x: auto;
+}
+
+.dasha-bar .seg {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--ink) 6%, var(--panel));
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 0.45rem 0.25rem;
+  min-width: 2.5rem;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  flex-basis: 0;
+}
+
+.dasha-bar .seg.current {
+  background: var(--ink);
+  color: #f7f1e6;
+  border-color: var(--ink);
+}
+
 .facts {
   margin: 0;
   display: grid;

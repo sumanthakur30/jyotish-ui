@@ -33,19 +33,39 @@
         type="time"
         [(ngModel)]="birthTime"
         name="birthTime"
-        [disabled]="birthTimeUnknown"
+        [disabled]="birthTimeAccuracy === 'UNKNOWN'"
         step="60"
       />
     </label>
-    <label class="check">
-      <input type="checkbox" [(ngModel)]="birthTimeUnknown" name="birthTimeUnknown" />
-      {{ 'profile.timeUnknown' | t }}
+    <label>
+      {{ 'profile.timeAccuracy' | t }}
+      <select
+        [(ngModel)]="birthTimeAccuracy"
+        name="birthTimeAccuracy"
+        (ngModelChange)="onAccuracyChange()"
+      >
+        <option value="EXACT">{{ 'profile.accuracy.exact' | t }}</option>
+        <option value="APPROXIMATE">{{ 'profile.accuracy.approx' | t }}</option>
+        <option value="UNKNOWN">{{ 'profile.accuracy.unknown' | t }}</option>
+      </select>
+    </label>
+    <label *ngIf="birthTimeAccuracy === 'APPROXIMATE'">
+      {{ 'profile.uncertainty' | t }}
+      <select [(ngModel)]="uncertaintyMinutes" name="uncertaintyMinutes">
+        <option [ngValue]="5">± 5 {{ 'profile.min' | t }}</option>
+        <option [ngValue]="15">± 15 {{ 'profile.min' | t }}</option>
+        <option [ngValue]="30">± 30 {{ 'profile.min' | t }}</option>
+        <option [ngValue]="60">± 60 {{ 'profile.min' | t }}</option>
+      </select>
     </label>
     <label class="check">
       <input type="checkbox" [(ngModel)]="dstObserved" name="dstObserved" />
       {{ 'profile.dst' | t }}
     </label>
   </div>
+
+  <p class="hint" *ngIf="birthTimeAccuracy === 'UNKNOWN'">{{ 'profile.unknownHint' | t }}</p>
+  <p class="hint" *ngIf="birthTimeAccuracy === 'APPROXIMATE'">{{ 'profile.approxHint' | t }}</p>
 
   <div class="form-grid">
     <label class="wide">
