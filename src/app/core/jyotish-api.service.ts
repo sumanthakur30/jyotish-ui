@@ -10,6 +10,21 @@ export interface StatusResponse {
   entitlementFlag: string;
 }
 
+export interface EntitlementsSnapshot {
+  checksEnabled: boolean;
+  features: Record<string, boolean>;
+  modules: {
+    kundali?: boolean;
+    transit?: boolean;
+    matching?: boolean;
+    reports?: boolean;
+    ai?: boolean;
+    profiles?: boolean;
+    clients?: boolean;
+    appointments?: boolean;
+  };
+}
+
 export interface BirthDetails {
   birthDate: string;
   birthTime: string | null;
@@ -445,6 +460,10 @@ export class JyotishApiService {
 
   status(): Observable<StatusResponse> {
     return this.http.get<StatusResponse>('/api/v1/jyotish/status');
+  }
+
+  entitlements(): Observable<EntitlementsSnapshot> {
+    return this.http.get<EntitlementsSnapshot>('/api/v1/jyotish/entitlements');
   }
 
   listProfiles(q?: string, includeArchived = false): Observable<{ items: Profile[] }> {

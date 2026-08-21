@@ -30,10 +30,20 @@
     <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
       Transit
     </button>
-    <button type="button" [class.active]="tab === 'reports'" (click)="openReports()">
+    <button
+      *ngIf="entitlements.can('reports')"
+      type="button"
+      [class.active]="tab === 'reports'"
+      (click)="openReports()"
+    >
       Reports
     </button>
-    <button type="button" [class.active]="tab === 'ask'" (click)="openAsk()">
+    <button
+      *ngIf="entitlements.can('ai')"
+      type="button"
+      [class.active]="tab === 'ask'"
+      (click)="openAsk()"
+    >
       Ask Sugam Jyotish
     </button>
   </nav>

@@ -14,6 +14,7 @@ import {
   YogaDto,
   YogaListResponse,
 } from '../core/jyotish-api.service';
+import { EntitlementStateService } from '../core/entitlement-state.service';
 
 @Component({
   selector: 'app-kundali-page',
@@ -84,7 +85,8 @@ export class KundaliPageComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly api: JyotishApiService
+    private readonly api: JyotishApiService,
+    readonly entitlements: EntitlementStateService
   ) {}
 
   ngOnInit(): void {

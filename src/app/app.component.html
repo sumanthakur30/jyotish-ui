@@ -8,7 +8,7 @@
   </div>
   <nav class="nav">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Profiles</a>
-    <a routerLink="/matching" routerLinkActive="active">Matching</a>
+    <a *ngIf="can('matching')" routerLink="/matching" routerLinkActive="active">Matching</a>
     <a routerLink="/clients" routerLinkActive="active">Clients</a>
     <a routerLink="/appointments" routerLinkActive="active">Appointments</a>
   </nav>
@@ -28,10 +28,14 @@
 <main class="shell">
   <p class="flash ok" *ngIf="message">{{ message }}</p>
   <p class="flash err" *ngIf="error">{{ error }}</p>
+  <section class="panel upgrade" *ngIf="showUpgradeBanner">
+    <p>{{ upgradeHint('Kundali &amp; core Jyotish') }}</p>
+  </section>
   <section class="panel compact" *ngIf="status as s">
     <span>{{ s.service }}</span>
     <span>· {{ s.phase }}</span>
     <span>· engine {{ s.engineVersion }}</span>
+    <span *ngIf="s.entitlementEnabled">· entitlements on</span>
   </section>
   <router-outlet></router-outlet>
 </main>

@@ -1,5 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { JyotishApiService, StatusResponse } from './core/jyotish-api.service';
+import {
+  EntitlementsSnapshot,
+  JyotishApiService,
+  StatusResponse,
+} from './core/jyotish-api.service';
+import { EntitlementStateService } from './core/entitlement-state.service';
 import { TenantService } from './core/tenant.service';
 
 @Component({
@@ -10,12 +15,14 @@ import { TenantService } from './core/tenant.service';
 export class AppComponent implements OnInit {
   tenantDraft = '';
   status: StatusResponse | null = null;
+  entitlements: EntitlementsSnapshot | null = null;
   message = '';
   error = '';
 
   constructor(
     private readonly api: JyotishApiService,
-    private readonly tenant: TenantService
+    private readonly tenant: TenantService,
+    readonly entitlementState: EntitlementStateService
   ) {}
 
   ngOnInit(): void {
@@ -24,6 +31,23 @@ export class AppComponent implements OnInit {
       this.tenant.setTenant(this.tenantDraft);
     }
     this.refreshStatus();
+  }
+
+  /** True when entitlement checks are off or the module flag is enabled. */
+  can(module: keyof NonNullable<EntitlementsSnapshot['modules']>): boolean {
+    return this.entitlementState.can(module);
+  }
+
+  get showUpgradeBanner(): boolean {
+    return (
+      !!this.status?.entitlementEnabled &&
+      !!this.entitlements?.checksEnabled &&
+      this.entitlements.modules?.kundali === false
+    );
+  }
+
+  upgradeHint(feature: string): string {
+    return `Upgrade your Jyotish plan to unlock ${feature}. Configure in SugamFlow Super Admin → Platform Subscription (jyotish-starter or higher).`;
   }
 
   saveTenant(): void {
@@ -40,9 +64,28 @@ export class AppComponent implements OnInit {
     this.api.status().subscribe({
       next: (s) => {
         this.status = s;
+        this.entitlementState.status = s;
         this.message = `Connected · ${s.service} · ${s.phase}`;
+        if (s.entitlementEnabled) {
+          this.loadEntitlements();
+        } else {
+          this.entitlements = null;
+          this.entitlementState.entitlements = null;
+        }
       },
       error: (err) => this.fail(err, 'Could not reach jyotish-service on :8097.'),
+    });
+  }
+
+  private loadEntitlements(): void {
+    this.api.entitlements().subscribe({
+      next: (snap) => {
+        this.entitlements = snap;
+        this.entitlementState.entitlements = snap;
+      },
+      error: () => {
+        /* keep null → fail-open UI until service answers */
+      },
     });
   }
 
