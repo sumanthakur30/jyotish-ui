@@ -119,3 +119,43 @@ export function signFull(name: string, lang: Lang): string {
   }
   return name;
 }
+
+const YOGA_HI: Record<string, string> = {
+  GAJAKESARI: 'गजकेसरी योग',
+  DHARMA_KARMADHIPATI: 'धर्म-कर्माधिपति राज योग',
+  DHANA_2_11: 'धन योग (द्वितीय–एकादश)',
+  RUCHAKA: 'रुचक योग',
+  BHADRA: 'भद्र योग',
+  HAMSA: 'हंस योग',
+  MALAVYA: 'मालव्य योग',
+  SASA: 'शश योग',
+  NEECHA_BHANGA: 'नीच भंग राज योग',
+  VIPARITA_RAJA: 'विपरीत राज योग',
+  KEMADRUMA: 'केमद्रुम योग',
+  BUDHADITYA: 'बुधादित्य योग',
+};
+
+const YOGA_CAT_HI: Record<string, string> = {
+  CHANDRA: 'चंद्र योग',
+  RAJA: 'राज योग',
+  DHANA: 'धन योग',
+  MAHAPURUSHA: 'पंच महापुरुष',
+  OTHER: 'अन्य योग',
+};
+
+const YOGA_CAT_EN: Record<string, string> = {
+  CHANDRA: 'Chandra Yoga',
+  RAJA: 'Raja Yoga',
+  DHANA: 'Dhana Yoga',
+  MAHAPURUSHA: 'Panch Mahapurusha',
+  OTHER: 'Other Yogas',
+};
+
+export function yogaNameHi(code: string): string {
+  return YOGA_HI[code] || code;
+}
+
+export function yogaCategoryLabel(code: string, lang: Lang): string {
+  const map = lang === 'hi' ? YOGA_CAT_HI : YOGA_CAT_EN;
+  return map[code] || code;
+}

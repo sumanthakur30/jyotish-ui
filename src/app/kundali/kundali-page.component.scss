@@ -344,11 +344,77 @@
   margin: 0 0 0.5rem;
 }
 
+.yoga-panel {
+  padding-top: 1rem;
+}
+
+.yoga-context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.yoga-context-main h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.yoga-context-main p {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.yoga-disclaimer {
+  margin: 0;
+  max-width: 22rem;
+  font-size: 0.82rem;
+  opacity: 0.7;
+  line-height: 1.35;
+}
+
+.yoga-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.yoga-stat {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.65rem 0.75rem;
+  background: color-mix(in srgb, var(--panel) 80%, var(--ink) 4%);
+}
+
+.yoga-stat.muted {
+  opacity: 0.75;
+}
+
+.yoga-stat .n {
+  display: block;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.yoga-stat .l {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
 .yoga-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0.75rem 0 1rem;
+  margin: 0 0 1rem;
 }
 
 .yoga-filters button {
@@ -356,16 +422,207 @@
   background: transparent;
   color: var(--ink);
   border-radius: 0.3rem;
-  padding: 0.3rem 0.65rem;
+  padding: 0.4rem 0.75rem;
   cursor: pointer;
   font: inherit;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
 }
 
 .yoga-filters button.active {
   background: var(--ink);
   color: #f7f1e6;
   border-color: var(--ink);
+}
+
+.yoga-section-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.yoga-empty {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed var(--line);
+  border-radius: 0.35rem;
+  font-size: 0.92rem;
+  opacity: 0.85;
+}
+
+.yoga-cards {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.yoga-cards.compact {
+  margin-top: 0.65rem;
+}
+
+.yoga-card {
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  padding: 0.9rem 1rem;
+  background: var(--panel);
+}
+
+.yoga-card.present {
+  border-color: color-mix(in srgb, var(--ok) 45%, var(--line));
+  background: color-mix(in srgb, var(--ok) 6%, var(--panel));
+}
+
+.yoga-card.absent {
+  opacity: 0.92;
+}
+
+.yoga-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.65rem;
+}
+
+.yoga-card-head h4 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.yoga-subname {
+  margin: 0.15rem 0 0;
+  font-size: 0.82rem;
+  opacity: 0.65;
+}
+
+.yoga-cat {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  opacity: 0.55;
+}
+
+.yoga-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.yoga-card .badge {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--line);
+  border-radius: 0.25rem;
+  padding: 0.2rem 0.45rem;
+  white-space: nowrap;
+}
+
+.yoga-card .badge.ok {
+  border-color: color-mix(in srgb, var(--ok) 50%, var(--line));
+  color: var(--ok);
+  font-weight: 650;
+}
+
+.yoga-card .badge.strength {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+}
+
+.yoga-card .badge.dim {
+  opacity: 0.65;
+}
+
+.yoga-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.55rem 1rem;
+  margin: 0 0 0.65rem;
+}
+
+.yoga-facts dt {
+  margin: 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+
+.yoga-facts dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.yoga-expl {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  opacity: 0.9;
+}
+
+.yoga-toggle {
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.yoga-card .yoga-detail {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--line);
+}
+
+.yoga-card .yoga-detail h5 {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+}
+
+.yoga-card .yoga-detail .expl {
+  margin: 0 0 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.yoga-absent,
+.yoga-tech {
+  margin: 0.5rem 0 0;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+}
+
+.yoga-absent summary,
+.yoga-tech summary {
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 600;
+  list-style: none;
+}
+
+.yoga-absent summary::-webkit-details-marker,
+.yoga-tech summary::-webkit-details-marker {
+  display: none;
+}
+
+.yoga-absent .count {
+  font-weight: 500;
+  opacity: 0.65;
+}
+
+.yoga-tech .soon {
+  margin: 0.35rem 0 0;
+}
+
+.yoga-tech .cat {
+  opacity: 0.6;
+  font-size: 0.85em;
+}
+
+@media (max-width: 720px) {
+  .yoga-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .yoga-disclaimer {
+    max-width: none;
+  }
 }
 
 .yoga-list {

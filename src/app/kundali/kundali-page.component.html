@@ -319,102 +319,184 @@
     </div>
   </section>
 
-  <section class="panel" *ngIf="tab === 'yogas'">
+  <section class="panel yoga-panel" *ngIf="tab === 'yogas'">
     <p class="flash err" *ngIf="yogaError">{{ yogaError }}</p>
-    <p class="hint" *ngIf="yogaBusy">Loading yogas…</p>
+    <p class="hint" *ngIf="yogaBusy">{{ 'yoga.loading' | t }}</p>
 
     <ng-container *ngIf="yogas as y">
-      <p class="hint disclaimer">{{ y.disclaimer }}</p>
-      <p class="sub">
-        Engine {{ y.calculationEngineVersion }}
-        <span *ngIf="y.categoryFilter"> · filter {{ y.categoryFilter }}</span>
-      </p>
+      <header class="yoga-context" *ngIf="kundali as k">
+        <div class="yoga-context-main">
+          <h2>{{ k.displayName }}</h2>
+          <p>
+            <span *ngIf="k.ascendant as a"
+              >{{ 'kundali.lagna' | t }} {{ signLabel(a.signName) }}</span
+            >
+            <span> · {{ 'yoga.rashi' | t }} {{ moonSignLabel() }}</span>
+            <span> · {{ 'yoga.nakshatra' | t }} {{ moonNakshatraLabel() }}</span>
+          </p>
+        </div>
+        <p class="yoga-disclaimer">{{ 'yoga.disclaimerShort' | t }}</p>
+      </header>
 
-      <div class="yoga-filters">
+      <div class="yoga-summary">
+        <div class="yoga-stat">
+          <span class="n">{{ yogaFoundCount() }}</span>
+          <span class="l">{{ 'yoga.found' | t }}</span>
+        </div>
+        <div class="yoga-stat">
+          <span class="n">{{ yogaStrongCount() }}</span>
+          <span class="l">{{ 'yoga.strong' | t }}</span>
+        </div>
+        <div class="yoga-stat">
+          <span class="n">{{ yogaModerateCount() }}</span>
+          <span class="l">{{ 'yoga.moderate' | t }}</span>
+        </div>
+        <div class="yoga-stat muted">
+          <span class="n">{{ yogaAbsentCount() }}</span>
+          <span class="l">{{ 'yoga.notFoundCount' | t }}</span>
+        </div>
+      </div>
+
+      <div class="yoga-filters" role="tablist">
         <button
           type="button"
           [class.active]="yogaCategory === null"
           (click)="selectYogaCategory(null)"
         >
-          All
+          {{ 'yoga.filter.all' | t }}
         </button>
         <button
           type="button"
           [class.active]="yogaCategory === 'CHANDRA'"
           (click)="selectYogaCategory('CHANDRA')"
         >
-          Chandra
+          {{ 'yoga.filter.chandra' | t }}
         </button>
         <button
           type="button"
           [class.active]="yogaCategory === 'RAJA'"
           (click)="selectYogaCategory('RAJA')"
         >
-          Raja
+          {{ 'yoga.filter.raja' | t }}
         </button>
         <button
           type="button"
           [class.active]="yogaCategory === 'DHANA'"
           (click)="selectYogaCategory('DHANA')"
         >
-          Dhana
+          {{ 'yoga.filter.dhana' | t }}
         </button>
         <button
           type="button"
           [class.active]="yogaCategory === 'MAHAPURUSHA'"
           (click)="selectYogaCategory('MAHAPURUSHA')"
         >
-          Mahapurusha
+          {{ 'yoga.filter.mahapurusha' | t }}
         </button>
       </div>
 
-      <h2 class="timeline-h">Present</h2>
-      <p class="hint" *ngIf="!presentYogas().length">No implemented yogas present under this filter.</p>
-      <ul class="yoga-list">
-        <li *ngFor="let yoga of presentYogas()" class="present">
-          <button type="button" class="yoga-row" (click)="toggleYoga(yoga.yogaCode)">
-            <span class="chev">{{ expandedYoga.has(yoga.yogaCode) ? '▾' : '▸' }}</span>
-            <span class="name">{{ yoga.displayName }}</span>
-            <span class="cat">{{ yoga.categoryName }}</span>
-            <span class="badge">Present</span>
-            <span class="str" *ngIf="yoga.strengthCode">{{ yoga.strengthCode }}</span>
-            <span class="str muted" *ngIf="!yoga.strengthCode">Strength: Coming Soon</span>
+      <h3 class="yoga-section-title">{{ 'yoga.section.present' | t }}</h3>
+      <p class="yoga-empty" *ngIf="!presentYogas().length">{{ 'yoga.empty.present' | t }}</p>
+
+      <div class="yoga-cards">
+        <article *ngFor="let yoga of presentYogas()" class="yoga-card present">
+          <header class="yoga-card-head">
+            <div>
+              <h4>{{ yogaTitle(yoga) }}</h4>
+              <p class="yoga-subname">{{ yogaTitleSecondary(yoga) }}</p>
+              <p class="yoga-cat">{{ yogaCatLabel(yoga.categoryCode) }}</p>
+            </div>
+            <div class="yoga-badges">
+              <span class="badge ok">{{ 'yoga.status.present' | t }}</span>
+              <span class="badge strength" *ngIf="yoga.strengthCode">{{
+                yogaStrengthLabel(yoga.strengthCode)
+              }}</span>
+            </div>
+          </header>
+
+          <dl class="yoga-facts">
+            <div>
+              <dt>{{ 'yoga.planets' | t }}</dt>
+              <dd>{{ yogaPlanetLabels(yoga.planets) }}</dd>
+            </div>
+            <div>
+              <dt>{{ 'yoga.houses' | t }}</dt>
+              <dd>{{ yoga.houses.join(', ') || '—' }}</dd>
+            </div>
+            <div *ngIf="yoga.strengthCode">
+              <dt>{{ 'yoga.strength' | t }}</dt>
+              <dd>{{ yogaStrengthLabel(yoga.strengthCode) }}</dd>
+            </div>
+          </dl>
+
+          <p class="yoga-expl">{{ yoga.explanation }}</p>
+
+          <button type="button" class="btn ghost yoga-toggle" (click)="toggleYoga(yoga.yogaCode)">
+            {{
+              expandedYoga.has(yoga.yogaCode) ? ('yoga.hideDetails' | t) : ('yoga.viewDetails' | t)
+            }}
           </button>
           <div class="yoga-detail" *ngIf="expandedYoga.has(yoga.yogaCode)">
-            <p class="meta">
-              Planets: {{ yoga.planets.join(', ') || '—' }} · Houses:
-              {{ yoga.houses.join(', ') || '—' }}
-            </p>
+            <h5>{{ 'yoga.conditions' | t }}</h5>
             <p class="expl">{{ yoga.explanation }}</p>
-            <p class="sub">Rule {{ yoga.ruleId }}</p>
+            <p class="sub">{{ 'yoga.rule' | t }}: {{ yoga.ruleId }}</p>
           </div>
-        </li>
-      </ul>
+        </article>
+      </div>
 
-      <h2 class="timeline-h">Checked (not present)</h2>
-      <ul class="yoga-list quiet">
-        <li *ngFor="let yoga of absentImplemented()">
-          <button type="button" class="yoga-row" (click)="toggleYoga(yoga.yogaCode)">
-            <span class="chev">{{ expandedYoga.has(yoga.yogaCode) ? '▾' : '▸' }}</span>
-            <span class="name">{{ yoga.displayName }}</span>
-            <span class="cat">{{ yoga.categoryName }}</span>
-            <span class="badge dim">Not present</span>
-          </button>
-          <div class="yoga-detail" *ngIf="expandedYoga.has(yoga.yogaCode)">
-            <p class="expl">{{ yoga.explanation }}</p>
-          </div>
-        </li>
-      </ul>
+      <details class="yoga-absent" *ngIf="absentImplemented().length">
+        <summary>
+          {{ 'yoga.moreChecked' | t }}
+          <span class="count">({{ yogaAbsentCount() }})</span>
+        </summary>
+        <p class="hint">{{ 'yoga.section.absent' | t }}</p>
+        <div class="yoga-cards compact">
+          <article *ngFor="let yoga of absentImplemented()" class="yoga-card absent">
+            <header class="yoga-card-head">
+              <div>
+                <h4>{{ yogaTitle(yoga) }}</h4>
+                <p class="yoga-subname">{{ yogaTitleSecondary(yoga) }}</p>
+                <p class="yoga-cat">{{ yogaCatLabel(yoga.categoryCode) }}</p>
+              </div>
+              <span class="badge dim">{{ 'yoga.status.absent' | t }}</span>
+            </header>
+            <button
+              type="button"
+              class="btn ghost yoga-toggle"
+              (click)="toggleYoga(yoga.yogaCode)"
+            >
+              {{
+                expandedYoga.has(yoga.yogaCode)
+                  ? ('yoga.hideDetails' | t)
+                  : ('yoga.viewDetails' | t)
+              }}
+            </button>
+            <div class="yoga-detail" *ngIf="expandedYoga.has(yoga.yogaCode)">
+              <h5>{{ 'yoga.conditions' | t }}</h5>
+              <p class="expl">{{ yoga.explanation }}</p>
+            </div>
+          </article>
+        </div>
+      </details>
 
-      <h2 class="timeline-h">Coming Soon</h2>
-      <ul class="soon">
-        <li *ngFor="let c of comingSoonCatalog()">
-          {{ c.displayName }}
-          <span class="cat">({{ c.categoryName }})</span>
-        </li>
-      </ul>
-
-      <p class="hint">{{ y.notes }}</p>
+      <details class="tech yoga-tech">
+        <summary>{{ 'yoga.tech' | t }}</summary>
+        <p class="hint">
+          Engine {{ y.calculationEngineVersion }}
+          <span *ngIf="y.categoryFilter"> · {{ y.categoryFilter }}</span>
+        </p>
+        <p class="hint" *ngIf="y.disclaimer">{{ y.disclaimer }}</p>
+        <p class="hint" *ngIf="y.notes">{{ y.notes }}</p>
+        <ng-container *ngIf="comingSoonCatalog().length">
+          <p class="hint">{{ 'yoga.roadmap' | t }}</p>
+          <ul class="soon">
+            <li *ngFor="let c of comingSoonCatalog()">
+              {{ language.lang === 'hi' ? yogaTitle(c) : c.displayName }}
+              <span class="cat">({{ yogaCatLabel(c.categoryCode) }})</span>
+            </li>
+          </ul>
+        </ng-container>
+      </details>
     </ng-container>
   </section>
 

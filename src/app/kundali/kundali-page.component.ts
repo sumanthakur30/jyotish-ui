@@ -19,7 +19,7 @@ import {
 } from '../core/jyotish-api.service';
 import { EntitlementStateService } from '../core/entitlement-state.service';
 import { LanguageService } from '../core/i18n/language.service';
-import { signFull } from '../core/i18n/jyotish-labels';
+import { planetFull, signFull, yogaCategoryLabel, yogaNameHi } from '../core/i18n/jyotish-labels';
 
 @Component({
   selector: 'app-kundali-page',
@@ -103,7 +103,7 @@ export class KundaliPageComponent implements OnInit {
     private readonly router: Router,
     private readonly api: JyotishApiService,
     readonly entitlements: EntitlementStateService,
-    private readonly language: LanguageService
+    readonly language: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -309,6 +309,77 @@ export class KundaliPageComponent implements OnInit {
     return (this.yogas?.catalog || []).filter((c) => !c.implemented);
   }
 
+  yogaFoundCount(): number {
+    return this.presentYogas().length;
+  }
+
+  yogaStrongCount(): number {
+    return this.presentYogas().filter((y) => (y.strengthCode || '').toUpperCase() === 'FULL').length;
+  }
+
+  yogaModerateCount(): number {
+    return this.presentYogas().filter((y) => {
+      const s = (y.strengthCode || '').toUpperCase();
+      return s === 'MODERATE' || s === 'PARTIAL';
+    }).length;
+  }
+
+  yogaAbsentCount(): number {
+    return this.absentImplemented().length;
+  }
+
+  yogaTitle(yoga: { yogaCode: string; displayName: string }): string {
+    if (this.language.lang === 'hi') {
+      return yogaNameHi(yoga.yogaCode) || yoga.displayName;
+    }
+    return yoga.displayName;
+  }
+
+  yogaTitleSecondary(yoga: { yogaCode: string; displayName: string }): string {
+    if (this.language.lang === 'hi') {
+      return yoga.displayName;
+    }
+    return yogaNameHi(yoga.yogaCode);
+  }
+
+  yogaCatLabel(categoryCode: string): string {
+    return yogaCategoryLabel(categoryCode, this.language.lang);
+  }
+
+  yogaStrengthLabel(code: string | null | undefined): string {
+    const s = (code || '').toUpperCase();
+    if (s === 'FULL') {
+      return this.language.t('yoga.strength.full');
+    }
+    if (s === 'MODERATE') {
+      return this.language.t('yoga.strength.moderate');
+    }
+    if (s === 'PARTIAL') {
+      return this.language.t('yoga.strength.partial');
+    }
+    return this.language.t('yoga.strength.none');
+  }
+
+  yogaPlanetLabels(codes: string[]): string {
+    if (!codes?.length) {
+      return '—';
+    }
+    return codes.map((c) => planetFull(c, this.language.lang)).join(', ');
+  }
+
+  moonSignLabel(): string {
+    const mo = this.planetOf('MOON');
+    return mo ? this.signLabel(mo.signName) : '—';
+  }
+
+  moonNakshatraLabel(): string {
+    const mo = this.planetOf('MOON');
+    if (!mo) {
+      return '—';
+    }
+    return `${mo.nakshatraName} ${this.language.t('kundali.pada')} ${mo.pada}`;
+  }
+
   selectVarga(code: string, implemented: boolean): void {
     this.selectedVarga = code;
     this.vargaChart = null;
@@ -453,7 +524,7 @@ export class KundaliPageComponent implements OnInit {
       error: (err) => {
         this.yogaBusy = false;
         this.yogas = null;
-        this.yogaError = err?.error?.message || 'Could not load yogas.';
+        this.yogaError = err?.error?.message || this.language.t('yoga.loadError');
       },
     });
   }
