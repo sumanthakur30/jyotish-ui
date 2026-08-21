@@ -9,6 +9,7 @@ import {
   DashaResponse,
   JyotishApiService,
   KundaliResponse,
+  PlanetDto,
   ShadbalaResponse,
   TransitResponse,
   VargaChartResponse,
@@ -17,6 +18,8 @@ import {
   YogaListResponse,
 } from '../core/jyotish-api.service';
 import { EntitlementStateService } from '../core/entitlement-state.service';
+import { LanguageService } from '../core/i18n/language.service';
+import { signFull } from '../core/i18n/jyotish-labels';
 
 @Component({
   selector: 'app-kundali-page',
@@ -99,7 +102,8 @@ export class KundaliPageComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly api: JyotishApiService,
-    readonly entitlements: EntitlementStateService
+    readonly entitlements: EntitlementStateService,
+    private readonly language: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -554,6 +558,14 @@ export class KundaliPageComponent implements OnInit {
     const d = Math.floor(n);
     const m = Math.floor((n - d) * 60);
     return `${d}° ${String(m).padStart(2, '0')}′`;
+  }
+
+  planetOf(code: string): PlanetDto | null {
+    return this.kundali?.planets?.find((p) => p.planetCode === code) || null;
+  }
+
+  signLabel(name: string): string {
+    return signFull(name, this.language.lang);
   }
 
   back(): void {

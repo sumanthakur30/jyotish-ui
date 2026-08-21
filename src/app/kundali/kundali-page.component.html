@@ -6,17 +6,13 @@
       <p>
         {{ k.birthDate }}
         <span *ngIf="k.birthTime"> · {{ k.birthTime }}</span>
-        <span *ngIf="k.birthTimeUnknown"> · time unknown</span>
+        <span *ngIf="k.birthTimeUnknown"> · {{ 'kundali.timeUnknown' | t }}</span>
         · {{ k.placeName }}
-      </p>
-      <p class="sub">
-        {{ k.ayanamsaCode }} {{ fmtDeg(k.ayanamsaDeg) }} · {{ k.houseSystem }} · engine
-        {{ k.calculationEngineVersion }}
       </p>
     </div>
   </header>
 
-  <nav class="tabs">
+  <nav class="tabs" aria-label="Kundali sections">
     <button type="button" [class.active]="tab === 'overview'" (click)="tab = 'overview'">
       {{ 'kundali.overview' | t }}
     </button>
@@ -62,25 +58,54 @@
     </button>
   </nav>
 
-  <section class="panel" *ngIf="tab === 'overview'">
+  <section class="panel overview-panel" *ngIf="tab === 'overview'">
     <div class="overview-grid">
       <app-kundali-chart
+        class="chart-stage"
         [planets]="k.planets"
         [houses]="k.houses"
         [ascendant]="k.ascendant"
       ></app-kundali-chart>
-      <div class="lagna">
-        <h2>{{ 'kundali.lagna' | t }}</h2>
-        <p *ngIf="k.ascendant as a">
-          {{ a.signName }} {{ fmtDeg(a.degreeInSign) }} · {{ a.nakshatraName }} pada {{ a.pada }}
-        </p>
-        <h2>Notes</h2>
-        <p class="hint">{{ k.notes }}</p>
-        <h2>Coming soon</h2>
-        <ul class="soon">
-          <li *ngFor="let c of k.comingSoon">{{ c.label }}</li>
-        </ul>
-      </div>
+      <aside class="key-panel">
+        <h2>{{ 'kundali.keyPoints' | t }}</h2>
+        <dl class="facts">
+          <div *ngIf="k.ascendant as a">
+            <dt>{{ 'kundali.lagna' | t }}</dt>
+            <dd>
+              {{ signLabel(a.signName) }} {{ fmtDeg(a.degreeInSign) }}
+              <span class="muted"
+                >· {{ a.nakshatraName }} {{ 'kundali.pada' | t }} {{ a.pada }}</span
+              >
+            </dd>
+          </div>
+          <div *ngIf="planetOf('MOON') as mo">
+            <dt>{{ 'kundali.moon' | t }}</dt>
+            <dd>
+              {{ signLabel(mo.signName) }} {{ fmtDeg(mo.degreeInSign) }}
+              <span class="muted">· H{{ mo.house }}</span>
+            </dd>
+          </div>
+          <div *ngIf="planetOf('SUN') as su">
+            <dt>{{ 'kundali.sun' | t }}</dt>
+            <dd>
+              {{ signLabel(su.signName) }} {{ fmtDeg(su.degreeInSign) }}
+              <span class="muted">· H{{ su.house }}</span>
+            </dd>
+          </div>
+        </dl>
+
+        <details class="tech">
+          <summary>{{ 'kundali.techDetails' | t }}</summary>
+          <p class="hint">
+            {{ k.ayanamsaCode }} {{ fmtDeg(k.ayanamsaDeg) }} · {{ k.houseSystem }} · engine
+            {{ k.calculationEngineVersion }}
+          </p>
+          <p class="hint" *ngIf="k.notes">{{ k.notes }}</p>
+          <ul class="soon" *ngIf="k.comingSoon?.length">
+            <li *ngFor="let c of k.comingSoon">{{ c.label }}</li>
+          </ul>
+        </details>
+      </aside>
     </div>
   </section>
 

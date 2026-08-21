@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { HouseDto, PlanetDto, TransitPlanetDto } from '../core/jyotish-api.service';
+import { LanguageService } from '../core/i18n/language.service';
+import { planetAbbrev, signAbbrev } from '../core/i18n/jyotish-labels';
 
 /** North-Indian style diamond chart rendered from API planet/house data (not a static image). */
 @Component({
@@ -14,25 +16,29 @@ export class KundaliChartComponent {
   /** Optional Gochar overlay — shown with a distinct style in natal houses. */
   @Input() transitPlanets: TransitPlanetDto[] = [];
 
+  constructor(private readonly language: LanguageService) {}
+
   /** Map house number → abbreviated planet labels in that house. */
   labelsForHouse(house: number): string[] {
+    const lang = this.language.lang;
     const labels: string[] = [];
     if (this.ascendant && this.ascendant.house === house) {
-      labels.push('As');
+      labels.push(planetAbbrev('ASCENDANT', lang));
     }
     for (const p of this.planets) {
       if (p.house === house) {
-        labels.push(this.abbrev(p.planetCode) + (p.retrograde ? 'ᵣ' : ''));
+        labels.push(planetAbbrev(p.planetCode, lang) + (p.retrograde ? 'ᵣ' : ''));
       }
     }
     return labels;
   }
 
   transitLabelsForHouse(house: number): string[] {
+    const lang = this.language.lang;
     const labels: string[] = [];
     for (const p of this.transitPlanets || []) {
       if (p.house === house) {
-        labels.push(this.abbrev(p.planetCode) + (p.retrograde ? 'ᵣ' : ''));
+        labels.push(planetAbbrev(p.planetCode, lang) + (p.retrograde ? 'ᵣ' : ''));
       }
     }
     return labels;
@@ -40,40 +46,6 @@ export class KundaliChartComponent {
 
   signForHouse(house: number): string {
     const h = this.houses.find((x) => x.house === house);
-    return h ? this.signAbbrev(h.signName) : '';
-  }
-
-  private abbrev(code: string): string {
-    const map: Record<string, string> = {
-      SUN: 'Su',
-      MOON: 'Mo',
-      MARS: 'Ma',
-      MERCURY: 'Me',
-      JUPITER: 'Ju',
-      VENUS: 'Ve',
-      SATURN: 'Sa',
-      RAHU: 'Ra',
-      KETU: 'Ke',
-      ASCENDANT: 'As',
-    };
-    return map[code] || code.slice(0, 2);
-  }
-
-  private signAbbrev(name: string): string {
-    const map: Record<string, string> = {
-      Aries: 'Ar',
-      Taurus: 'Ta',
-      Gemini: 'Ge',
-      Cancer: 'Cn',
-      Leo: 'Le',
-      Virgo: 'Vi',
-      Libra: 'Li',
-      Scorpio: 'Sc',
-      Sagittarius: 'Sg',
-      Capricorn: 'Cp',
-      Aquarius: 'Aq',
-      Pisces: 'Pi',
-    };
-    return map[name] || name.slice(0, 2);
+    return h ? signAbbrev(h.signName, this.language.lang) : '';
   }
 }
