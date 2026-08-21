@@ -10,44 +10,100 @@
         · {{ k.placeName }}
       </p>
     </div>
+    <div class="view-mode" role="group" [attr.aria-label]="'view.aria' | t">
+      <button
+        type="button"
+        [class.active]="viewMode.isSimple"
+        (click)="viewMode.setMode('simple')"
+      >
+        {{ 'view.simple' | t }}
+      </button>
+      <button
+        type="button"
+        [class.active]="viewMode.isExpert"
+        (click)="viewMode.setMode('expert')"
+      >
+        {{ 'view.expert' | t }}
+      </button>
+    </div>
   </header>
 
   <nav class="tabs" aria-label="Kundali sections">
     <button type="button" [class.active]="tab === 'overview'" (click)="tab = 'overview'">
-      {{ 'kundali.overview' | t }}
+      {{ viewMode.isSimple ? ('simple.homeTab' | t) : ('kundali.overview' | t) }}
     </button>
-    <button type="button" [class.active]="tab === 'planets'" (click)="tab = 'planets'">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'planets'"
+      (click)="tab = 'planets'"
+    >
       {{ 'kundali.planets' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'houses'"
+      (click)="tab = 'houses'"
+    >
       {{ 'kundali.houses' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'charts'"
+      (click)="openCharts()"
+    >
       {{ 'kundali.charts' | t }}
     </button>
     <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">
       {{ 'kundali.dasha' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'yogas'"
+      (click)="openYogas()"
+    >
       {{ 'kundali.yogas' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'doshas'" (click)="openDoshas()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'doshas'"
+      (click)="openDoshas()"
+    >
       {{ 'kundali.doshas' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'ashtakavarga'" (click)="openAshtakavarga()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'ashtakavarga'"
+      (click)="openAshtakavarga()"
+    >
       {{ 'kundali.ashtakavarga' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'shadbala'" (click)="openShadbala()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'shadbala'"
+      (click)="openShadbala()"
+    >
       {{ 'kundali.shadbala' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
+    <button
+      *ngIf="viewMode.isExpert"
+      type="button"
+      [class.active]="tab === 'transit'"
+      (click)="openTransit()"
+    >
       {{ 'kundali.transit' | t }}
     </button>
     <button type="button" [class.active]="tab === 'life'" (click)="tab = 'life'">
       {{ 'life.title' | t }}
     </button>
     <button
-      *ngIf="entitlements.can('reports')"
+      *ngIf="entitlements.can('reports') && viewMode.isExpert"
       type="button"
       [class.active]="tab === 'reports'"
       (click)="openReports()"
@@ -55,7 +111,7 @@
       {{ 'kundali.reports' | t }}
     </button>
     <button
-      *ngIf="entitlements.can('ai')"
+      *ngIf="entitlements.can('ai') && viewMode.isExpert"
       type="button"
       [class.active]="tab === 'ask'"
       (click)="openAsk()"
@@ -64,7 +120,15 @@
     </button>
   </nav>
 
-  <section class="panel overview-panel" *ngIf="tab === 'overview'">
+  <section class="panel overview-panel" *ngIf="tab === 'overview' && viewMode.isSimple">
+    <app-simple-kundali-home
+      [kundaliId]="k.id"
+      (openLifeArea)="openLifeFromSimple($event)"
+      (openDasha)="openDasha()"
+    ></app-simple-kundali-home>
+  </section>
+
+  <section class="panel overview-panel" *ngIf="tab === 'overview' && viewMode.isExpert">
     <div class="chart-toolbar">
       <div class="view-toggle" role="group">
         <button
@@ -327,104 +391,157 @@
 
   <section class="panel" *ngIf="tab === 'dasha'">
     <p class="flash err" *ngIf="dashaError">{{ dashaError }}</p>
-    <p class="hint" *ngIf="dashaBusy">Loading Vimshottari…</p>
+    <p class="hint" *ngIf="dashaBusy">{{ 'simple.dashaLoading' | t }}</p>
 
     <ng-container *ngIf="dasha as d">
-      <div class="dasha-current" *ngIf="d.current?.maha as maha">
-        <h2>{{ 'dasha.current' | t }}</h2>
-        <p class="current-line">
-          <strong>{{ maha.lordName }}</strong>
-          <span *ngIf="d.current.antar as antar"> → {{ antar.lordName }}</span>
-          <span *ngIf="d.current.pratyantar as pr"> → {{ pr.lordName }}</span>
-        </p>
-        <p class="sub">
-          {{ fmtWhen(maha.startAt) }} – {{ fmtWhen(maha.endAt) }}
-          <span *ngIf="maha.remainingDays != null"> · {{ maha.remainingDays }} days remaining</span>
-        </p>
-        <p class="hint">
-          Moon {{ d.moonNakshatraName }} · birth balance
-          {{ d.balanceAtBirthYears | number: '1.2-4' }} y ({{ d.birthMahadashaLord }}) · engine
-          {{ d.calculationEngineVersion }}
-        </p>
+      <!-- Simple journey -->
+      <div class="dasha-journey" *ngIf="viewMode.isSimple">
+        <ng-container *ngIf="dashaJourney() as j">
+          <article class="journey-card current" *ngIf="j.current as cur">
+            <p class="journey-label">{{ 'simple.journey.current' | t }}</p>
+            <h2>
+              {{ cur.maha.lordName }}
+              <span *ngIf="cur.antar"> → {{ cur.antar.lordName }}</span>
+            </h2>
+            <p class="dates">
+              {{ fmtWhen((cur.antar && cur.antar.startAt) || cur.maha.startAt) }} –
+              {{ fmtWhen((cur.antar && cur.antar.endAt) || cur.maha.endAt) }}
+            </p>
+            <button
+              type="button"
+              class="btn ghost"
+              (click)="selectPeriod(cur.antar || cur.maha)"
+            >
+              {{ 'simple.understandPeriod' | t }}
+            </button>
+          </article>
+          <article class="journey-card" *ngIf="j.next as n">
+            <p class="journey-label">{{ 'simple.journey.next' | t }}</p>
+            <h2>{{ n.lordName }} · {{ n.level }}</h2>
+            <p class="dates">{{ fmtWhen(n.startAt) }} – {{ fmtWhen(n.endAt) }}</p>
+            <button type="button" class="btn ghost" (click)="selectPeriod(n)">
+              {{ 'simple.understandPeriod' | t }}
+            </button>
+          </article>
+          <article class="journey-card" *ngIf="j.later.length">
+            <p class="journey-label">{{ 'simple.journey.later' | t }}</p>
+            <ul class="later-list">
+              <li *ngFor="let L of j.later">
+                <strong>{{ L.lordName }}</strong>
+                <span class="dates">{{ fmtWhen(L.startAt) }} – {{ fmtWhen(L.endAt) }}</span>
+                <button type="button" class="linkish" (click)="selectPeriod(L)">
+                  {{ 'simple.understandPeriod' | t }}
+                </button>
+              </li>
+            </ul>
+          </article>
+        </ng-container>
+        <details class="tech">
+          <summary>{{ 'kundali.techDetails' | t }}</summary>
+          <p class="hint">
+            {{ d.moonNakshatraName }} · {{ d.systemCode }} · {{ d.calculationEngineVersion }}
+          </p>
+        </details>
       </div>
 
-      <h2 class="timeline-h">{{ 'dasha.timeline' | t }}</h2>
-      <div class="dasha-bar" *ngIf="d.timeline?.length">
-        <button
-          type="button"
-          class="seg"
-          *ngFor="let m of d.timeline"
-          [class.current]="m.current"
-          [style.flexGrow]="mahaWidthPct(m)"
-          (click)="toggleMaha(periodKey(m))"
-          [attr.title]="m.lordName"
-        >
-          {{ m.lordName }}
-        </button>
-      </div>
+      <!-- Expert tree (existing) -->
+      <ng-container *ngIf="viewMode.isExpert">
+        <div class="dasha-current" *ngIf="d.current?.maha as maha">
+          <h2>{{ 'dasha.current' | t }}</h2>
+          <p class="current-line">
+            <strong>{{ maha.lordName }}</strong>
+            <span *ngIf="d.current.antar as antar"> → {{ antar.lordName }}</span>
+            <span *ngIf="d.current.pratyantar as pr"> → {{ pr.lordName }}</span>
+          </p>
+          <p class="sub">
+            {{ fmtWhen(maha.startAt) }} – {{ fmtWhen(maha.endAt) }}
+            <span *ngIf="maha.remainingDays != null"> · {{ maha.remainingDays }} days remaining</span>
+          </p>
+          <p class="hint">
+            Moon {{ d.moonNakshatraName }} · birth balance
+            {{ d.balanceAtBirthYears | number: '1.2-4' }} y ({{ d.birthMahadashaLord }}) · engine
+            {{ d.calculationEngineVersion }}
+          </p>
+        </div>
 
-      <div class="dasha-catalog" *ngIf="d.catalog?.length">
-        <span *ngFor="let c of d.catalog" [class.soon]="!c.implemented" class="sys">
-          {{ c.displayName }}
-          <span *ngIf="!c.implemented">Soon</span>
-        </span>
-      </div>
-
-      <h2 class="timeline-h">Timeline</h2>
-      <ul class="dasha-tree">
-        <li *ngFor="let m of d.timeline" [class.current]="m.current">
+        <h2 class="timeline-h">{{ 'dasha.timeline' | t }}</h2>
+        <div class="dasha-bar" *ngIf="d.timeline?.length">
           <button
             type="button"
-            class="row maha"
+            class="seg"
+            *ngFor="let m of d.timeline"
+            [class.current]="m.current"
+            [style.flexGrow]="mahaWidthPct(m)"
             (click)="toggleMaha(periodKey(m))"
-            (dblclick)="selectPeriod(m, $event)"
+            [attr.title]="m.lordName"
           >
-            <span class="chev">{{ expandedMaha.has(periodKey(m)) ? '▾' : '▸' }}</span>
-            <span class="lord">{{ m.lordName }}</span>
-            <span class="lvl">Mahadasha</span>
-            <span class="dates">{{ fmtWhen(m.startAt) }} – {{ fmtWhen(m.endAt) }}</span>
-            <span class="badge" *ngIf="m.current">Now</span>
-            <span
-              class="linkish"
-              (click)="selectPeriod(m, $event)"
-              title="Interpretation"
-              >ⓘ</span
-            >
+            {{ m.lordName }}
           </button>
-          <ul class="nested" *ngIf="expandedMaha.has(periodKey(m))">
-            <li *ngFor="let a of m.children" [class.current]="a.current">
-              <button
-                type="button"
-                class="row antar"
-                (click)="toggleAntar(periodKey(a))"
-              >
-                <span class="chev">{{ expandedAntar.has(periodKey(a)) ? '▾' : '▸' }}</span>
-                <span class="lord">{{ a.lordName }}</span>
-                <span class="lvl">Antardasha</span>
-                <span class="dates">{{ fmtWhen(a.startAt) }} – {{ fmtWhen(a.endAt) }}</span>
-                <span class="badge" *ngIf="a.current">Now</span>
-                <span class="linkish" (click)="selectPeriod(a, $event)">ⓘ</span>
-              </button>
-              <ul class="nested" *ngIf="expandedAntar.has(periodKey(a))">
-                <li *ngFor="let p of a.children" [class.current]="p.current">
-                  <button type="button" class="row praty" (click)="selectPeriod(p)">
-                    <span class="chev pad"></span>
-                    <span class="lord">{{ p.lordName }}</span>
-                    <span class="lvl">Pratyantar</span>
-                    <span class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</span>
-                    <span class="badge" *ngIf="p.current">Now</span>
-                  </button>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </li>
-      </ul>
+        </div>
 
-      <p class="hint">{{ d.notes }}</p>
+        <div class="dasha-catalog" *ngIf="d.catalog?.length">
+          <span *ngFor="let c of d.catalog" [class.soon]="!c.implemented" class="sys">
+            {{ c.displayName }}
+            <span *ngIf="!c.implemented">Soon</span>
+          </span>
+        </div>
+
+        <h2 class="timeline-h">Timeline</h2>
+        <ul class="dasha-tree">
+          <li *ngFor="let m of d.timeline" [class.current]="m.current">
+            <button
+              type="button"
+              class="row maha"
+              (click)="toggleMaha(periodKey(m))"
+              (dblclick)="selectPeriod(m, $event)"
+            >
+              <span class="chev">{{ expandedMaha.has(periodKey(m)) ? '▾' : '▸' }}</span>
+              <span class="lord">{{ m.lordName }}</span>
+              <span class="lvl">Mahadasha</span>
+              <span class="dates">{{ fmtWhen(m.startAt) }} – {{ fmtWhen(m.endAt) }}</span>
+              <span class="badge" *ngIf="m.current">Now</span>
+              <span
+                class="linkish"
+                (click)="selectPeriod(m, $event)"
+                title="Interpretation"
+                >ⓘ</span
+              >
+            </button>
+            <ul class="nested" *ngIf="expandedMaha.has(periodKey(m))">
+              <li *ngFor="let a of m.children" [class.current]="a.current">
+                <button
+                  type="button"
+                  class="row antar"
+                  (click)="toggleAntar(periodKey(a))"
+                >
+                  <span class="chev">{{ expandedAntar.has(periodKey(a)) ? '▾' : '▸' }}</span>
+                  <span class="lord">{{ a.lordName }}</span>
+                  <span class="lvl">Antardasha</span>
+                  <span class="dates">{{ fmtWhen(a.startAt) }} – {{ fmtWhen(a.endAt) }}</span>
+                  <span class="badge" *ngIf="a.current">Now</span>
+                  <span class="linkish" (click)="selectPeriod(a, $event)">ⓘ</span>
+                </button>
+                <ul class="nested" *ngIf="expandedAntar.has(periodKey(a))">
+                  <li *ngFor="let p of a.children" [class.current]="p.current">
+                    <button type="button" class="row praty" (click)="selectPeriod(p)">
+                      <span class="chev pad"></span>
+                      <span class="lord">{{ p.lordName }}</span>
+                      <span class="lvl">Pratyantar</span>
+                      <span class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</span>
+                      <span class="badge" *ngIf="p.current">Now</span>
+                    </button>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+
+        <p class="hint">{{ d.notes }}</p>
+      </ng-container>
     </ng-container>
 
-    <div class="interp" *ngIf="showInterpretation && selectedPeriod as sp">
+    <div class="interp" *ngIf="showInterpretation && viewMode.isExpert && selectedPeriod as sp">
       <div class="interp-card">
         <h3>{{ sp.lordName }} · {{ sp.level }}</h3>
         <p class="sub">{{ fmtWhen(sp.startAt) }} – {{ fmtWhen(sp.endAt) }}</p>
@@ -433,6 +550,34 @@
         <button type="button" class="btn ghost" (click)="closeInterpretation()">Close</button>
       </div>
     </div>
+
+    <div
+      class="interp"
+      *ngIf="showInterpretation && viewMode.isSimple && simplePeriodExplain as se"
+    >
+      <div class="interp-card">
+        <h3>{{ 'simple.understandPeriod' | t }}</h3>
+        <p class="sub">{{ fmtWhen(se.startAt) }} – {{ fmtWhen(se.endAt) }}</p>
+        <p *ngIf="se.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
+        <p *ngFor="let para of explainParagraphs(se.explanation)">{{ para }}</p>
+        <details *ngIf="se.explanation?.whyFacts?.length">
+          <summary>{{ 'simple.why' | t }}</summary>
+          <ul>
+            <li *ngFor="let f of se.explanation.whyFacts">
+              <strong>{{ language.lang === 'hi' ? f.labelHi : f.labelEn }}:</strong>
+              {{ f.value }}
+            </li>
+          </ul>
+        </details>
+        <p class="hint">
+          {{ language.lang === 'hi' ? se.generalDisclaimerHi : se.generalDisclaimerEn }}
+        </p>
+        <button type="button" class="btn ghost" (click)="closeInterpretation()">
+          {{ 'simple.close' | t }}
+        </button>
+      </div>
+    </div>
+    <p class="hint" *ngIf="simplePeriodBusy">{{ 'common.busy' | t }}</p>
   </section>
 
   <section class="panel yoga-panel" *ngIf="tab === 'yogas'">
@@ -884,7 +1029,10 @@
   </section>
 
   <section class="panel" *ngIf="tab === 'life' && kundali">
-    <app-life-analysis-panel [kundaliId]="kundali.id"></app-life-analysis-panel>
+    <app-life-analysis-panel
+      [kundaliId]="kundali.id"
+      [focusCategory]="lifeCategoryFocus"
+    ></app-life-analysis-panel>
   </section>
 
   <section class="panel" *ngIf="tab === 'reports'">

@@ -1,0 +1,193 @@
+.simple-home {
+  padding-top: 0.5rem;
+}
+
+.hello h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+}
+
+.hello .lead {
+  margin: 0 0 1rem;
+  opacity: 0.75;
+  max-width: 40rem;
+}
+
+.glance {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.g-card {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.75rem 0.85rem;
+  background: color-mix(in srgb, var(--paper, #f7f1e6) 88%, transparent);
+}
+
+.g-card h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.g-card .value {
+  margin: 0.35rem 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.g-card details summary {
+  cursor: pointer;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.g-card details p {
+  margin: 0.4rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.period,
+.areas,
+.upcoming {
+  margin: 1.25rem 0;
+}
+
+.period-title {
+  margin: 0.25rem 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.dates {
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+.meaning p {
+  line-height: 1.5;
+  max-width: 42rem;
+}
+
+.why {
+  margin: 0.75rem 0;
+}
+
+.why ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.period-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.area-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.65rem;
+}
+
+.area-card {
+  text-align: left;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  border-radius: 0.35rem;
+  padding: 0.7rem 0.8rem;
+  cursor: pointer;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.area-card:hover {
+  border-color: var(--ink);
+}
+
+.area-name {
+  font-weight: 600;
+}
+
+.area-status {
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.area-dasha {
+  font-size: 0.78rem;
+  opacity: 0.65;
+}
+
+.upcoming ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+
+.upcoming li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.tech {
+  margin-top: 1.5rem;
+  opacity: 0.85;
+}
+
+.disclaimer {
+  font-size: 0.82rem;
+  opacity: 0.75;
+  line-height: 1.4;
+  max-width: 42rem;
+}
+
+.understand-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 16, 12, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  padding: 1rem;
+}
+
+.understand-card {
+  background: var(--paper, #f7f1e6);
+  color: var(--ink);
+  border-radius: 0.5rem;
+  padding: 1.1rem 1.25rem;
+  max-width: 32rem;
+  width: 100%;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.understand-card h3 {
+  margin: 0 0 0.35rem;
+}
+
+.hint {
+  opacity: 0.7;
+}
+
+.flash.err {
+  color: #8b1a1a;
+}

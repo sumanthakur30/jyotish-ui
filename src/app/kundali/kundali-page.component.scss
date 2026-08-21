@@ -13,6 +13,73 @@
   margin-bottom: 0.75rem;
 }
 
+.view-mode {
+  display: inline-flex;
+  margin-left: auto;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  overflow: hidden;
+}
+
+.view-mode button {
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  padding: 0.4rem 0.85rem;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.view-mode button.active {
+  background: var(--ink);
+  color: #f7f1e6;
+}
+
+.dasha-journey {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.journey-card {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.9rem 1rem;
+}
+
+.journey-card.current {
+  border-color: var(--ink);
+}
+
+.journey-label {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.65;
+}
+
+.journey-card h2 {
+  margin: 0.25rem 0;
+  font-size: 1.2rem;
+}
+
+.later-list {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+}
+
+.later-list li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
 .meta h1 {
   margin: 0;
   font-size: 1.35rem;

@@ -1,0 +1,147 @@
+<div class="simple-home" *ngIf="!busy; else loading">
+  <p class="flash err" *ngIf="error">{{ error }}</p>
+
+  <ng-container *ngIf="overview as o">
+    <header class="hello">
+      <h2>{{ 'simple.hello' | t: { name: o.displayName } }}</h2>
+      <p class="lead">{{ 'simple.lead' | t }}</p>
+    </header>
+
+    <section class="glance" aria-label="Glance">
+      <article class="g-card">
+        <h3>{{ 'simple.glance.lagna' | t }}</h3>
+        <p class="value">{{ glanceValue(o.lagna) }}</p>
+        <details>
+          <summary>{{ 'simple.whatIsThis' | t }}</summary>
+          <p>{{ whatIsThis(o.lagna) }}</p>
+        </details>
+      </article>
+      <article class="g-card">
+        <h3>{{ 'simple.glance.moon' | t }}</h3>
+        <p class="value">{{ glanceValue(o.moonRashi) }}</p>
+        <details>
+          <summary>{{ 'simple.whatIsThis' | t }}</summary>
+          <p>{{ whatIsThis(o.moonRashi) }}</p>
+        </details>
+      </article>
+      <article class="g-card">
+        <h3>{{ 'simple.glance.nakshatra' | t }}</h3>
+        <p class="value">{{ glanceValue(o.nakshatra) }}</p>
+        <details>
+          <summary>{{ 'simple.whatIsThis' | t }}</summary>
+          <p>{{ whatIsThis(o.nakshatra) }}</p>
+        </details>
+      </article>
+      <article class="g-card">
+        <h3>{{ 'simple.glance.dasha' | t }}</h3>
+        <p class="value">{{ glanceValue(o.currentDashaGlance) }}</p>
+        <details>
+          <summary>{{ 'simple.whatIsThis' | t }}</summary>
+          <p>{{ whatIsThis(o.currentDashaGlance) }}</p>
+        </details>
+      </article>
+    </section>
+
+    <section class="period" *ngIf="o.currentLifePeriod as p; else noPeriod">
+      <h3>{{ 'simple.currentPeriod' | t }}</h3>
+      <p class="period-title">{{ periodTitle(p) }}</p>
+      <p class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</p>
+      <div class="meaning" *ngIf="p.explanation as ex">
+        <p *ngIf="ex.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
+        <p *ngFor="let para of paragraphs(ex)">{{ para }}</p>
+        <details class="why" [open]="whyOpen">
+          <summary>{{ 'simple.why' | t }}</summary>
+          <ul>
+            <li *ngFor="let f of ex.whyFacts">
+              <strong>{{ language.lang === 'hi' ? f.labelHi : f.labelEn }}:</strong>
+              {{ f.value }}
+            </li>
+          </ul>
+        </details>
+        <div class="period-actions">
+          <button type="button" class="btn ghost" (click)="openUnderstandCurrent()">
+            {{ 'simple.understandPeriod' | t }}
+          </button>
+          <button type="button" class="btn ghost" (click)="goDasha()">
+            {{ 'simple.seeJourney' | t }}
+          </button>
+        </div>
+      </div>
+    </section>
+    <ng-template #noPeriod>
+      <section class="period">
+        <h3>{{ 'simple.currentPeriod' | t }}</h3>
+        <p class="hint">{{ 'simple.calcMissing' | t }}</p>
+      </section>
+    </ng-template>
+
+    <section class="areas" *ngIf="o.lifeAreas?.length">
+      <h3>{{ 'simple.lifeAreas' | t }}</h3>
+      <p class="hint">{{ 'simple.lifeAreasHint' | t }}</p>
+      <div class="area-grid">
+        <button
+          type="button"
+          class="area-card"
+          *ngFor="let a of o.lifeAreas"
+          (click)="goLife(a.category)"
+        >
+          <span class="area-name">{{ areaLabel(a) }}</span>
+          <span class="area-status">{{ statusLabel(a.status) }}</span>
+          <span class="area-dasha" *ngIf="a.currentDashaLine">{{ a.currentDashaLine }}</span>
+        </button>
+      </div>
+      <p class="disclaimer" *ngIf="showsHealth(o.lifeAreas)">
+        {{ language.lang === 'hi' ? o.healthDisclaimerHi : o.healthDisclaimerEn }}
+      </p>
+    </section>
+
+    <section class="upcoming" *ngIf="o.upcoming?.length">
+      <h3>{{ 'simple.upcoming' | t }}</h3>
+      <ul>
+        <li *ngFor="let u of o.upcoming | slice: 0:5">
+          <strong>{{ upcomingLabel(u) }}</strong>
+          <span class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</span>
+        </li>
+      </ul>
+    </section>
+
+    <details class="tech">
+      <summary>{{ 'kundali.techDetails' | t }}</summary>
+      <p class="hint" *ngIf="o.technical as t">
+        {{ t.ayanamsaCode }} · {{ t.houseSystem }} · {{ t.dashaSystemCode }} ·
+        {{ t.calculationEngineVersion }}
+      </p>
+      <p class="disclaimer">{{ disclaimer() }}</p>
+    </details>
+  </ng-container>
+</div>
+
+<ng-template #loading>
+  <p class="hint">{{ 'simple.loading' | t }}</p>
+</ng-template>
+
+<div class="understand-overlay" *ngIf="understand as u" (click)="closeUnderstand()">
+  <div class="understand-card" (click)="$event.stopPropagation()">
+    <h3>{{ 'simple.understandPeriod' | t }}</h3>
+    <p class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</p>
+    <p *ngIf="u.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
+    <p *ngFor="let para of paragraphs(u.explanation)">{{ para }}</p>
+    <details *ngIf="u.explanation?.whyFacts?.length">
+      <summary>{{ 'simple.why' | t }}</summary>
+      <ul>
+        <li *ngFor="let f of u.explanation.whyFacts">
+          <strong>{{ language.lang === 'hi' ? f.labelHi : f.labelEn }}:</strong>
+          {{ f.value }}
+        </li>
+      </ul>
+    </details>
+    <p class="disclaimer">
+      {{ language.lang === 'hi' ? u.generalDisclaimerHi : u.generalDisclaimerEn }}
+    </p>
+    <button type="button" class="btn ghost" (click)="closeUnderstand()">
+      {{ 'simple.close' | t }}
+    </button>
+  </div>
+</div>
+
+<p class="hint" *ngIf="understandBusy">{{ 'common.busy' | t }}</p>

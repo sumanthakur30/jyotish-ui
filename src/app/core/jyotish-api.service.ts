@@ -806,6 +806,121 @@ export interface LifeSearchResponse {
   hits: LifeSearchHit[];
 }
 
+export interface SimpleGlanceCard {
+  code: string;
+  available: boolean;
+  valueEn: string | null;
+  valueHi: string | null;
+  whatIsThisEn: string;
+  whatIsThisHi: string;
+}
+
+export interface SimpleFactBullet {
+  code: string;
+  labelEn: string;
+  labelHi: string;
+  value: string;
+}
+
+export interface SimpleExplainedBlock {
+  calculationNotAvailable: boolean;
+  paragraphsEn: string[];
+  paragraphsHi: string[];
+  whyFacts: SimpleFactBullet[];
+}
+
+export interface SimpleCurrentLifePeriod {
+  titleEn: string;
+  titleHi: string;
+  startAt: string | null;
+  endAt: string | null;
+  mahaLordCode: string | null;
+  mahaLordName: string | null;
+  antarLordCode: string | null;
+  antarLordName: string | null;
+  explanation: SimpleExplainedBlock;
+}
+
+export interface SimpleLifeAreaCard {
+  category: string;
+  labelEn: string;
+  labelHi: string;
+  status: string;
+  currentDashaLine: string | null;
+  currentDashaEndAt: string | null;
+}
+
+export interface SimpleUpcomingItem {
+  levelCode: string;
+  labelEn: string;
+  labelHi: string;
+  lordCode: string;
+  lordName: string;
+  mahaLordCode: string | null;
+  mahaLordName: string | null;
+  startAt: string | null;
+  endAt: string | null;
+}
+
+export interface SimplePresentYoga {
+  yogaCode: string;
+  displayName: string;
+  strengthCode: string | null;
+  planets: string[];
+}
+
+export interface SimpleLordTheme {
+  lordCode: string;
+  nameEn: string;
+  nameHi: string;
+  meaningEn: string[];
+  meaningHi: string[];
+}
+
+export interface SimpleTechnicalDetails {
+  ayanamsaCode: string | null;
+  houseSystem: string | null;
+  calculationEngineVersion: string | null;
+  zodiacSystem: string | null;
+  dashaSystemCode: string | null;
+}
+
+export interface SimpleOverviewResponse {
+  kundaliId: number;
+  displayName: string;
+  asOf: string;
+  calculationNotAvailable: boolean;
+  lagna: SimpleGlanceCard;
+  moonRashi: SimpleGlanceCard;
+  nakshatra: SimpleGlanceCard;
+  currentDashaGlance: SimpleGlanceCard;
+  currentLifePeriod: SimpleCurrentLifePeriod | null;
+  lifeAreas: SimpleLifeAreaCard[];
+  upcoming: SimpleUpcomingItem[];
+  presentYogas: SimplePresentYoga[];
+  lordThemes: SimpleLordTheme[];
+  technical: SimpleTechnicalDetails;
+  generalDisclaimerEn: string;
+  generalDisclaimerHi: string;
+  healthDisclaimerEn: string;
+  healthDisclaimerHi: string;
+}
+
+export interface SimplePeriodExplainResponse {
+  kundaliId: number;
+  calculationNotAvailable: boolean;
+  levelCode: string | null;
+  mahaLordCode: string | null;
+  mahaLordName: string | null;
+  antarLordCode: string | null;
+  antarLordName: string | null;
+  startAt: string | null;
+  endAt: string | null;
+  explanation: SimpleExplainedBlock;
+  generalDisclaimerEn: string;
+  generalDisclaimerHi: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class JyotishApiService {
   constructor(private readonly http: HttpClient) {}
@@ -882,6 +997,31 @@ export class JyotishApiService {
   getDasha(kundaliId: number, system = 'VIMSHOTTARI'): Observable<DashaResponse> {
     return this.http.get<DashaResponse>(
       `/api/v1/jyotish/kundali/${kundaliId}/dasha/${system}`
+    );
+  }
+
+  getSimpleOverview(kundaliId: number): Observable<SimpleOverviewResponse> {
+    return this.http.get<SimpleOverviewResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/simple-overview`
+    );
+  }
+
+  getSimplePeriod(
+    kundaliId: number,
+    level: string,
+    mahaLord?: string | null,
+    antarLord?: string | null
+  ): Observable<SimplePeriodExplainResponse> {
+    let params = new HttpParams().set('level', level);
+    if (mahaLord) {
+      params = params.set('mahaLord', mahaLord);
+    }
+    if (antarLord) {
+      params = params.set('antarLord', antarLord);
+    }
+    return this.http.get<SimplePeriodExplainResponse>(
+      `/api/v1/jyotish/kundali/${kundaliId}/simple-period`,
+      { params }
     );
   }
 

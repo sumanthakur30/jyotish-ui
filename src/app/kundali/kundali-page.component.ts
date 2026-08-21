@@ -12,6 +12,9 @@ import {
   KundaliResponse,
   PlanetDto,
   ShadbalaResponse,
+  SimpleExplainedBlock,
+  SimpleLordTheme,
+  SimplePeriodExplainResponse,
   TransitResponse,
   VargaChartResponse,
   YogaCatalogItem,
@@ -20,6 +23,7 @@ import {
 } from '../core/jyotish-api.service';
 import { EntitlementStateService } from '../core/entitlement-state.service';
 import { LanguageService } from '../core/i18n/language.service';
+import { ViewModeService } from '../core/view-mode.service';
 import { planetFull, signFull, signLordCode, nakshatraLordCode, yogaCategoryLabel, yogaNameHi } from '../core/i18n/jyotish-labels';
 import { buildChartView, ChartViewMode } from './chart-view.util';
 
@@ -46,6 +50,7 @@ export class KundaliPageComponent implements OnInit {
     | 'ask' = 'overview';
   error = '';
   busy = false;
+  lifeCategoryFocus: string | null = null;
 
   chartViewMode: ChartViewMode = 'LAGNA';
   chartSignMode: 'number' | 'abbrev' = 'number';
@@ -67,6 +72,9 @@ export class KundaliPageComponent implements OnInit {
   expandedAntar = new Set<string>();
   selectedPeriod: DashaPeriodDto | null = null;
   showInterpretation = false;
+  simplePeriodExplain: SimplePeriodExplainResponse | null = null;
+  simplePeriodBusy = false;
+  lordThemes: SimpleLordTheme[] = [];
 
   yogas: YogaListResponse | null = null;
   yogaBusy = false;
@@ -119,7 +127,8 @@ export class KundaliPageComponent implements OnInit {
     private readonly router: Router,
     private readonly api: JyotishApiService,
     readonly entitlements: EntitlementStateService,
-    readonly language: LanguageService
+    readonly language: LanguageService,
+    readonly viewMode: ViewModeService
   ) {}
 
   ngOnInit(): void {
@@ -139,6 +148,25 @@ export class KundaliPageComponent implements OnInit {
         this.error = err?.error?.message || 'Could not load kundali.';
       },
     });
+    this.viewMode.mode$.subscribe((mode) => {
+      if (mode === 'simple') {
+        const expertOnly = [
+          'planets',
+          'houses',
+          'charts',
+          'yogas',
+          'doshas',
+          'ashtakavarga',
+          'shadbala',
+          'transit',
+          'reports',
+          'ask',
+        ];
+        if (expertOnly.includes(this.tab)) {
+          this.tab = 'overview';
+        }
+      }
+    });
   }
 
   openCharts(): void {
@@ -157,6 +185,9 @@ export class KundaliPageComponent implements OnInit {
     this.tab = 'dasha';
     if (!this.kundali) {
       return;
+    }
+    if (this.viewMode.isSimple) {
+      this.ensureLordThemes();
     }
     if (!this.dasha) {
       this.loadDasha();
@@ -499,11 +530,161 @@ export class KundaliPageComponent implements OnInit {
       event.stopPropagation();
     }
     this.selectedPeriod = p;
+    if (this.viewMode.isSimple) {
+      this.explainSimplePeriod(p);
+      return;
+    }
     this.showInterpretation = true;
   }
 
   closeInterpretation(): void {
     this.showInterpretation = false;
+    this.simplePeriodExplain = null;
+  }
+
+  openLifeFromSimple(category: string): void {
+    this.lifeCategoryFocus = category;
+    this.tab = 'life';
+  }
+
+  /** Next MAHA after current, and a few upcoming ANTARs from the tree. */
+  dashaJourney(): {
+    current: { maha: DashaPeriodDto; antar: DashaPeriodDto | null } | null;
+    next: DashaPeriodDto | null;
+    later: DashaPeriodDto[];
+  } {
+    if (!this.dasha?.timeline?.length) {
+      return { current: null, next: null, later: [] };
+    }
+    const timeline = this.dasha.timeline;
+    const curMaha = timeline.find((m) => m.current) || null;
+    const curAntar = curMaha?.children?.find((a) => a.current) || null;
+    let next: DashaPeriodDto | null = null;
+    const later: DashaPeriodDto[] = [];
+    if (curMaha) {
+      const antars = curMaha.children || [];
+      const idx = antars.findIndex((a) => a.current);
+      if (idx >= 0 && idx + 1 < antars.length) {
+        next = antars[idx + 1];
+        for (let i = idx + 2; i < antars.length && later.length < 4; i++) {
+          later.push(antars[i]);
+        }
+      }
+      if (!next) {
+        const mIdx = timeline.findIndex((m) => m.current);
+        if (mIdx >= 0 && mIdx + 1 < timeline.length) {
+          next = timeline[mIdx + 1];
+          for (let i = mIdx + 2; i < timeline.length && later.length < 3; i++) {
+            later.push(timeline[i]);
+          }
+        }
+      } else {
+        const mIdx = timeline.findIndex((m) => m.current);
+        if (mIdx >= 0) {
+          for (let i = mIdx + 1; i < timeline.length && later.length < 3; i++) {
+            later.push(timeline[i]);
+          }
+        }
+      }
+    }
+    return {
+      current: curMaha ? { maha: curMaha, antar: curAntar } : null,
+      next,
+      later,
+    };
+  }
+
+  explainSimplePeriod(p: DashaPeriodDto): void {
+    if (!this.kundali) {
+      return;
+    }
+    this.simplePeriodBusy = true;
+    this.simplePeriodExplain = null;
+    const level = (p.level || 'MAHA').toUpperCase();
+    const maha = p.mahaLordCode || (level === 'MAHA' ? p.lordCode : null);
+    const antar =
+      p.antarLordCode || (level === 'ANTAR' || level === 'PRATYANTAR' ? p.lordCode : null);
+    this.api.getSimplePeriod(this.kundali.id, level, maha, antar).subscribe({
+      next: (res) => {
+        this.simplePeriodExplain = res;
+        this.simplePeriodBusy = false;
+        this.showInterpretation = true;
+      },
+      error: () => {
+        this.simplePeriodBusy = false;
+        const theme = this.themeFor(p.lordCode);
+        const parasEn = theme?.meaningEn?.length
+          ? theme.meaningEn
+          : ['A detailed explanation is not available for this period yet.'];
+        const parasHi = theme?.meaningHi?.length
+          ? theme.meaningHi
+          : ['इस अवधि की विस्तृत व्याख्या अभी उपलब्ध नहीं है।'];
+        const block: SimpleExplainedBlock = {
+          calculationNotAvailable: true,
+          paragraphsEn: parasEn,
+          paragraphsHi: parasHi,
+          whyFacts: [
+            {
+              code: 'LORD',
+              labelEn: 'Lord',
+              labelHi: 'स्वामी',
+              value: p.lordName || p.lordCode,
+            },
+            {
+              code: 'LEVEL',
+              labelEn: 'Level',
+              labelHi: 'स्तर',
+              value: p.level,
+            },
+          ],
+        };
+        this.simplePeriodExplain = {
+          kundaliId: this.kundali!.id,
+          calculationNotAvailable: true,
+          levelCode: p.level,
+          mahaLordCode: maha,
+          mahaLordName: null,
+          antarLordCode: antar,
+          antarLordName: null,
+          startAt: p.startAt,
+          endAt: p.endAt,
+          explanation: block,
+          generalDisclaimerEn:
+            'Sugam Jyotish Simple View uses calculated chart facts with gentle traditional wording.',
+          generalDisclaimerHi:
+            'सुगम ज्योतिष सिंपल व्यू गणना तथ्यों पर आधारित सौम्य पारंपरिक भाषा उपयोग करता है।',
+        };
+        this.showInterpretation = true;
+      },
+    });
+  }
+
+  themeFor(code: string | null | undefined): SimpleLordTheme | undefined {
+    if (!code) {
+      return undefined;
+    }
+    return this.lordThemes.find((t) => t.lordCode === code.toUpperCase());
+  }
+
+  ensureLordThemes(): void {
+    if (this.lordThemes.length || !this.kundali) {
+      return;
+    }
+    this.api.getSimpleOverview(this.kundali.id).subscribe({
+      next: (o) => {
+        this.lordThemes = o.lordThemes || [];
+      },
+      error: () => {
+        this.lordThemes = [];
+      },
+    });
+  }
+
+  explainParagraphs(block: SimpleExplainedBlock | null | undefined): string[] {
+    if (!block) {
+      return [];
+    }
+    return this.language.lang === 'hi' ? block.paragraphsHi : block.paragraphsEn;
   }
 
   fmtWhen(iso: string | null | undefined): string {

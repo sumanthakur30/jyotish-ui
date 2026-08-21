@@ -115,6 +115,8 @@ const SECTION_KEYS: Record<string, { key: string; en: string; hi: string }[]> = 
 })
 export class LifeAnalysisPanelComponent implements OnChanges {
   @Input() kundaliId!: number;
+  /** When set (e.g. from Simple View life-area cards), open that category. */
+  @Input() focusCategory: string | null = null;
 
   dashboard: LifeAnalysisDashboard | null = null;
   selected: string | null = null;
@@ -164,6 +166,9 @@ export class LifeAnalysisPanelComponent implements OnChanges {
       this.selected = null;
       this.detail = null;
     }
+    if (changes['focusCategory'] && this.focusCategory && this.dashboard) {
+      this.openCategory(this.focusCategory);
+    }
   }
 
   loadDashboard(): void {
@@ -173,6 +178,9 @@ export class LifeAnalysisPanelComponent implements OnChanges {
       next: (d) => {
         this.dashboard = d;
         this.busy = false;
+        if (this.focusCategory) {
+          this.openCategory(this.focusCategory);
+        }
       },
       error: (err) => {
         this.busy = false;
