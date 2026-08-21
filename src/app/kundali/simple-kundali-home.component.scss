@@ -149,9 +149,30 @@
 
 .area-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
-  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 0.75rem;
   margin-top: 0.65rem;
+}
+
+.area-period-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.45rem 0.75rem;
+  margin-top: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--paper, #f7f1e6) 90%, transparent);
+  font-size: 0.88rem;
+}
+
+.area-period-banner .banner-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+  width: 100%;
 }
 
 .area-card {
@@ -160,12 +181,24 @@
   background: transparent;
   color: inherit;
   border-radius: 0.35rem;
-  padding: 0.7rem 0.8rem;
-  cursor: pointer;
+  padding: 0.75rem 0.85rem;
   font: inherit;
   display: flex;
   flex-direction: column;
-  gap: 0.22rem;
+  gap: 0.35rem;
+}
+
+.area-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
 }
 
 .area-card:hover {
@@ -181,18 +214,70 @@
   opacity: 0.8;
 }
 
-.area-dasha,
-.area-until,
-.area-next {
-  font-size: 0.78rem;
-  opacity: 0.68;
-  line-height: 1.35;
+.area-focus {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+.area-para {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.82;
+}
+
+.area-planets {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.8rem;
+  opacity: 0.78;
+  line-height: 1.4;
+}
+
+.area-why {
+  font-size: 0.8rem;
+}
+
+.area-why summary {
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.area-why ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
 }
 
 .area-cta {
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
   font-size: 0.78rem;
   opacity: 0.75;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.tl-place {
+  display: block;
+  font-size: 0.82rem;
+  opacity: 0.78;
+  margin-top: 0.15rem;
+}
+
+.tl-gloss {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  opacity: 0.75;
+  max-width: 36rem;
 }
 
 .timeline {

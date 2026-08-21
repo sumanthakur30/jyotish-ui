@@ -84,27 +84,38 @@
     <section class="areas" *ngIf="o.lifeAreas?.length">
       <h3>{{ 'simple.lifeAreas' | t }}</h3>
       <p class="hint">{{ 'simple.lifeAreasHint' | t }}</p>
-      <div class="area-grid">
-        <button
-          type="button"
-          class="area-card"
-          *ngFor="let a of o.lifeAreas"
-          (click)="goLife(a.category)"
-        >
-          <span class="area-name">{{ areaLabel(a) }}</span>
-          <span class="area-status">{{ areaStatusLine(a) }}</span>
-          <span class="area-dasha" *ngIf="a.currentDashaLine">
-            {{ 'simple.now' | t }}: {{ a.currentDashaLine }}
-          </span>
-          <span class="area-until" *ngIf="a.currentDashaEndAt">
-            {{ 'simple.until' | t }} {{ fmtWhen(a.currentDashaEndAt) }}
-          </span>
-          <span class="area-next" *ngIf="areaNextLine(a) as next">
-            {{ next }}
-            <span *ngIf="a.nextPeriodAt"> · {{ fmtWhen(a.nextPeriodAt) }}</span>
-          </span>
-          <span class="area-cta">{{ 'simple.openLife' | t }} →</span>
+      <div class="area-period-banner" *ngIf="o.currentLifePeriod as p">
+        <span class="banner-label">{{ 'simple.areaPeriodBanner' | t }}</span>
+        <strong>{{ periodTitle(p) }}</strong>
+        <span class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</span>
+        <button type="button" class="linkish" (click)="goDasha()">
+          {{ 'simple.seeJourney' | t }}
         </button>
+      </div>
+      <div class="area-grid">
+        <article class="area-card" *ngFor="let a of o.lifeAreas">
+          <button type="button" class="area-head" (click)="goLife(a.category)">
+            <span class="area-name">{{ areaLabel(a) }}</span>
+            <span class="area-status">{{ areaStatusLine(a) }}</span>
+          </button>
+          <p class="area-focus" *ngIf="areaFocus(a)">{{ areaFocus(a) }}</p>
+          <p class="area-para" *ngFor="let para of areaParagraphs(a)">{{ para }}</p>
+          <ul class="area-planets" *ngIf="areaPlanets(a).length">
+            <li *ngFor="let line of areaPlanets(a)">{{ line }}</li>
+          </ul>
+          <details class="area-why" *ngIf="a.factBullets?.length">
+            <summary>{{ 'simple.why' | t }}</summary>
+            <ul>
+              <li *ngFor="let f of a.factBullets">
+                <strong>{{ language.lang === 'hi' ? f.labelHi : f.labelEn }}:</strong>
+                {{ f.value }}
+              </li>
+            </ul>
+          </details>
+          <button type="button" class="area-cta" (click)="goLife(a.category)">
+            {{ 'simple.openLife' | t }} →
+          </button>
+        </article>
       </div>
       <p class="disclaimer" *ngIf="showsHealth(o.lifeAreas)">
         {{ language.lang === 'hi' ? o.healthDisclaimerHi : o.healthDisclaimerEn }}
@@ -113,6 +124,7 @@
 
     <section class="upcoming" *ngIf="o.upcoming?.length">
       <h3>{{ 'simple.upcoming' | t }}</h3>
+      <p class="hint">{{ 'simple.upcomingHint' | t }}</p>
       <ol class="timeline">
         <li *ngFor="let u of o.upcoming | slice: 0:5; let i = index">
           <span class="tl-mark" [class.next]="i === 0">{{
@@ -121,6 +133,8 @@
           <div class="tl-body">
             <strong>{{ upcomingLabel(u) }}</strong>
             <span class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</span>
+            <span class="tl-place" *ngIf="upcomingPlacement(u) as place">{{ place }}</span>
+            <p class="tl-gloss" *ngIf="upcomingGloss(u) as gloss">{{ gloss }}</p>
             <button type="button" class="linkish" (click)="openUnderstandUpcoming(u)">
               {{ 'simple.understandPeriod' | t }}
             </button>

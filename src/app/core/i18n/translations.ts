@@ -332,11 +332,15 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'simple.understandPeriod': 'Understand this period',
     'simple.seeJourney': 'See period journey',
     'simple.lifeAreas': 'Life areas',
-    'simple.lifeAreasHint': 'Each card opens Life Analysis notes. Status is from Jyotish notes; dates come from calculated periods only.',
+    'simple.lifeAreasHint':
+      'Each card shows topic houses and key graha from your stored chart. Note status is separate; period dates are in the banner above — not predictions.',
+    'simple.areaPeriodBanner': 'Shared period (same for all areas)',
     'simple.openLife': 'Open notes',
     'simple.now': 'Now',
     'simple.until': 'Until',
     'simple.upcoming': 'Coming up',
+    'simple.upcomingHint':
+      'Each chapter lists real date range, period lord, and that lord’s natal house/sign from D1 — facts only.',
     'simple.calcMissing': 'Calculation not available for this part yet.',
     'simple.notAvailable': 'Not available',
     'simple.loading': 'Loading your simple Kundli…',
@@ -684,11 +688,14 @@ export const TRANSLATIONS: Record<Lang, Record<string, string>> = {
     'simple.seeJourney': 'अवधि यात्रा देखें',
     'simple.lifeAreas': 'जीवन क्षेत्र',
     'simple.lifeAreasHint':
-      'प्रत्येक कार्ड जीवन विश्लेषण खोलता है। स्थिति ज्योतिषी टिप्पणियों से है; तिथियाँ केवल गणना अवधि से।',
+      'प्रत्येक कार्ड आपके संग्रहीत कुंडली के विषय-भाव और मुख्य ग्रह दिखाता है। टिप्पणी स्थिति अलग है; अवधि तिथियाँ ऊपर बैनर में हैं — भविष्यवाणी नहीं।',
+    'simple.areaPeriodBanner': 'साझा अवधि (सभी क्षेत्रों के लिए एक)',
     'simple.openLife': 'टिप्पणियाँ खोलें',
     'simple.now': 'अभी',
     'simple.until': 'तक',
     'simple.upcoming': 'आगे आने वाला',
+    'simple.upcomingHint':
+      'प्रत्येक अध्याय में वास्तविक तिथि सीमा, अवधि स्वामी, और उस स्वामी का जन्म भाव/राशि (D1) — केवल तथ्य।',
     'simple.calcMissing': 'इस भाग की गणना अभी उपलब्ध नहीं है।',
     'simple.notAvailable': 'उपलब्ध नहीं',
     'simple.loading': 'आपकी सिंपल कुंडली लोड हो रही है…',

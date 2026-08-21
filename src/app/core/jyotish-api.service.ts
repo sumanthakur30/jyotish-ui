@@ -848,11 +848,20 @@ export interface SimpleLifeAreaCard {
   status: string;
   statusLineEn?: string | null;
   statusLineHi?: string | null;
+  /** Deprecated: period strip moved to section banner — usually null. */
   currentDashaLine: string | null;
   currentDashaEndAt: string | null;
   nextPeriodAt?: string | null;
   nextPeriodLineEn?: string | null;
   nextPeriodLineHi?: string | null;
+  focusSummaryEn?: string | null;
+  focusSummaryHi?: string | null;
+  summaryParagraphsEn?: string[];
+  summaryParagraphsHi?: string[];
+  factBullets?: SimpleFactBullet[];
+  relevantPlanetLinesEn?: string[];
+  relevantPlanetLinesHi?: string[];
+  focusHouses?: number[];
 }
 
 export interface SimpleUpcomingItem {
@@ -865,6 +874,12 @@ export interface SimpleUpcomingItem {
   mahaLordName: string | null;
   startAt: string | null;
   endAt: string | null;
+  lordSignName?: string | null;
+  lordHouse?: number;
+  placementLineEn?: string | null;
+  placementLineHi?: string | null;
+  glossEn?: string | null;
+  glossHi?: string | null;
 }
 
 export interface SimplePresentYoga {

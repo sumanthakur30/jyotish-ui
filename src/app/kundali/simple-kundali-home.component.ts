@@ -94,15 +94,43 @@ export class SimpleKundaliHomeComponent implements OnChanges {
     return a.statusLineEn || this.statusLabel(a.status);
   }
 
-  areaNextLine(a: SimpleLifeAreaCard): string | null {
+  areaFocus(a: SimpleLifeAreaCard): string | null {
     if (this.language.lang === 'hi') {
-      return a.nextPeriodLineHi || null;
+      return a.focusSummaryHi || null;
     }
-    return a.nextPeriodLineEn || null;
+    return a.focusSummaryEn || null;
+  }
+
+  areaParagraphs(a: SimpleLifeAreaCard): string[] {
+    if (this.language.lang === 'hi') {
+      return a.summaryParagraphsHi || [];
+    }
+    return a.summaryParagraphsEn || [];
+  }
+
+  areaPlanets(a: SimpleLifeAreaCard): string[] {
+    if (this.language.lang === 'hi') {
+      return a.relevantPlanetLinesHi || [];
+    }
+    return a.relevantPlanetLinesEn || [];
   }
 
   upcomingLabel(u: SimpleUpcomingItem): string {
     return this.language.lang === 'hi' ? u.labelHi : u.labelEn;
+  }
+
+  upcomingPlacement(u: SimpleUpcomingItem): string | null {
+    if (this.language.lang === 'hi') {
+      return u.placementLineHi || null;
+    }
+    return u.placementLineEn || null;
+  }
+
+  upcomingGloss(u: SimpleUpcomingItem): string | null {
+    if (this.language.lang === 'hi') {
+      return u.glossHi || null;
+    }
+    return u.glossEn || null;
   }
 
   statusLabel(status: string): string {
