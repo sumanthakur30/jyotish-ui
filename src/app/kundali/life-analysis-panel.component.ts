@@ -151,6 +151,7 @@ export class LifeAnalysisPanelComponent implements OnChanges {
     status: 'PLANNED',
   };
   editingPeriodId: number | null = null;
+  addDashaBusy = false;
 
   constructor(
     private readonly api: JyotishApiService,
@@ -362,6 +363,29 @@ export class LifeAnalysisPanelComponent implements OnChanges {
       calculationBasis: '',
       status: 'PLANNED',
     };
+  }
+
+  addCurrentDasha(): void {
+    if (!this.selected) {
+      return;
+    }
+    this.addDashaBusy = true;
+    this.flash = '';
+    this.error = '';
+    this.api.addCurrentDashaToLifeTimeline(this.kundaliId, this.selected).subscribe({
+      next: () => {
+        this.addDashaBusy = false;
+        this.flash = this.language.t('life.dashaAdded');
+        this.loadPeriods(this.selected!);
+        this.api.getLifeAnalysis(this.kundaliId, this.selected!).subscribe({
+          next: (d) => this.applyDetail(d),
+        });
+      },
+      error: (err) => {
+        this.addDashaBusy = false;
+        this.error = err?.error?.message || 'Could not add current Dasha.';
+      },
+    });
   }
 
   toggleHistory(): void {

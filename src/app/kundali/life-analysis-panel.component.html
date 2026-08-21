@@ -54,6 +54,7 @@
     >
       <span class="card-title">{{ label(c) }}</span>
       <span class="card-status" [attr.data-status]="c.status">{{ statusLabel(c.status) }}</span>
+      <span class="card-dasha" *ngIf="c.currentDashaLine">{{ c.currentDashaLine }}</span>
       <span class="card-meta">{{ c.updatedAt ? fmtWhen(c.updatedAt) : '—' }}</span>
     </button>
   </div>
@@ -85,6 +86,76 @@
     <p class="health-banner" *ngIf="d.healthDisclaimerEn">
       {{ language.lang === 'hi' ? d.healthDisclaimerHi : d.healthDisclaimerEn }}
     </p>
+
+    <div class="calc-periods-panel" *ngIf="d.calculatedTimeline as strip">
+      <div class="calc-periods-head">
+        <div>
+          <h4>{{ 'life.calcPeriods' | t }}</h4>
+          <p class="hint">{{ 'life.calcPeriodsHint' | t }}</p>
+        </div>
+        <button
+          type="button"
+          class="btn ghost"
+          [disabled]="addDashaBusy || !strip.currentDasha"
+          (click)="addCurrentDasha()"
+        >
+          {{ addDashaBusy ? ('life.addingDasha' | t) : ('life.addCurrentDasha' | t) }}
+        </button>
+      </div>
+
+      <div class="current-dasha" *ngIf="strip.currentDasha as cd; else noDasha">
+        <strong>{{ 'life.currentDasha' | t }}</strong>
+        <p class="dasha-line">{{ cd.summaryLine || '—' }}</p>
+        <dl class="dasha-range" *ngIf="cd.maha || cd.antar">
+          <div *ngIf="cd.maha as m">
+            <dt>{{ 'life.maha' | t }} · {{ m.lordName }}</dt>
+            <dd>{{ fmtWhen(m.startAt) }} → {{ fmtWhen(m.endAt) }}</dd>
+          </div>
+          <div *ngIf="cd.antar as a">
+            <dt>{{ 'life.antar' | t }} · {{ a.lordName }}</dt>
+            <dd>{{ fmtWhen(a.startAt) }} → {{ fmtWhen(a.endAt) }}</dd>
+          </div>
+        </dl>
+      </div>
+      <ng-template #noDasha>
+        <p class="hint">{{ 'life.noDasha' | t }}</p>
+      </ng-template>
+
+      <div class="upcoming-block" *ngIf="strip.upcomingDasha?.length">
+        <h5>{{ 'life.upcomingDasha' | t }}</h5>
+        <table class="table compact">
+          <thead>
+            <tr>
+              <th>{{ 'life.from' | t }}</th>
+              <th>{{ 'life.to' | t }}</th>
+              <th>{{ 'life.level' | t }}</th>
+              <th>{{ 'life.lord' | t }}</th>
+              <th>{{ 'life.basis' | t }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of strip.upcomingDasha">
+              <td>{{ fmtWhen(u.startAt) }}</td>
+              <td>{{ fmtWhen(u.endAt) }}</td>
+              <td>{{ u.levelCode }}</td>
+              <td>{{ u.lordName }}</td>
+              <td>{{ u.basis }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="gochar-block">
+        <strong>{{ 'life.gocharAsOf' | t }}</strong>
+        <ng-container *ngIf="strip.gocharAsOf as g; else noGochar">
+          <p class="gochar-date">{{ g.transitDate }}</p>
+          <p class="muted" *ngIf="g.summaryLine">{{ g.summaryLine }}</p>
+        </ng-container>
+        <ng-template #noGochar>
+          <p class="hint">{{ 'life.noGochar' | t }}</p>
+        </ng-template>
+      </div>
+    </div>
 
     <div class="detail-grid">
       <div class="calc-panel">

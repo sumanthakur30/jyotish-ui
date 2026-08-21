@@ -77,9 +77,65 @@
   color: #8a5a00;
 }
 
+.card-dasha {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  opacity: 0.78;
+}
+
 .card-meta {
   font-size: 0.72rem;
   opacity: 0.55;
+}
+
+.calc-periods-panel {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--panel) 92%, var(--ink));
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.calc-periods-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.calc-periods-panel h4,
+.calc-periods-panel h5 {
+  margin: 0 0 0.35rem;
+}
+
+.dasha-line {
+  margin: 0.25rem 0 0.5rem;
+  font-weight: 600;
+}
+
+.dasha-range {
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.dasha-range dt {
+  font-weight: 600;
+}
+
+.dasha-range dd {
+  margin: 0.1rem 0 0;
+  opacity: 0.8;
+}
+
+.gochar-date {
+  margin: 0.25rem 0;
+  font-weight: 600;
 }
 
 .detail-toolbar {
@@ -127,7 +183,8 @@
 .notes-panel,
 .timeline-block,
 .history-block,
-.consult-panel {
+.consult-panel,
+.calc-periods-panel {
   border: 1px solid var(--line);
   border-radius: 0.4rem;
   padding: 0.9rem 1rem;

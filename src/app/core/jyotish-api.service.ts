@@ -632,11 +632,56 @@ export interface LifeCategorySummary {
   status: string;
   updatedAt: string | null;
   includeInReport: boolean;
+  /** e.g. "Jupiter / Saturn · until 2027-03-12" from stored Vimshottari */
+  currentDashaLine?: string | null;
+  currentDashaEndAt?: string | null;
+}
+
+export interface CalculatedDashaPeriod {
+  levelCode: string;
+  lordCode: string;
+  lordName: string;
+  mahaLordCode: string | null;
+  mahaLordName: string | null;
+  antarLordCode: string | null;
+  antarLordName: string | null;
+  startAt: string;
+  endAt: string;
+  basis: string;
+}
+
+export interface CurrentDashaStrip {
+  systemCode: string;
+  maha: CalculatedDashaPeriod | null;
+  antar: CalculatedDashaPeriod | null;
+  summaryLine: string | null;
+}
+
+export interface GocharPlanetFact {
+  planetCode: string;
+  planetName: string;
+  signName: string;
+  house: number;
+}
+
+export interface GocharAsOf {
+  transitDate: string;
+  planets: GocharPlanetFact[];
+  summaryLine: string | null;
+}
+
+export interface CalculatedTimelineStrip {
+  asOf: string;
+  currentDasha: CurrentDashaStrip | null;
+  upcomingDasha: CalculatedDashaPeriod[];
+  gocharAsOf: GocharAsOf | null;
+  topicPeriods: LifePeriodDto[];
 }
 
 export interface LifeAnalysisDashboard {
   kundaliId: number;
   categories: LifeCategorySummary[];
+  calculatedTimeline?: CalculatedTimelineStrip | null;
 }
 
 export interface LifeIndicatorItem {
@@ -666,6 +711,7 @@ export interface LifeAnalysisDetail {
   createdAt: string | null;
   updatedAt: string | null;
   updatedBy: string | null;
+  calculatedTimeline?: CalculatedTimelineStrip | null;
 }
 
 export interface UpsertLifeAnalysisRequest {
@@ -1028,6 +1074,14 @@ export class JyotishApiService {
     return this.http.post<LifePeriodDto>(
       `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/periods`,
       body
+    );
+  }
+
+  /** Seeds timeline from stored current Vimshottari dates; observation left empty. */
+  addCurrentDashaToLifeTimeline(kundaliId: number, category: string): Observable<LifePeriodDto> {
+    return this.http.post<LifePeriodDto>(
+      `/api/v1/jyotish/kundali/${kundaliId}/life-analysis/${category}/periods/from-current-dasha`,
+      {}
     );
   }
 
