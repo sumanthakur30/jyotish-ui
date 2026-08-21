@@ -5,6 +5,7 @@ import {
   StatusResponse,
 } from './core/jyotish-api.service';
 import { EntitlementStateService } from './core/entitlement-state.service';
+import { Lang, LanguageService } from './core/i18n/language.service';
 import { TenantService } from './core/tenant.service';
 
 @Component({
@@ -22,7 +23,8 @@ export class AppComponent implements OnInit {
   constructor(
     private readonly api: JyotishApiService,
     private readonly tenant: TenantService,
-    readonly entitlementState: EntitlementStateService
+    readonly entitlementState: EntitlementStateService,
+    readonly language: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -46,13 +48,25 @@ export class AppComponent implements OnInit {
     );
   }
 
-  upgradeHint(feature: string): string {
-    return `Upgrade your Jyotish plan to unlock ${feature}. Configure in SugamFlow Super Admin → Platform Subscription (jyotish-starter or higher).`;
+  setLang(lang: Lang): void {
+    this.language.setLang(lang);
+    if (this.status) {
+      this.message = this.language.t('status.connected', {
+        service: this.status.service,
+        phase: this.status.phase,
+      });
+    }
+  }
+
+  upgradeHint(): string {
+    return this.language.t('upgrade.hint', {
+      feature: this.language.t('upgrade.feature.core'),
+    });
   }
 
   saveTenant(): void {
     this.tenant.setTenant(this.tenantDraft.trim());
-    this.message = 'Tenant saved';
+    this.message = this.language.lang === 'hi' ? 'टेनेंट सेव हो गया' : 'Tenant saved';
     this.error = '';
     this.api.bootstrapWorkspace().subscribe({
       next: () => this.refreshStatus(),
@@ -65,7 +79,10 @@ export class AppComponent implements OnInit {
       next: (s) => {
         this.status = s;
         this.entitlementState.status = s;
-        this.message = `Connected · ${s.service} · ${s.phase}`;
+        this.message = this.language.t('status.connected', {
+          service: s.service,
+          phase: s.phase,
+        });
         if (s.entitlementEnabled) {
           this.loadEntitlements();
         } else {
@@ -73,7 +90,13 @@ export class AppComponent implements OnInit {
           this.entitlementState.entitlements = null;
         }
       },
-      error: (err) => this.fail(err, 'Could not reach jyotish-service on :8097.'),
+      error: (err) =>
+        this.fail(
+          err,
+          this.language.lang === 'hi'
+            ? 'jyotish-service (:8097) से कनेक्ट नहीं हो सका।'
+            : 'Could not reach jyotish-service on :8097.'
+        ),
     });
   }
 

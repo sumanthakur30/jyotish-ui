@@ -3,26 +3,48 @@
     <span class="mark">SJ</span>
     <div>
       <h1>Sugam Jyotish</h1>
-      <p class="tag">Phase 9 · Astrologer CRM</p>
+      <p class="tag">{{ 'app.tag' | t }}</p>
     </div>
   </div>
   <nav class="nav">
-    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Profiles</a>
-    <a *ngIf="can('matching')" routerLink="/matching" routerLinkActive="active">Matching</a>
-    <a routerLink="/panchang" routerLinkActive="active">Panchang</a>
-    <a routerLink="/clients" routerLinkActive="active">Clients</a>
-    <a routerLink="/appointments" routerLinkActive="active">Appointments</a>
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{
+      'nav.profiles' | t
+    }}</a>
+    <a *ngIf="can('matching')" routerLink="/matching" routerLinkActive="active">{{
+      'nav.matching' | t
+    }}</a>
+    <a routerLink="/panchang" routerLinkActive="active">{{ 'nav.panchang' | t }}</a>
+    <a routerLink="/clients" routerLinkActive="active">{{ 'nav.clients' | t }}</a>
+    <a routerLink="/appointments" routerLinkActive="active">{{ 'nav.appointments' | t }}</a>
   </nav>
   <div class="tenant-bar">
-    <label for="tenant">Tenant</label>
+    <div class="lang-toggle" role="group" [attr.aria-label]="'lang.aria' | t">
+      <button
+        type="button"
+        class="lang-btn"
+        [class.active]="language.lang === 'hi'"
+        (click)="setLang('hi')"
+      >
+        {{ 'lang.hi' | t }}
+      </button>
+      <button
+        type="button"
+        class="lang-btn"
+        [class.active]="language.lang === 'en'"
+        (click)="setLang('en')"
+      >
+        {{ 'lang.en' | t }}
+      </button>
+    </div>
+    <label for="tenant">{{ 'tenant.label' | t }}</label>
     <input
       id="tenant"
       [(ngModel)]="tenantDraft"
       name="tenant"
       placeholder="JYOTISH-DEMO-01"
     />
-    <button type="button" class="btn" (click)="saveTenant()">Set</button>
-    <button type="button" class="btn ghost" (click)="refreshStatus()">Ping</button>
+    <button type="button" class="btn" (click)="saveTenant()">{{ 'tenant.set' | t }}</button>
+    <button type="button" class="btn ghost" (click)="refreshStatus()">{{ 'tenant.ping' | t }}</button>
   </div>
 </header>
 
@@ -30,13 +52,13 @@
   <p class="flash ok" *ngIf="message">{{ message }}</p>
   <p class="flash err" *ngIf="error">{{ error }}</p>
   <section class="panel upgrade" *ngIf="showUpgradeBanner">
-    <p>{{ upgradeHint('Kundali &amp; core Jyotish') }}</p>
+    <p>{{ upgradeHint() }}</p>
   </section>
   <section class="panel compact" *ngIf="status as s">
     <span>{{ s.service }}</span>
     <span>· {{ s.phase }}</span>
-    <span>· engine {{ s.engineVersion }}</span>
-    <span *ngIf="s.entitlementEnabled">· entitlements on</span>
+    <span>· {{ 'status.engine' | t: { version: s.engineVersion } }}</span>
+    <span *ngIf="s.entitlementEnabled">· {{ 'status.entitlementsOn' | t }}</span>
   </section>
   <router-outlet></router-outlet>
 </main>

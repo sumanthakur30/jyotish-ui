@@ -3,30 +3,32 @@
 
 <section class="panel">
   <div class="row between">
-    <h2>{{ editingId ? 'Edit birth profile' : 'New birth profile' }}</h2>
-    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+    <h2>{{ editingId ? ('profile.edit' | t) : ('profile.new' | t) }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">
+      {{ 'common.clear' | t }}
+    </button>
   </div>
 
   <div class="form-grid">
     <label>
-      Name
-      <input [(ngModel)]="displayName" name="displayName" placeholder="Ravi Kumar" />
+      {{ 'common.name' | t }}
+      <input [(ngModel)]="displayName" name="displayName" [placeholder]="'profile.namePh' | t" />
     </label>
     <label>
-      Gender
+      {{ 'profile.gender' | t }}
       <select [(ngModel)]="gender" name="gender">
         <option value="">—</option>
-        <option value="MALE">Male</option>
-        <option value="FEMALE">Female</option>
-        <option value="OTHER">Other</option>
+        <option value="MALE">{{ 'profile.gender.male' | t }}</option>
+        <option value="FEMALE">{{ 'profile.gender.female' | t }}</option>
+        <option value="OTHER">{{ 'profile.gender.other' | t }}</option>
       </select>
     </label>
     <label>
-      Date of birth
+      {{ 'profile.dob' | t }}
       <input type="date" [(ngModel)]="birthDate" name="birthDate" />
     </label>
     <label>
-      Time of birth
+      {{ 'profile.tob' | t }}
       <input
         type="time"
         [(ngModel)]="birthTime"
@@ -37,35 +39,32 @@
     </label>
     <label class="check">
       <input type="checkbox" [(ngModel)]="birthTimeUnknown" name="birthTimeUnknown" />
-      Birth time unknown
+      {{ 'profile.timeUnknown' | t }}
     </label>
     <label class="check">
       <input type="checkbox" [(ngModel)]="dstObserved" name="dstObserved" />
-      DST observed
+      {{ 'profile.dst' | t }}
     </label>
   </div>
 
   <div class="form-grid">
     <label class="wide">
-      Birth place search
+      {{ 'profile.placeSearch' | t }}
       <div class="row">
         <input
           [(ngModel)]="placeQuery"
           name="placeQuery"
-          placeholder="Patna, Bihar, Delhi…"
+          [placeholder]="'profile.searchPh' | t"
           (ngModelChange)="onPlaceQueryChange()"
           (keyup.enter)="searchPlaces()"
         />
         <button type="button" class="btn" [disabled]="placeSearchBusy" (click)="searchPlaces()">
-          {{ placeSearchBusy ? 'Searching…' : 'Search' }}
+          {{ placeSearchBusy ? ('common.searching' | t) : ('common.search' | t) }}
         </button>
       </div>
     </label>
   </div>
-  <p class="hint place-help">
-    Search a city (e.g. Patna or Bihar), then click a result. Or type Place and enter Lat/Lon
-    manually.
-  </p>
+  <p class="hint place-help">{{ 'profile.placeHelp' | t }}</p>
   <ul class="hits" *ngIf="placeHits.length">
     <li *ngFor="let p of placeHits">
       <button type="button" class="linkish" (click)="pickPlace(p)">
@@ -77,21 +76,21 @@
     class="hint place-empty"
     *ngIf="placeSearchAttempted && !placeSearchBusy && !placeHits.length"
   >
-    No catalog matches. Try a city name (Patna, Gaya…), or fill Place + Lat/Lon below.
+    {{ 'profile.placeEmpty' | t }}
   </p>
 
   <div class="form-grid">
     <label class="wide">
-      Place
+      {{ 'common.place' | t }}
       <input
         [(ngModel)]="placeName"
         name="placeName"
-        placeholder="City or district name"
+        [placeholder]="'profile.placePh' | t"
         (ngModelChange)="onPlaceNameManualEdit()"
       />
     </label>
     <label>
-      Latitude
+      {{ 'common.latitude' | t }}
       <input
         type="number"
         step="0.0000001"
@@ -102,7 +101,7 @@
       />
     </label>
     <label>
-      Longitude
+      {{ 'common.longitude' | t }}
       <input
         type="number"
         step="0.0000001"
@@ -113,30 +112,30 @@
       />
     </label>
     <label>
-      Time zone
+      {{ 'common.timezone' | t }}
       <input [(ngModel)]="timeZone" name="timeZone" placeholder="Asia/Kolkata" />
     </label>
     <label class="wide">
-      Notes
+      {{ 'common.notes' | t }}
       <textarea [(ngModel)]="notes" name="notes" rows="2"></textarea>
     </label>
   </div>
 
   <div class="row">
     <button type="button" class="btn primary" [disabled]="busy" (click)="saveProfile()">
-      {{ editingId ? 'Update profile' : 'Save profile' }}
+      {{ editingId ? ('profile.update' | t) : ('profile.save' | t) }}
     </button>
   </div>
 </section>
 
 <section class="panel">
   <div class="row between wrap">
-    <h2>Birth profiles</h2>
+    <h2>{{ 'profile.list' | t }}</h2>
     <div class="row wrap">
       <input
         [(ngModel)]="searchQ"
         name="searchQ"
-        placeholder="Search name"
+        [placeholder]="'profile.searchName' | t"
         (keyup.enter)="reloadProfiles()"
       />
       <label class="check">
@@ -146,19 +145,21 @@
           name="includeArchived"
           (change)="reloadProfiles()"
         />
-        Include archived
+        {{ 'profile.includeArchived' | t }}
       </label>
-      <button type="button" class="btn" [disabled]="busy" (click)="reloadProfiles()">Refresh</button>
+      <button type="button" class="btn" [disabled]="busy" (click)="reloadProfiles()">
+        {{ 'common.refresh' | t }}
+      </button>
     </div>
   </div>
 
   <table class="table" *ngIf="profiles.length; else empty">
     <thead>
       <tr>
-        <th>Name</th>
-        <th>DOB</th>
-        <th>Place</th>
-        <th>Status</th>
+        <th>{{ 'common.name' | t }}</th>
+        <th>{{ 'profile.col.dob' | t }}</th>
+        <th>{{ 'common.place' | t }}</th>
+        <th>{{ 'common.status' | t }}</th>
         <th></th>
       </tr>
     </thead>
@@ -178,24 +179,28 @@
             [disabled]="generatingId === p.id"
             (click)="generateKundali(p)"
           >
-            {{ generatingId === p.id ? 'Generating…' : 'Kundali' }}
+            {{ generatingId === p.id ? ('profile.generating' | t) : ('profile.kundali' | t) }}
           </button>
-          <button type="button" class="btn ghost" (click)="edit(p)">Edit</button>
-          <button type="button" class="btn ghost" (click)="duplicate(p)">Duplicate</button>
+          <button type="button" class="btn ghost" (click)="edit(p)">{{ 'common.edit' | t }}</button>
+          <button type="button" class="btn ghost" (click)="duplicate(p)">
+            {{ 'common.duplicate' | t }}
+          </button>
           <button
             type="button"
             class="btn ghost"
             *ngIf="p.status === 'ACTIVE'"
             (click)="archive(p)"
           >
-            Archive
+            {{ 'common.archive' | t }}
           </button>
-          <button type="button" class="btn ghost" (click)="remove(p)">Delete</button>
+          <button type="button" class="btn ghost" (click)="remove(p)">
+            {{ 'common.delete' | t }}
+          </button>
         </td>
       </tr>
     </tbody>
   </table>
   <ng-template #empty>
-    <p class="hint">No profiles yet. Enter birth details above and save.</p>
+    <p class="hint">{{ 'profile.empty' | t }}</p>
   </ng-template>
 </section>

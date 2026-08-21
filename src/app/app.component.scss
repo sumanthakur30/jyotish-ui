@@ -61,6 +61,32 @@
   font-size: 0.85rem;
 }
 
+.lang-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 0.35rem;
+  overflow: hidden;
+  margin-right: 0.35rem;
+}
+
+.lang-btn {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+.lang-btn.active {
+  background: var(--ink);
+  color: #f7f1e6;
+  opacity: 1;
+}
+
 .tenant-bar {
   display: flex;
   flex-wrap: wrap;

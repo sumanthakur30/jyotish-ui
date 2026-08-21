@@ -14,34 +14,36 @@
 
 <section class="panel">
   <div class="row between">
-    <h2>{{ editingId ? 'Edit appointment' : 'New appointment' }}</h2>
-    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+    <h2>{{ editingId ? ('appt.edit' | t) : ('appt.new' | t) }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">
+      {{ 'common.clear' | t }}
+    </button>
   </div>
 
   <div class="form-grid">
     <label>
-      Client
+      {{ 'appt.client' | t }}
       <select [(ngModel)]="clientId" name="apptClient">
-        <option [ngValue]="null">— Select —</option>
+        <option [ngValue]="null">—</option>
         <option *ngFor="let c of clients" [ngValue]="c.id">{{ c.name }}</option>
       </select>
     </label>
     <label>
-      Date
+      {{ 'appt.date' | t }}
       <input type="date" [(ngModel)]="appointmentDate" name="apptDate" />
     </label>
     <label>
-      Time
+      {{ 'appt.time' | t }}
       <input type="time" [(ngModel)]="appointmentTime" name="apptTime" step="60" />
     </label>
     <label>
-      Consultation type
+      {{ 'appt.type' | t }}
       <select [(ngModel)]="consultationType" name="consultationType">
         <option *ngFor="let t of consultationTypes" [value]="t">{{ t }}</option>
       </select>
     </label>
     <label>
-      Status
+      {{ 'common.status' | t }}
       <select [(ngModel)]="status" name="apptStatus">
         <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
       </select>
@@ -64,24 +66,25 @@
 
   <div class="row">
     <button type="button" class="btn primary" [disabled]="busy" (click)="saveAppointment()">
-      {{ editingId ? 'Update appointment' : 'Save appointment' }}
+      {{ editingId ? ('common.update' | t) : ('common.save' | t) }}
     </button>
   </div>
   <p class="hint" *ngIf="!clients.length">
-    Create a client first under <a routerLink="/clients">Clients</a>.
+    {{ 'clients.createFirst' | t }}
+    (<a routerLink="/clients">{{ 'nav.clients' | t }}</a>)
   </p>
 </section>
 
 <section class="panel">
   <div class="row between wrap">
-    <h2>Appointments</h2>
+    <h2>{{ 'appt.list' | t }}</h2>
     <div class="row wrap">
       <select [(ngModel)]="filterStatus" name="filterStatus" (change)="reloadAppointments()">
-        <option value="">All statuses</option>
+        <option value="">—</option>
         <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
       </select>
       <button type="button" class="btn" [disabled]="busy" (click)="reloadAppointments()">
-        Refresh
+        {{ 'common.refresh' | t }}
       </button>
     </div>
   </div>
@@ -114,6 +117,6 @@
     </tbody>
   </table>
   <ng-template #empty>
-    <p class="hint">No appointments yet. Schedule one above.</p>
+    <p class="hint">{{ 'appt.empty' | t }}</p>
   </ng-template>
 </section>

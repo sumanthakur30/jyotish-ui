@@ -14,25 +14,27 @@
 
 <section class="panel">
   <div class="row between">
-    <h2>{{ editingId ? 'Edit client' : 'New client' }}</h2>
-    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">Clear</button>
+    <h2>{{ editingId ? ('clients.edit' | t) : ('clients.new' | t) }}</h2>
+    <button type="button" class="btn ghost" *ngIf="editingId" (click)="startCreate()">
+      {{ 'common.clear' | t }}
+    </button>
   </div>
 
   <div class="form-grid">
     <label>
-      Name
+      {{ 'common.name' | t }}
       <input [(ngModel)]="name" name="clientName" placeholder="Anita Sharma" />
     </label>
     <label>
-      Mobile
+      {{ 'clients.mobile' | t }}
       <input [(ngModel)]="mobile" name="mobile" placeholder="9876543210" />
     </label>
     <label>
-      Email
+      {{ 'clients.email' | t }}
       <input [(ngModel)]="email" name="email" type="email" placeholder="anita@example.com" />
     </label>
     <label class="wide">
-      Notes
+      {{ 'common.notes' | t }}
       <textarea [(ngModel)]="notes" name="clientNotes" rows="2"></textarea>
     </label>
   </div>
@@ -54,13 +56,13 @@
 
   <div class="row">
     <button type="button" class="btn primary" [disabled]="busy" (click)="saveClient()">
-      {{ editingId ? 'Update client' : 'Save client' }}
+      {{ editingId ? ('common.update' | t) : ('common.save' | t) }}
     </button>
   </div>
 </section>
 
 <section class="panel" *ngIf="detail as d">
-  <h2>Client detail</h2>
+  <h2>{{ 'clients.detail' | t }}</h2>
   <dl class="detail">
     <div><dt>Name</dt><dd>{{ d.name }}</dd></div>
     <div><dt>Mobile</dt><dd>{{ d.mobile || '—' }}</dd></div>
@@ -80,15 +82,17 @@
 
 <section class="panel">
   <div class="row between wrap">
-    <h2>Clients</h2>
+    <h2>{{ 'clients.list' | t }}</h2>
     <div class="row wrap">
       <input
         [(ngModel)]="searchQ"
         name="clientSearch"
-        placeholder="Search name or mobile"
+        [placeholder]="'clients.search' | t"
         (keyup.enter)="reloadClients()"
       />
-      <button type="button" class="btn" [disabled]="busy" (click)="reloadClients()">Refresh</button>
+      <button type="button" class="btn" [disabled]="busy" (click)="reloadClients()">
+        {{ 'common.refresh' | t }}
+      </button>
     </div>
   </div>
 
@@ -118,6 +122,6 @@
     </tbody>
   </table>
   <ng-template #empty>
-    <p class="hint">No clients yet. Add a client above to start CRM.</p>
+    <p class="hint">{{ 'clients.empty' | t }}</p>
   </ng-template>
 </section>

@@ -3,18 +3,14 @@
 
 <section class="panel">
   <div class="row between">
-    <h2>Panchang</h2>
+    <h2>{{ 'panchang.title' | t }}</h2>
     <span class="meta">Compute-only · Meeus + Lahiri</span>
   </div>
-  <p class="hint">
-    Classical five limbs for a civil date and place. Limbs are evaluated at sunrise. Rahu Kaal,
-    Yamaganda, Gulika, Choghadiya, Hora, and Abhijit are included when sunrise/sunset are available.
-    Moonrise/moonset remain Coming Soon.
-  </p>
+  <p class="hint">{{ 'panchang.moonriseSoon' | t }}</p>
 
   <div class="form-grid">
     <label>
-      Date
+      {{ 'panchang.date' | t }}
       <input type="date" [(ngModel)]="date" name="date" />
     </label>
     <label>
@@ -29,21 +25,19 @@
 
   <div class="form-grid">
     <label class="wide">
-      Place search
+      {{ 'profile.placeSearch' | t }}
       <div class="row">
         <input
           [(ngModel)]="placeQuery"
           name="placeQuery"
-          placeholder="Patna, Bihar, Delhi…"
+          [placeholder]="'profile.searchPh' | t"
           (keyup.enter)="searchPlaces()"
         />
-        <button type="button" class="btn" (click)="searchPlaces()">Search</button>
+        <button type="button" class="btn" (click)="searchPlaces()">{{ 'common.search' | t }}</button>
       </div>
     </label>
   </div>
-  <p class="hint place-help">
-    Search a city (e.g. Patna), then click a result. Or type Place and enter Lat/Lon manually.
-  </p>
+  <p class="hint place-help">{{ 'profile.placeHelp' | t }}</p>
   <ul class="hits" *ngIf="placeHits.length">
     <li *ngFor="let p of placeHits">
       <button type="button" class="linkish" (click)="pickPlace(p)">
@@ -54,26 +48,26 @@
 
   <div class="form-grid">
     <label class="wide">
-      Place
+      {{ 'common.place' | t }}
       <input [(ngModel)]="placeName" name="placeName" />
     </label>
     <label>
-      Latitude
+      {{ 'common.latitude' | t }}
       <input type="number" step="0.0000001" [(ngModel)]="latitude" name="latitude" />
     </label>
     <label>
-      Longitude
+      {{ 'common.longitude' | t }}
       <input type="number" step="0.0000001" [(ngModel)]="longitude" name="longitude" />
     </label>
     <label>
-      Timezone
+      {{ 'common.timezone' | t }}
       <input [(ngModel)]="timeZone" name="timeZone" placeholder="Asia/Kolkata" />
     </label>
   </div>
 
   <div class="actions">
     <button type="button" class="btn" [disabled]="busy" (click)="compute()">
-      {{ busy ? 'Computing…' : 'Compute Panchang' }}
+      {{ busy ? ('common.busy' | t) : ('panchang.compute' | t) }}
     </button>
   </div>
 </section>

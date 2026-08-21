@@ -1,6 +1,6 @@
 <div class="page" *ngIf="kundali as k; else loading">
   <header class="k-header">
-    <button type="button" class="btn ghost" (click)="back()">← Profiles</button>
+    <button type="button" class="btn ghost" (click)="back()">← {{ 'kundali.back' | t }}</button>
     <div class="meta">
       <h1>{{ k.displayName }}</h1>
       <p>
@@ -18,23 +18,31 @@
 
   <nav class="tabs">
     <button type="button" [class.active]="tab === 'overview'" (click)="tab = 'overview'">
-      Overview
+      {{ 'kundali.overview' | t }}
     </button>
     <button type="button" [class.active]="tab === 'planets'" (click)="tab = 'planets'">
-      Planets
+      {{ 'kundali.planets' | t }}
     </button>
-    <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">Houses</button>
-    <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">Charts</button>
-    <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">Dasha</button>
-    <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">Yogas</button>
+    <button type="button" [class.active]="tab === 'houses'" (click)="tab = 'houses'">
+      {{ 'kundali.houses' | t }}
+    </button>
+    <button type="button" [class.active]="tab === 'charts'" (click)="openCharts()">
+      {{ 'kundali.charts' | t }}
+    </button>
+    <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">
+      {{ 'kundali.dasha' | t }}
+    </button>
+    <button type="button" [class.active]="tab === 'yogas'" (click)="openYogas()">
+      {{ 'kundali.yogas' | t }}
+    </button>
     <button type="button" [class.active]="tab === 'ashtakavarga'" (click)="openAshtakavarga()">
-      Ashtakavarga
+      {{ 'kundali.ashtakavarga' | t }}
     </button>
     <button type="button" [class.active]="tab === 'shadbala'" (click)="openShadbala()">
-      Shadbala
+      {{ 'kundali.shadbala' | t }}
     </button>
     <button type="button" [class.active]="tab === 'transit'" (click)="openTransit()">
-      Transit
+      {{ 'kundali.transit' | t }}
     </button>
     <button
       *ngIf="entitlements.can('reports')"
@@ -42,7 +50,7 @@
       [class.active]="tab === 'reports'"
       (click)="openReports()"
     >
-      Reports
+      {{ 'kundali.reports' | t }}
     </button>
     <button
       *ngIf="entitlements.can('ai')"
@@ -50,7 +58,7 @@
       [class.active]="tab === 'ask'"
       (click)="openAsk()"
     >
-      Ask Sugam Jyotish
+      {{ 'kundali.ask' | t }}
     </button>
   </nav>
 
@@ -62,7 +70,7 @@
         [ascendant]="k.ascendant"
       ></app-kundali-chart>
       <div class="lagna">
-        <h2>Lagna</h2>
+        <h2>{{ 'kundali.lagna' | t }}</h2>
         <p *ngIf="k.ascendant as a">
           {{ a.signName }} {{ fmtDeg(a.degreeInSign) }} · {{ a.nakshatraName }} pada {{ a.pada }}
         </p>
@@ -519,7 +527,7 @@
           </p>
         </div>
         <div class="lagna">
-          <h2>Sade Sati</h2>
+          <h2>{{ 'kundali.sadeSati' | t }}</h2>
           <ng-container *ngIf="t.sadeSati as ss; else noSade">
             <p class="current-line">
               <strong>{{ ss.phaseLabel }}</strong>
@@ -590,7 +598,7 @@
   </section>
 
   <section class="panel" *ngIf="tab === 'reports'">
-    <h2>PDF reports</h2>
+    <h2>{{ 'kundali.pdf.title' | t }}</h2>
     <p class="hint">
       Generates a professional PDF from this stored snapshot (no recalculation). Includes birth
       details, D1 planet table, engine version, and disclaimer. Dasha / transit pages are included
@@ -617,7 +625,7 @@
   </section>
 
   <section class="panel" *ngIf="tab === 'ask'">
-    <h2>Ask Sugam Jyotish</h2>
+    <h2>{{ 'kundali.ask' | t }}</h2>
     <p class="hint">
       AI-assisted interpretation grounded only in this kundali’s stored planets, houses, current
       dasha, present yogas, and optional transit. Planetary positions and dasha dates are never

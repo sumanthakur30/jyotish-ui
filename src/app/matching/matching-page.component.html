@@ -3,27 +3,23 @@
 
 <section class="panel">
   <div class="row between">
-    <h2>Kundali matching</h2>
-    <a routerLink="/" class="btn ghost">Profiles</a>
+    <h2>{{ 'match.title' | t }}</h2>
+    <a routerLink="/" class="btn ghost">{{ 'nav.profiles' | t }}</a>
   </div>
-  <p class="hint">
-    Select two birth profiles. Person A is the classical groom-side orientation for directional
-    kootas (Varna, Vashya, Tara); Person B is the bride-side. Scores are traditional indicators —
-    not predictions.
-  </p>
+  <p class="hint">{{ 'match.selectProfiles' | t }}</p>
 
   <div class="form-grid match-pick">
     <label>
-      Person A
+      {{ 'match.personA' | t }}
       <select [(ngModel)]="profileIdA" name="profileIdA">
-        <option [ngValue]="null">— select —</option>
+        <option [ngValue]="null">—</option>
         <option *ngFor="let p of profiles" [ngValue]="p.id">{{ p.displayName }}</option>
       </select>
     </label>
     <label>
-      Person B
+      {{ 'match.personB' | t }}
       <select [(ngModel)]="profileIdB" name="profileIdB">
-        <option [ngValue]="null">— select —</option>
+        <option [ngValue]="null">—</option>
         <option *ngFor="let p of profiles" [ngValue]="p.id">{{ p.displayName }}</option>
       </select>
     </label>
@@ -31,18 +27,20 @@
 
   <div class="actions">
     <button type="button" class="btn" [disabled]="busy" (click)="runMatch()">
-      {{ busy ? 'Matching…' : 'Run Ashta Koota + Manglik' }}
+      {{ busy ? ('common.busy' | t) : ('match.run' | t) }}
     </button>
-    <button type="button" class="btn ghost" *ngIf="result" (click)="clearResult()">New match</button>
+    <button type="button" class="btn ghost" *ngIf="result" (click)="clearResult()">
+      {{ 'common.clear' | t }}
+    </button>
   </div>
 </section>
 
 <section class="panel" *ngIf="result as r">
   <div class="row between">
-    <h2>Result #{{ r.id }}</h2>
+    <h2>{{ 'match.result' | t: { id: r.id } }}</h2>
     <div class="result-actions">
       <button type="button" class="btn" [disabled]="reportBusy" (click)="downloadPdf()">
-        {{ reportBusy ? 'Generating…' : 'Download PDF' }}
+        {{ reportBusy ? ('common.busy' | t) : ('match.downloadPdf' | t) }}
       </button>
       <span class="meta">engine {{ r.calculationEngineVersion }}</span>
     </div>

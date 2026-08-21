@@ -13,6 +13,7 @@ import { MatchingPageComponent } from './matching/matching-page.component';
 import { ClientsPageComponent } from './clients/clients-page.component';
 import { AppointmentsPageComponent } from './appointments/appointments-page.component';
 import { PanchangPageComponent } from './panchang/panchang-page.component';
+import { TranslatePipe } from './core/i18n/translate.pipe';
 
 const routes: Routes = [
   { path: '', component: ProfilesPageComponent },
@@ -36,6 +37,7 @@ const routes: Routes = [
     ClientsPageComponent,
     AppointmentsPageComponent,
     PanchangPageComponent,
+    TranslatePipe,
   ],
   imports: [BrowserModule, HttpClientModule, FormsModule, RouterModule.forRoot(routes)],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true }],
