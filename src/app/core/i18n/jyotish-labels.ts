@@ -20,7 +20,7 @@ const PLANET_HI: Record<string, string> = {
   MERCURY: 'बु',
   JUPITER: 'गु',
   VENUS: 'शु',
-  SATURN: 'शनि',
+  SATURN: 'श',
   RAHU: 'रा',
   KETU: 'के',
   ASCENDANT: 'ल',
@@ -67,15 +67,16 @@ const SIGN_EN: Record<string, string> = {
   Pisces: 'Pi',
 };
 
+/** Short forms for chart cells (keep off the diamond lines). */
 const SIGN_HI: Record<string, string> = {
   Aries: 'मेष',
   Taurus: 'वृष',
-  Gemini: 'मिथुन',
+  Gemini: 'मिथु',
   Cancer: 'कर्क',
   Leo: 'सिंह',
   Virgo: 'कन्या',
   Libra: 'तुला',
-  Scorpio: 'वृश्चिक',
+  Scorpio: 'वृश्च',
   Sagittarius: 'धनु',
   Capricorn: 'मकर',
   Aquarius: 'कुंभ',
