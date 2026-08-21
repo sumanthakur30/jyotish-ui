@@ -89,19 +89,27 @@ export class DashboardPageComponent implements OnInit {
 
   muhuratRange(code: string): string {
     const p = this.muhuratByCode(code);
-    if (!p) {
+    if (!p?.start || !p?.end) {
       return '—';
     }
-    return `${this.shortTime(p.start)}–${this.shortTime(p.end)}`;
+    return `${this.formatInstantLocal(p.start)}–${this.formatInstantLocal(p.end)}`;
   }
 
-  private shortTime(isoOrLocal: string): string {
-    if (!isoOrLocal) {
+  private formatInstantLocal(raw: string): string {
+    if (!raw) {
       return '—';
     }
-    // API may return "HH:mm" or ISO; keep HH:mm when possible
-    const m = isoOrLocal.match(/(\d{2}:\d{2})/);
-    return m ? m[1] : isoOrLocal.slice(0, 5);
+    const d = new Date(raw);
+    if (Number.isNaN(d.getTime())) {
+      const m = raw.match(/(\d{2}:\d{2})/);
+      return m ? m[1] : raw.slice(0, 5);
+    }
+    return d.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: DESK.timezone,
+    });
   }
 
   todaysOpenAppointments(): JyotishAppointment[] {
