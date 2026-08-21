@@ -2,3 +2,8 @@
 /dist
 /.angular
 .DS_Store
+
+local-ui.err.log
+local-ui.out.log
+local-ui.pid
+*.pid
