@@ -15,7 +15,7 @@ const SIGN_NAMES = [
   'Pisces',
 ];
 
-export type ChartViewMode = 'LAGNA' | 'CHANDRA' | 'SURYA';
+export type ChartViewMode = 'LAGNA' | 'CHANDRA' | 'SURYA' | 'CHALIT';
 
 export interface ChartView {
   mode: ChartViewMode;
@@ -25,15 +25,25 @@ export interface ChartView {
   pivotLabel: string;
 }
 
-/** Remap whole-sign houses so pivot planet's natal house becomes house 1 (Chandra/Surya Kundli). */
+/**
+ * Remap whole-sign houses so pivot planet's natal house becomes house 1 (Chandra/Surya Kundli).
+ * For CHALIT, pass already-rehoused Sripati planets/houses from GET .../charts/CHALIT — do not
+ * fake by copying Rashi.
+ */
 export function buildChartView(
   mode: ChartViewMode,
   planets: PlanetDto[],
   houses: HouseDto[],
   ascendant: PlanetDto | null
 ): ChartView {
-  if (mode === 'LAGNA') {
-    return { mode, planets, houses, ascendant, pivotLabel: 'Lagna' };
+  if (mode === 'LAGNA' || mode === 'CHALIT') {
+    return {
+      mode,
+      planets,
+      houses,
+      ascendant,
+      pivotLabel: mode === 'CHALIT' ? 'Chalit' : 'Lagna',
+    };
   }
   const code = mode === 'CHANDRA' ? 'MOON' : 'SUN';
   const pivot = planets.find((p) => p.planetCode === code);

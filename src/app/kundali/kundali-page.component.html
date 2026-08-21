@@ -152,11 +152,20 @@
         >
           {{ 'chart.surya' | t }}
         </button>
+        <button
+          type="button"
+          [class.active]="chartViewMode === 'CHALIT'"
+          (click)="setChartView('CHALIT')"
+        >
+          {{ 'chart.chalit' | t }}
+        </button>
       </div>
       <button type="button" class="btn ghost" (click)="toggleSignMode()">
         {{ chartSignMode === 'number' ? ('chart.signAbbrev' | t) : ('chart.signNumber' | t) }}
       </button>
     </div>
+    <p class="hint" *ngIf="chartViewMode === 'CHALIT' && chalitBusy">Loading Bhava Chalit…</p>
+    <p class="hint error" *ngIf="chalitError">{{ chalitError }}</p>
     <div class="overview-grid" *ngIf="overviewChart() as cv">
       <app-kundali-chart
         class="chart-stage"
@@ -223,6 +232,7 @@
 
   <section class="panel" *ngIf="tab === 'planets'">
     <h2 class="timeline-h">{{ 'table.spashta' | t }}</h2>
+    <p class="hint" *ngIf="!hasOuterPlanets()">{{ 'chart.outerSoon' | t }}</p>
     <div class="table-scroll">
       <table class="table">
         <thead>

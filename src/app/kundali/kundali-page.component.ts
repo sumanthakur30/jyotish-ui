@@ -54,6 +54,10 @@ export class KundaliPageComponent implements OnInit {
 
   chartViewMode: ChartViewMode = 'LAGNA';
   chartSignMode: 'number' | 'abbrev' = 'number';
+  /** Loaded when overview toggle is Chalit (Sripati), not a Rashi copy. */
+  chalitChart: VargaChartResponse | null = null;
+  chalitBusy = false;
+  chalitError = '';
 
   chartCatalog: ChartCatalogItem[] = [];
   selectedVarga = 'D9';
@@ -141,6 +145,8 @@ export class KundaliPageComponent implements OnInit {
     this.api.getKundali(id).subscribe({
       next: (k) => {
         this.kundali = k;
+        this.chalitChart = null;
+        this.chalitError = '';
         this.busy = false;
       },
       error: (err) => {
@@ -1063,6 +1069,17 @@ export class KundaliPageComponent implements OnInit {
     if (!this.kundali) {
       return null;
     }
+    if (this.chartViewMode === 'CHALIT') {
+      if (!this.chalitChart) {
+        return null;
+      }
+      return buildChartView(
+        'CHALIT',
+        this.chalitChart.planets,
+        this.chalitChart.houses,
+        this.chalitChart.ascendant
+      );
+    }
     return buildChartView(
       this.chartViewMode,
       this.kundali.planets,
@@ -1073,6 +1090,30 @@ export class KundaliPageComponent implements OnInit {
 
   setChartView(mode: ChartViewMode): void {
     this.chartViewMode = mode;
+    if (mode === 'CHALIT' && this.kundali && !this.chalitChart && !this.chalitBusy) {
+      this.loadChalit(this.kundali.id);
+    }
+  }
+
+  private loadChalit(kundaliId: number): void {
+    this.chalitBusy = true;
+    this.chalitError = '';
+    this.api.getChart(kundaliId, 'CHALIT').subscribe({
+      next: (c) => {
+        this.chalitChart = c;
+        this.chalitBusy = false;
+      },
+      error: (err) => {
+        this.chalitBusy = false;
+        this.chalitError = err?.error?.message || 'Could not load Bhava Chalit.';
+      },
+    });
+  }
+
+  hasOuterPlanets(): boolean {
+    return !!this.kundali?.planets?.some((p) =>
+      ['URANUS', 'NEPTUNE', 'PLUTO'].includes(p.planetCode)
+    );
   }
 
   toggleSignMode(): void {

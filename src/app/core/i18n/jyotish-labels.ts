@@ -10,6 +10,9 @@ const PLANET_EN: Record<string, string> = {
   SATURN: 'Sa',
   RAHU: 'Ra',
   KETU: 'Ke',
+  URANUS: 'Ur',
+  NEPTUNE: 'Ne',
+  PLUTO: 'Pl',
   ASCENDANT: 'As',
 };
 
@@ -23,6 +26,9 @@ const PLANET_HI: Record<string, string> = {
   SATURN: 'श',
   RAHU: 'रा',
   KETU: 'के',
+  URANUS: 'यू',
+  NEPTUNE: 'ने',
+  PLUTO: 'प्ल',
   ASCENDANT: 'ल',
 };
 
@@ -36,6 +42,9 @@ const PLANET_FULL_EN: Record<string, string> = {
   SATURN: 'Saturn',
   RAHU: 'Rahu',
   KETU: 'Ketu',
+  URANUS: 'Uranus',
+  NEPTUNE: 'Neptune',
+  PLUTO: 'Pluto',
   ASCENDANT: 'Lagna',
 };
 
@@ -49,6 +58,9 @@ const PLANET_FULL_HI: Record<string, string> = {
   SATURN: 'शनि',
   RAHU: 'राहु',
   KETU: 'केतु',
+  URANUS: 'यूरेनस',
+  NEPTUNE: 'नेपच्यून',
+  PLUTO: 'प्लूटो',
   ASCENDANT: 'लग्न',
 };
 
