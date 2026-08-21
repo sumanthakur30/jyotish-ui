@@ -135,6 +135,10 @@ export class ProfilesPageComponent implements OnInit {
       this.error = 'Please select a valid birth location.';
       return;
     }
+    if (!this.birthTimeUnknown && !this.birthTime) {
+      this.error = 'Birth time is required (or mark birth time unknown).';
+      return;
+    }
     const body: UpsertProfileRequest = {
       displayName: this.displayName.trim(),
       gender: this.gender || null,
@@ -222,8 +226,17 @@ export class ProfilesPageComponent implements OnInit {
     });
   }
 
-  private fail(err: { error?: { message?: string } }, fallback?: string): void {
-    this.error = err?.error?.message || fallback || 'Request failed';
+  private fail(
+    err: { error?: { message?: string } | string; message?: string },
+    fallback?: string
+  ): void {
+    const bodyMsg =
+      typeof err?.error === 'string'
+        ? err.error
+        : err?.error && typeof err.error === 'object'
+          ? err.error.message
+          : undefined;
+    this.error = bodyMsg || err?.message || fallback || 'Request failed';
     this.message = '';
   }
 }

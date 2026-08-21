@@ -46,8 +46,17 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private fail(err: { error?: { message?: string } }, fallback?: string): void {
-    this.error = err?.error?.message || fallback || 'Request failed';
+  private fail(
+    err: { error?: { message?: string } | string; message?: string },
+    fallback?: string
+  ): void {
+    const bodyMsg =
+      typeof err?.error === 'string'
+        ? err.error
+        : err?.error && typeof err.error === 'object'
+          ? err.error.message
+          : undefined;
+    this.error = bodyMsg || err?.message || fallback || 'Request failed';
     this.message = '';
   }
 }
