@@ -413,6 +413,67 @@ export interface AiAskResponse {
   askId: number | null;
 }
 
+export interface PanchangLimb {
+  index: number;
+  name: string;
+  paksha: string | null;
+  pada: number | null;
+  progress: number;
+  detail: string | null;
+}
+
+export interface PanchangSolarEvent {
+  available: boolean;
+  localTime: string | null;
+  instant: string | null;
+  note: string | null;
+}
+
+export interface PanchangLunarEvent {
+  available: boolean;
+  localTime: string | null;
+  instant: string | null;
+  note: string | null;
+}
+
+export interface PanchangCatalogItem {
+  code: string;
+  displayName: string;
+  implemented: boolean;
+  status: string;
+}
+
+export interface PanchangComingSoon {
+  code: string;
+  label: string;
+}
+
+export interface PanchangResponse {
+  date: string;
+  timeZone: string;
+  placeName: string | null;
+  latitude: number;
+  longitude: number;
+  ayanamsaCode: string;
+  ayanamsaDeg: number;
+  julianDayUt: number;
+  asOf: string;
+  calculationEngineVersion: string;
+  tithi: PanchangLimb;
+  vara: PanchangLimb;
+  nakshatra: PanchangLimb;
+  yoga: PanchangLimb;
+  karana: PanchangLimb;
+  sunrise: PanchangSolarEvent;
+  sunset: PanchangSolarEvent;
+  moonrise: PanchangLunarEvent;
+  moonset: PanchangLunarEvent;
+  catalog: PanchangCatalogItem[];
+  comingSoon: PanchangComingSoon[];
+  notes: string | null;
+  disclaimer: string;
+}
+
 export interface KundaliResponse {
   id: number;
   birthProfileId: number | null;
@@ -649,5 +710,38 @@ export class JyotishApiService {
 
   askAi(body: AiAskRequest): Observable<AiAskResponse> {
     return this.http.post<AiAskResponse>('/api/v1/jyotish/ai/ask', body);
+  }
+
+  getPanchang(opts: {
+    date: string;
+    lat: number;
+    lon: number;
+    timezone: string;
+    placeName?: string;
+    ayanamsaCode?: string;
+  }): Observable<PanchangResponse> {
+    let params = new HttpParams()
+      .set('date', opts.date)
+      .set('lat', String(opts.lat))
+      .set('lon', String(opts.lon))
+      .set('timezone', opts.timezone);
+    if (opts.placeName) {
+      params = params.set('placeName', opts.placeName);
+    }
+    if (opts.ayanamsaCode) {
+      params = params.set('ayanamsaCode', opts.ayanamsaCode);
+    }
+    return this.http.get<PanchangResponse>('/api/v1/jyotish/panchang', { params });
+  }
+
+  postPanchang(body: {
+    date: string;
+    lat: number;
+    lon: number;
+    timezone: string;
+    placeName?: string | null;
+    ayanamsaCode?: string | null;
+  }): Observable<PanchangResponse> {
+    return this.http.post<PanchangResponse>('/api/v1/jyotish/panchang', body);
   }
 }

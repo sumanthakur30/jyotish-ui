@@ -8,4 +8,4 @@ npm install
 npm start
 ```
 
-Open http://localhost:4600 — set tenant, manage birth profiles, open **Kundali** (D1 / Charts / Dasha / Yogas / Transit / Reports PDF / **Ask Sugam Jyotish**), **Matching**, plus Phase 9 **Clients** and **Appointments** CRM. AI answers are labeled AI-assisted and grounded in stored calc only.
+Open http://localhost:4600 — set tenant, manage birth profiles, open **Kundali** (D1 / Charts / Dasha / Yogas / Transit / Reports PDF / **Ask Sugam Jyotish**), **Matching**, **Panchang**, plus Phase 9 **Clients** and **Appointments** CRM. AI answers are labeled AI-assisted and grounded in stored calc only.

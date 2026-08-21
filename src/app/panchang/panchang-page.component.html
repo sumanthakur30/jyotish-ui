@@ -1,0 +1,146 @@
+<p class="flash ok" *ngIf="message">{{ message }}</p>
+<p class="flash err" *ngIf="error">{{ error }}</p>
+
+<section class="panel">
+  <div class="row between">
+    <h2>Panchang</h2>
+    <span class="meta">Compute-only · Meeus + Lahiri</span>
+  </div>
+  <p class="hint">
+    Classical five limbs for a civil date and place. Limbs are evaluated at sunrise. Choghadiya,
+    Rahu Kaal, and moonrise/moonset are Coming Soon.
+  </p>
+
+  <div class="form-grid">
+    <label>
+      Date
+      <input type="date" [(ngModel)]="date" name="date" />
+    </label>
+    <label>
+      Ayanamsa
+      <select [(ngModel)]="ayanamsaCode" name="ayanamsaCode">
+        <option value="LAHIRI">Lahiri</option>
+        <option value="RAMAN">Raman</option>
+        <option value="KP">KP</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="form-grid">
+    <label class="wide">
+      Place search
+      <div class="row">
+        <input
+          [(ngModel)]="placeQuery"
+          name="placeQuery"
+          placeholder="Delhi, Mumbai…"
+          (keyup.enter)="searchPlaces()"
+        />
+        <button type="button" class="btn" (click)="searchPlaces()">Search</button>
+      </div>
+    </label>
+  </div>
+  <ul class="hits" *ngIf="placeHits.length">
+    <li *ngFor="let p of placeHits">
+      <button type="button" class="linkish" (click)="pickPlace(p)">
+        {{ p.placeName }} · {{ p.latitude }}, {{ p.longitude }} · {{ p.timeZone }}
+      </button>
+    </li>
+  </ul>
+
+  <div class="form-grid">
+    <label class="wide">
+      Place
+      <input [(ngModel)]="placeName" name="placeName" />
+    </label>
+    <label>
+      Latitude
+      <input type="number" step="0.0000001" [(ngModel)]="latitude" name="latitude" />
+    </label>
+    <label>
+      Longitude
+      <input type="number" step="0.0000001" [(ngModel)]="longitude" name="longitude" />
+    </label>
+    <label>
+      Timezone
+      <input [(ngModel)]="timeZone" name="timeZone" placeholder="Asia/Kolkata" />
+    </label>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn" [disabled]="busy" (click)="compute()">
+      {{ busy ? 'Computing…' : 'Compute Panchang' }}
+    </button>
+  </div>
+</section>
+
+<section class="panel" *ngIf="result as r">
+  <div class="row between">
+    <h2>
+      {{ r.placeName || 'Selected place' }}
+      <span class="sub"> · {{ r.date }}</span>
+    </h2>
+    <span class="meta">engine {{ r.calculationEngineVersion }}</span>
+  </div>
+
+  <div class="sun-row">
+    <div>
+      <span class="label">Sunrise</span>
+      <strong>{{ r.sunrise.available ? r.sunrise.localTime : '—' }}</strong>
+      <span class="note" *ngIf="!r.sunrise.available">{{ r.sunrise.note }}</span>
+    </div>
+    <div>
+      <span class="label">Sunset</span>
+      <strong>{{ r.sunset.available ? r.sunset.localTime : '—' }}</strong>
+      <span class="note" *ngIf="!r.sunset.available">{{ r.sunset.note }}</span>
+    </div>
+    <div>
+      <span class="label">Moonrise</span>
+      <strong>Coming Soon</strong>
+    </div>
+    <div>
+      <span class="label">Moonset</span>
+      <strong>Coming Soon</strong>
+    </div>
+  </div>
+
+  <div class="limbs">
+    <article>
+      <h3>Tithi</h3>
+      <p class="value">
+        <span *ngIf="r.tithi.paksha">{{ r.tithi.paksha }} </span>{{ r.tithi.name }}
+      </p>
+      <p class="detail">{{ r.tithi.detail }} · {{ pct(r.tithi.progress) }} elapsed</p>
+    </article>
+    <article>
+      <h3>Vara</h3>
+      <p class="value">{{ r.vara.name }}</p>
+      <p class="detail">{{ r.vara.detail }}</p>
+    </article>
+    <article>
+      <h3>Nakshatra</h3>
+      <p class="value">{{ r.nakshatra.name }} · pada {{ r.nakshatra.pada }}</p>
+      <p class="detail">{{ r.nakshatra.detail }} · {{ pct(r.nakshatra.progress) }} elapsed</p>
+    </article>
+    <article>
+      <h3>Yoga</h3>
+      <p class="value">{{ r.yoga.name }}</p>
+      <p class="detail">{{ r.yoga.detail }} · {{ pct(r.yoga.progress) }} elapsed</p>
+    </article>
+    <article>
+      <h3>Karana</h3>
+      <p class="value">{{ r.karana.name }}</p>
+      <p class="detail">{{ r.karana.detail }} · {{ pct(r.karana.progress) }} elapsed</p>
+    </article>
+  </div>
+
+  <div class="soon" *ngIf="r.comingSoon?.length">
+    <h3>Coming Soon</h3>
+    <ul>
+      <li *ngFor="let c of r.comingSoon">{{ c.label }}</li>
+    </ul>
+  </div>
+
+  <p class="disclaimer">{{ r.disclaimer }}</p>
+  <p class="notes">{{ r.notes }}</p>
+</section>

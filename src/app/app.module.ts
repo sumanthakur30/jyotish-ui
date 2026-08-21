@@ -12,6 +12,7 @@ import { KundaliChartComponent } from './kundali/kundali-chart.component';
 import { MatchingPageComponent } from './matching/matching-page.component';
 import { ClientsPageComponent } from './clients/clients-page.component';
 import { AppointmentsPageComponent } from './appointments/appointments-page.component';
+import { PanchangPageComponent } from './panchang/panchang-page.component';
 
 const routes: Routes = [
   { path: '', component: ProfilesPageComponent },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'clients', component: ClientsPageComponent },
   { path: 'clients/:id', component: ClientsPageComponent },
   { path: 'appointments', component: AppointmentsPageComponent },
+  { path: 'panchang', component: PanchangPageComponent },
   { path: '**', redirectTo: '' },
 ];
 
@@ -33,6 +35,7 @@ const routes: Routes = [
     MatchingPageComponent,
     ClientsPageComponent,
     AppointmentsPageComponent,
+    PanchangPageComponent,
   ],
   imports: [BrowserModule, HttpClientModule, FormsModule, RouterModule.forRoot(routes)],
   providers: [{ provide: HTTP_INTERCEPTORS, useClass: TenantInterceptor, multi: true }],
