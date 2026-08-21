@@ -57,7 +57,7 @@
       {{ 'kundali.charts' | t }}
     </button>
     <button type="button" [class.active]="tab === 'dasha'" (click)="openDasha()">
-      {{ 'kundali.dasha' | t }}
+      {{ viewMode.isSimple ? ('simple.dashaTab' | t) : ('kundali.dasha' | t) }}
     </button>
     <button
       *ngIf="viewMode.isExpert"
@@ -396,13 +396,20 @@
     <ng-container *ngIf="dasha as d">
       <!-- Simple journey -->
       <div class="dasha-journey" *ngIf="viewMode.isSimple">
+        <h2 class="journey-title">{{ 'simple.journey.title' | t }}</h2>
         <ng-container *ngIf="dashaJourney() as j">
+          <p class="hint" *ngIf="!j.current && !j.next && !j.later.length">
+            {{ 'simple.journey.empty' | t }}
+          </p>
           <article class="journey-card current" *ngIf="j.current as cur">
             <p class="journey-label">{{ 'simple.journey.current' | t }}</p>
             <h2>
               {{ cur.maha.lordName }}
               <span *ngIf="cur.antar"> → {{ cur.antar.lordName }}</span>
             </h2>
+            <p class="lvl-soft">
+              {{ periodLevelLabel(cur.antar || cur.maha) }}
+            </p>
             <p class="dates">
               {{ fmtWhen((cur.antar && cur.antar.startAt) || cur.maha.startAt) }} –
               {{ fmtWhen((cur.antar && cur.antar.endAt) || cur.maha.endAt) }}
@@ -417,7 +424,8 @@
           </article>
           <article class="journey-card" *ngIf="j.next as n">
             <p class="journey-label">{{ 'simple.journey.next' | t }}</p>
-            <h2>{{ n.lordName }} · {{ n.level }}</h2>
+            <h2>{{ n.lordName }}</h2>
+            <p class="lvl-soft">{{ periodLevelLabel(n) }}</p>
             <p class="dates">{{ fmtWhen(n.startAt) }} – {{ fmtWhen(n.endAt) }}</p>
             <button type="button" class="btn ghost" (click)="selectPeriod(n)">
               {{ 'simple.understandPeriod' | t }}
@@ -427,7 +435,10 @@
             <p class="journey-label">{{ 'simple.journey.later' | t }}</p>
             <ul class="later-list">
               <li *ngFor="let L of j.later">
-                <strong>{{ L.lordName }}</strong>
+                <div>
+                  <strong>{{ L.lordName }}</strong>
+                  <span class="lvl-soft"> · {{ periodLevelLabel(L) }}</span>
+                </div>
                 <span class="dates">{{ fmtWhen(L.startAt) }} – {{ fmtWhen(L.endAt) }}</span>
                 <button type="button" class="linkish" (click)="selectPeriod(L)">
                   {{ 'simple.understandPeriod' | t }}
@@ -560,7 +571,7 @@
         <p class="sub">{{ fmtWhen(se.startAt) }} – {{ fmtWhen(se.endAt) }}</p>
         <p *ngIf="se.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
         <p *ngFor="let para of explainParagraphs(se.explanation)">{{ para }}</p>
-        <details *ngIf="se.explanation?.whyFacts?.length">
+        <details open *ngIf="se.explanation?.whyFacts?.length">
           <summary>{{ 'simple.why' | t }}</summary>
           <ul>
             <li *ngFor="let f of se.explanation.whyFacts">

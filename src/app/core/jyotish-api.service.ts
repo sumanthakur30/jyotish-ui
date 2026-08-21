@@ -846,8 +846,13 @@ export interface SimpleLifeAreaCard {
   labelEn: string;
   labelHi: string;
   status: string;
+  statusLineEn?: string | null;
+  statusLineHi?: string | null;
   currentDashaLine: string | null;
   currentDashaEndAt: string | null;
+  nextPeriodAt?: string | null;
+  nextPeriodLineEn?: string | null;
+  nextPeriodLineHi?: string | null;
 }
 
 export interface SimpleUpcomingItem {

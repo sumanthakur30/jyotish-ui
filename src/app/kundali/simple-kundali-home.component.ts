@@ -24,7 +24,6 @@ export class SimpleKundaliHomeComponent implements OnChanges {
   overview: SimpleOverviewResponse | null = null;
   busy = false;
   error = '';
-  whyOpen = false;
   understand: SimplePeriodExplainResponse | null = null;
   understandBusy = false;
 
@@ -88,6 +87,20 @@ export class SimpleKundaliHomeComponent implements OnChanges {
     return this.language.lang === 'hi' ? a.labelHi : a.labelEn;
   }
 
+  areaStatusLine(a: SimpleLifeAreaCard): string {
+    if (this.language.lang === 'hi') {
+      return a.statusLineHi || this.statusLabel(a.status);
+    }
+    return a.statusLineEn || this.statusLabel(a.status);
+  }
+
+  areaNextLine(a: SimpleLifeAreaCard): string | null {
+    if (this.language.lang === 'hi') {
+      return a.nextPeriodLineHi || null;
+    }
+    return a.nextPeriodLineEn || null;
+  }
+
   upcomingLabel(u: SimpleUpcomingItem): string {
     return this.language.lang === 'hi' ? u.labelHi : u.labelEn;
   }
@@ -110,11 +123,19 @@ export class SimpleKundaliHomeComponent implements OnChanges {
     if (!iso) {
       return '—';
     }
-    try {
-      return new Date(iso).toISOString().slice(0, 10);
-    } catch {
-      return iso.slice(0, 10);
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) {
+      try {
+        return iso.slice(0, 10);
+      } catch {
+        return iso;
+      }
     }
+    return d.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   }
 
   goLife(category: string): void {
@@ -130,34 +151,57 @@ export class SimpleKundaliHomeComponent implements OnChanges {
     if (!this.kundaliId || !p) {
       return;
     }
+    const level = p.antarLordCode ? 'ANTAR' : 'MAHA';
+    this.fetchUnderstand(level, p.mahaLordCode, p.antarLordCode, p);
+  }
+
+  openUnderstandUpcoming(u: SimpleUpcomingItem): void {
+    if (!this.kundaliId || !u) {
+      return;
+    }
+    const level = (u.levelCode || 'ANTAR').toUpperCase();
+    const maha = u.mahaLordCode || (level === 'MAHA' ? u.lordCode : null);
+    const antar =
+      level === 'MAHA' ? null : u.lordCode || null;
+    this.fetchUnderstand(level, maha, antar, null);
+  }
+
+  private fetchUnderstand(
+    level: string,
+    maha: string | null | undefined,
+    antar: string | null | undefined,
+    fallback: SimpleCurrentLifePeriod | null
+  ): void {
+    if (!this.kundaliId) {
+      return;
+    }
     this.understandBusy = true;
     this.understand = null;
-    const level = p.antarLordCode ? 'ANTAR' : 'MAHA';
-    this.api
-      .getSimplePeriod(this.kundaliId, level, p.mahaLordCode, p.antarLordCode)
-      .subscribe({
-        next: (res) => {
-          this.understand = res;
-          this.understandBusy = false;
-        },
-        error: () => {
-          this.understandBusy = false;
+    this.api.getSimplePeriod(this.kundaliId, level, maha || undefined, antar || undefined).subscribe({
+      next: (res) => {
+        this.understand = res;
+        this.understandBusy = false;
+      },
+      error: () => {
+        this.understandBusy = false;
+        if (fallback && this.overview) {
           this.understand = {
             kundaliId: this.kundaliId!,
             calculationNotAvailable: false,
             levelCode: level,
-            mahaLordCode: p.mahaLordCode,
-            mahaLordName: p.mahaLordName,
-            antarLordCode: p.antarLordCode,
-            antarLordName: p.antarLordName,
-            startAt: p.startAt,
-            endAt: p.endAt,
-            explanation: p.explanation,
-            generalDisclaimerEn: this.overview!.generalDisclaimerEn,
-            generalDisclaimerHi: this.overview!.generalDisclaimerHi,
+            mahaLordCode: fallback.mahaLordCode,
+            mahaLordName: fallback.mahaLordName,
+            antarLordCode: fallback.antarLordCode,
+            antarLordName: fallback.antarLordName,
+            startAt: fallback.startAt,
+            endAt: fallback.endAt,
+            explanation: fallback.explanation,
+            generalDisclaimerEn: this.overview.generalDisclaimerEn,
+            generalDisclaimerHi: this.overview.generalDisclaimerHi,
           };
-        },
-      });
+        }
+      },
+    });
   }
 
   closeUnderstand(): void {

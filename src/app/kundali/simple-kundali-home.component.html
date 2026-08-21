@@ -5,7 +5,10 @@
     <header class="hello">
       <h2>{{ 'simple.hello' | t: { name: o.displayName } }}</h2>
       <p class="lead">{{ 'simple.lead' | t }}</p>
+      <p class="mode-hint">{{ 'simple.modeHint' | t }}</p>
     </header>
+
+    <p class="banner warn" *ngIf="o.calculationNotAvailable">{{ 'simple.calcMissing' | t }}</p>
 
     <section class="glance" aria-label="Glance">
       <article class="g-card">
@@ -32,7 +35,7 @@
           <p>{{ whatIsThis(o.nakshatra) }}</p>
         </details>
       </article>
-      <article class="g-card">
+      <article class="g-card accent">
         <h3>{{ 'simple.glance.dasha' | t }}</h3>
         <p class="value">{{ glanceValue(o.currentDashaGlance) }}</p>
         <details>
@@ -43,13 +46,16 @@
     </section>
 
     <section class="period" *ngIf="o.currentLifePeriod as p; else noPeriod">
-      <h3>{{ 'simple.currentPeriod' | t }}</h3>
+      <div class="period-head">
+        <h3>{{ 'simple.currentPeriod' | t }}</h3>
+        <span class="now-pill">{{ 'simple.journey.current' | t }}</span>
+      </div>
       <p class="period-title">{{ periodTitle(p) }}</p>
       <p class="dates">{{ fmtWhen(p.startAt) }} – {{ fmtWhen(p.endAt) }}</p>
       <div class="meaning" *ngIf="p.explanation as ex">
         <p *ngIf="ex.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
         <p *ngFor="let para of paragraphs(ex)">{{ para }}</p>
-        <details class="why" [open]="whyOpen">
+        <details class="why" open *ngIf="ex.whyFacts?.length">
           <summary>{{ 'simple.why' | t }}</summary>
           <ul>
             <li *ngFor="let f of ex.whyFacts">
@@ -59,7 +65,7 @@
           </ul>
         </details>
         <div class="period-actions">
-          <button type="button" class="btn ghost" (click)="openUnderstandCurrent()">
+          <button type="button" class="btn primary" (click)="openUnderstandCurrent()">
             {{ 'simple.understandPeriod' | t }}
           </button>
           <button type="button" class="btn ghost" (click)="goDasha()">
@@ -86,8 +92,18 @@
           (click)="goLife(a.category)"
         >
           <span class="area-name">{{ areaLabel(a) }}</span>
-          <span class="area-status">{{ statusLabel(a.status) }}</span>
-          <span class="area-dasha" *ngIf="a.currentDashaLine">{{ a.currentDashaLine }}</span>
+          <span class="area-status">{{ areaStatusLine(a) }}</span>
+          <span class="area-dasha" *ngIf="a.currentDashaLine">
+            {{ 'simple.now' | t }}: {{ a.currentDashaLine }}
+          </span>
+          <span class="area-until" *ngIf="a.currentDashaEndAt">
+            {{ 'simple.until' | t }} {{ fmtWhen(a.currentDashaEndAt) }}
+          </span>
+          <span class="area-next" *ngIf="areaNextLine(a) as next">
+            {{ next }}
+            <span *ngIf="a.nextPeriodAt"> · {{ fmtWhen(a.nextPeriodAt) }}</span>
+          </span>
+          <span class="area-cta">{{ 'simple.openLife' | t }} →</span>
         </button>
       </div>
       <p class="disclaimer" *ngIf="showsHealth(o.lifeAreas)">
@@ -97,13 +113,23 @@
 
     <section class="upcoming" *ngIf="o.upcoming?.length">
       <h3>{{ 'simple.upcoming' | t }}</h3>
-      <ul>
-        <li *ngFor="let u of o.upcoming | slice: 0:5">
-          <strong>{{ upcomingLabel(u) }}</strong>
-          <span class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</span>
+      <ol class="timeline">
+        <li *ngFor="let u of o.upcoming | slice: 0:5; let i = index">
+          <span class="tl-mark" [class.next]="i === 0">{{
+            i === 0 ? ('simple.journey.next' | t) : ('simple.journey.later' | t)
+          }}</span>
+          <div class="tl-body">
+            <strong>{{ upcomingLabel(u) }}</strong>
+            <span class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</span>
+            <button type="button" class="linkish" (click)="openUnderstandUpcoming(u)">
+              {{ 'simple.understandPeriod' | t }}
+            </button>
+          </div>
         </li>
-      </ul>
+      </ol>
     </section>
+
+    <p class="disclaimer foot">{{ disclaimer() }}</p>
 
     <details class="tech">
       <summary>{{ 'kundali.techDetails' | t }}</summary>
@@ -111,7 +137,6 @@
         {{ t.ayanamsaCode }} · {{ t.houseSystem }} · {{ t.dashaSystemCode }} ·
         {{ t.calculationEngineVersion }}
       </p>
-      <p class="disclaimer">{{ disclaimer() }}</p>
     </details>
   </ng-container>
 </div>
@@ -126,7 +151,7 @@
     <p class="dates">{{ fmtWhen(u.startAt) }} – {{ fmtWhen(u.endAt) }}</p>
     <p *ngIf="u.calculationNotAvailable" class="hint">{{ 'simple.calcMissing' | t }}</p>
     <p *ngFor="let para of paragraphs(u.explanation)">{{ para }}</p>
-    <details *ngIf="u.explanation?.whyFacts?.length">
+    <details open *ngIf="u.explanation?.whyFacts?.length">
       <summary>{{ 'simple.why' | t }}</summary>
       <ul>
         <li *ngFor="let f of u.explanation.whyFacts">

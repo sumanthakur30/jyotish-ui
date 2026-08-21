@@ -687,6 +687,20 @@ export class KundaliPageComponent implements OnInit {
     return this.language.lang === 'hi' ? block.paragraphsHi : block.paragraphsEn;
   }
 
+  periodLevelLabel(p: DashaPeriodDto | null | undefined): string {
+    const level = (p?.level || '').toUpperCase();
+    if (level === 'MAHA') {
+      return this.language.t('simple.level.maha');
+    }
+    if (level === 'ANTAR') {
+      return this.language.t('simple.level.antar');
+    }
+    if (level === 'PRATYANTAR') {
+      return this.language.t('simple.level.pratyantar');
+    }
+    return p?.level || '';
+  }
+
   fmtWhen(iso: string | null | undefined): string {
     if (!iso) {
       return '—';
