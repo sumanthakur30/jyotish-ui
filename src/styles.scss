@@ -2,10 +2,14 @@
   --bg: #f3efe6;
   --ink: #1a3a2f;
   --accent: #c45c26;
+  --gold: #b8893a;
   --panel: #fffdf8;
   --line: #d4cbb8;
   --ok: #2f6b4f;
-  --err: #9b2c2c;
+  --err: #8a3a2a;
+  --shadow: 0 10px 28px rgba(26, 58, 47, 0.07);
+  --font: "Noto Sans Devanagari", "Source Sans 3", "Segoe UI", sans-serif;
+  --display: "Fraunces", "Noto Serif", "Noto Sans Devanagari", serif;
 }
 
 * {
@@ -16,12 +20,19 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: "Segoe UI", "Noto Sans", sans-serif;
+  font-family: var(--font);
   color: var(--ink);
   background:
-    radial-gradient(ellipse at 20% 0%, #ebe2d0 0%, transparent 50%),
-    radial-gradient(ellipse at 90% 10%, #e7ddd0 0%, transparent 40%),
+    radial-gradient(ellipse at 12% -10%, #f7e7c8 0%, transparent 42%),
+    radial-gradient(ellipse at 92% 0%, #e4efe6 0%, transparent 38%),
+    radial-gradient(ellipse at 50% 100%, #efe6d4 0%, transparent 45%),
     var(--bg);
+}
+
+h1,
+h2,
+.brand h1 {
+  font-family: var(--display);
 }
 
 .row {
@@ -56,11 +67,17 @@ textarea {
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--ink);
-  border-radius: 0.3rem;
-  padding: 0.4rem 0.75rem;
+  border-radius: 0.45rem;
+  padding: 0.4rem 0.85rem;
   cursor: pointer;
   white-space: nowrap;
   font: inherit;
+  font-weight: 600;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ink) 35%, var(--line));
 }
 
 .btn.primary {
@@ -81,9 +98,10 @@ textarea {
 .panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 0.4rem;
+  border-radius: 0.75rem;
   padding: 1.1rem 1.2rem;
   margin-top: 1rem;
+  box-shadow: var(--shadow);
 }
 
 .panel.compact {
@@ -137,8 +155,12 @@ label.check input {
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 0.3rem;
-  max-height: 10rem;
+  max-height: 16rem;
   overflow: auto;
+}
+
+.hits li.active .linkish {
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
 }
 
 .hits li {
@@ -192,18 +214,20 @@ label.check input {
 
 .flash {
   margin: 0.75rem 0 0;
-  padding: 0.55rem 0.75rem;
-  border-radius: 0.3rem;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.5rem;
 }
 
 .flash.ok {
-  background: color-mix(in srgb, var(--ok) 12%, white);
+  background: color-mix(in srgb, var(--ok) 14%, var(--panel));
   color: var(--ok);
+  border: 1px solid color-mix(in srgb, var(--ok) 22%, var(--line));
 }
 
 .flash.err {
-  background: color-mix(in srgb, var(--err) 12%, white);
-  color: var(--err);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel));
+  color: #7a3a1c;
+  border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
 }
 
 @media (max-width: 700px) {

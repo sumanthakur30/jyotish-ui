@@ -4,9 +4,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.5rem;
+  padding: 0.9rem 1.5rem 0.85rem;
   border-bottom: 1px solid var(--line);
-  background: color-mix(in srgb, var(--panel) 88%, transparent);
+  background:
+    linear-gradient(180deg, #fffdf8 0%, color-mix(in srgb, var(--panel) 92%, #f3efe6) 100%);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--gold) 45%, transparent);
 }
 
 .brand {
@@ -38,9 +40,10 @@
   color: inherit;
   text-decoration: none;
   font-size: 0.92rem;
-  opacity: 0.7;
+  font-weight: 600;
+  opacity: 0.62;
   border-bottom: 2px solid transparent;
-  padding-bottom: 0.15rem;
+  padding-bottom: 0.2rem;
   white-space: nowrap;
   flex: 0 0 auto;
 }
@@ -48,40 +51,42 @@
 .nav a.active,
 .nav a:hover {
   opacity: 1;
-  border-bottom-color: var(--ink);
+  border-bottom-color: var(--accent);
 }
 
 .mark {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.65rem;
+  height: 2.65rem;
   display: grid;
   place-items: center;
-  border-radius: 0.35rem;
-  background: var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #2a5746, var(--ink));
   color: #f7f1e6;
   font-weight: 700;
   letter-spacing: 0.04em;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 70%, white);
 }
 
 .brand h1 {
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 650;
+  font-size: 1.4rem;
+  font-weight: 700;
   letter-spacing: -0.02em;
 }
 
 .tag {
   margin: 0.15rem 0 0;
   color: color-mix(in srgb, var(--ink) 65%, transparent);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .lang-toggle {
   display: inline-flex;
   border: 1px solid var(--line);
-  border-radius: 0.35rem;
+  border-radius: 999px;
   overflow: hidden;
   margin-right: 0.35rem;
+  background: var(--panel);
 }
 
 .lang-btn {
@@ -91,7 +96,7 @@
   font: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  padding: 0.35rem 0.65rem;
+  padding: 0.35rem 0.7rem;
   cursor: pointer;
   opacity: 0.65;
 }
@@ -116,19 +121,44 @@
 
 .tenant-bar input {
   width: auto;
-  min-width: 10rem;
+  min-width: 7rem;
+  border-radius: 0.45rem;
+}
+
+.staff-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.session-chip {
+  font-size: 0.82rem;
+  font-weight: 650;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ok) 12%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--ok) 22%, var(--line));
+}
+
+.panel.login-gate {
+  max-width: 28rem;
 }
 
 .shell {
-  max-width: 64rem;
+  max-width: 72rem;
   margin: 0 auto;
-  padding: 1.25rem 1.5rem 3rem;
+  padding: 1.15rem 1.5rem 3rem;
 }
 
 .status-strip {
   margin: 0 0 1rem;
+  padding: 0.45rem 0.85rem;
   font-size: 0.82rem;
-  opacity: 0.7;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ok) 10%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--ok) 20%, var(--line));
+  color: var(--ok);
 }
 
 .status-strip summary {
@@ -142,11 +172,12 @@
 
 .status-strip p {
   margin: 0.35rem 0 0;
+  color: color-mix(in srgb, var(--ink) 72%, transparent);
 }
 
 .panel.upgrade {
-  border: 1px solid color-mix(in srgb, var(--ink) 25%, transparent);
-  background: color-mix(in srgb, var(--panel) 70%, #c4a574);
+  border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--line));
+  background: color-mix(in srgb, var(--panel) 70%, #e8d4a8);
   padding: 0.85rem 1rem;
   margin-bottom: 1rem;
 }

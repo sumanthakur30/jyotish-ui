@@ -8,6 +8,7 @@ import {
   LifeHistoryItem,
   LifePeriodDto,
   LifeSearchHit,
+  LifeStoryChapter,
 } from '../core/jyotish-api.service';
 import { LanguageService } from '../core/i18n/language.service';
 
@@ -154,6 +155,7 @@ export class LifeAnalysisPanelComponent implements OnChanges {
   };
   editingPeriodId: number | null = null;
   addDashaBusy = false;
+  selectedStoryFromYear: number | null = null;
 
   constructor(
     private readonly api: JyotishApiService,
@@ -178,6 +180,8 @@ export class LifeAnalysisPanelComponent implements OnChanges {
       next: (d) => {
         this.dashboard = d;
         this.busy = false;
+        const here = d.lifeStory?.find((c) => c.current) || d.lifeStory?.[0];
+        this.selectedStoryFromYear = here ? here.fromYear : null;
         if (this.focusCategory) {
           this.openCategory(this.focusCategory);
         }
@@ -210,6 +214,123 @@ export class LifeAnalysisPanelComponent implements OnChanges {
       return this.language.t('life.statusInProgress');
     }
     return this.language.t('life.statusNotStarted');
+  }
+
+  notesStatusLabel(status: string): string {
+    const s = (status || 'NOT_STARTED').toUpperCase();
+    if (s === 'COMPLETED') {
+      return this.language.t('life.notesCompleted');
+    }
+    if (s === 'IN_PROGRESS') {
+      return this.language.t('life.notesInProgress');
+    }
+    return this.language.t('life.notesPending');
+  }
+
+  houseLines(c: LifeCategorySummary): string[] {
+    const f = c.facts;
+    if (!f) {
+      return [];
+    }
+    return this.language.lang === 'hi' ? f.houseLinesHi || [] : f.houseLinesEn || [];
+  }
+
+  grahasLine(c: LifeCategorySummary): string {
+    const f = c.facts;
+    if (!f) {
+      return '';
+    }
+    return (this.language.lang === 'hi' ? f.grahasLineHi : f.grahasLineEn) || '';
+  }
+
+  meaning(c: LifeCategorySummary): string {
+    const f = c.facts;
+    if (!f) {
+      return '';
+    }
+    return (this.language.lang === 'hi' ? f.meaningHi : f.meaningEn) || '';
+  }
+
+  emphasisLabel(c: LifeCategorySummary): string {
+    const f = c.facts;
+    if (!f) {
+      return '';
+    }
+    return (this.language.lang === 'hi' ? f.emphasisLabelHi : f.emphasisLabelEn) || '';
+  }
+
+  stars(c: LifeCategorySummary): string {
+    const n = Math.max(0, Math.min(5, c.facts?.emphasisLevel ?? 0));
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  areaIcon(code: string): string {
+    switch ((code || '').toUpperCase()) {
+      case 'CAREER':
+        return '💼';
+      case 'JOB':
+        return '👔';
+      case 'BUSINESS':
+        return '💰';
+      case 'FINANCE':
+        return '🪙';
+      case 'MARRIAGE':
+        return '❤️';
+      case 'FAMILY':
+        return '👨‍👩‍👧';
+      case 'CHILDREN':
+        return '👶';
+      case 'EDUCATION':
+        return '🎓';
+      case 'PROPERTY':
+        return '🏠';
+      case 'FOREIGN':
+        return '✈️';
+      case 'SPIRITUALITY':
+        return '🧘';
+      case 'HEALTH':
+        return '🩺';
+      default:
+        return '✨';
+    }
+  }
+
+  selectedMeaning(): string {
+    const c = this.dashboard?.categories?.find((x) => x.category === this.selected);
+    return c ? this.meaning(c) : '';
+  }
+
+  storyChapters(): LifeStoryChapter[] {
+    return this.dashboard?.lifeStory || [];
+  }
+
+  activeStory(): LifeStoryChapter | null {
+    const list = this.storyChapters();
+    if (!list.length) {
+      return null;
+    }
+    return list.find((c) => c.fromYear === this.selectedStoryFromYear) || list.find((c) => c.current) || list[0];
+  }
+
+  selectStory(ch: LifeStoryChapter): void {
+    this.selectedStoryFromYear = ch.fromYear;
+  }
+
+  storyLord(ch: LifeStoryChapter): string {
+    return this.language.lang === 'hi' ? ch.lordNameHi : ch.lordNameEn;
+  }
+
+  storyMeaning(ch: LifeStoryChapter): string {
+    return this.language.lang === 'hi' ? ch.meaningHi : ch.meaningEn;
+  }
+
+  storyFocus(ch: LifeStoryChapter): string {
+    return this.language.lang === 'hi' ? ch.focusLineHi : ch.focusLineEn;
+  }
+
+  cardHighlighted(c: LifeCategorySummary): boolean {
+    const story = this.activeStory();
+    return !!story?.focusCategories?.includes(c.category);
   }
 
   openCategory(code: string): void {

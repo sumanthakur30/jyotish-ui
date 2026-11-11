@@ -635,6 +635,21 @@ export interface LifeCategorySummary {
   /** e.g. "Jupiter / Saturn · until 2027-03-12" from stored Vimshottari */
   currentDashaLine?: string | null;
   currentDashaEndAt?: string | null;
+  facts?: LifeCategoryCardFacts | null;
+}
+
+export interface LifeCategoryCardFacts {
+  houseLinesEn: string[];
+  houseLinesHi: string[];
+  grahasLineEn: string | null;
+  grahasLineHi: string | null;
+  summaryEn: string;
+  summaryHi: string;
+  meaningEn?: string | null;
+  meaningHi?: string | null;
+  emphasisLevel?: number;
+  emphasisLabelEn?: string | null;
+  emphasisLabelHi?: string | null;
 }
 
 export interface CalculatedDashaPeriod {
@@ -682,6 +697,26 @@ export interface LifeAnalysisDashboard {
   kundaliId: number;
   categories: LifeCategorySummary[];
   calculatedTimeline?: CalculatedTimelineStrip | null;
+  lifeStory?: LifeStoryChapter[];
+}
+
+export interface LifeStoryChapter {
+  lordCode: string;
+  lordNameEn: string;
+  lordNameHi: string;
+  startAt: string;
+  endAt: string;
+  fromYear: number;
+  toYear: number;
+  current: boolean;
+  past: boolean;
+  themeEn: string;
+  themeHi: string;
+  focusCategories: string[];
+  focusLineEn: string;
+  focusLineHi: string;
+  meaningEn: string;
+  meaningHi: string;
 }
 
 export interface LifeIndicatorItem {
@@ -862,6 +897,9 @@ export interface SimpleLifeAreaCard {
   relevantPlanetLinesEn?: string[];
   relevantPlanetLinesHi?: string[];
   focusHouses?: number[];
+  emphasisLevel?: number;
+  emphasisLabelEn?: string | null;
+  emphasisLabelHi?: string | null;
 }
 
 export interface SimpleUpcomingItem {
@@ -994,8 +1032,13 @@ export class JyotishApiService {
     birthProfileId?: number;
     birth?: unknown;
     ayanamsaCode?: string;
+    includeChalit?: boolean;
   }): Observable<KundaliResponse> {
     return this.http.post<KundaliResponse>('/api/v1/jyotish/kundali/generate', body);
+  }
+
+  regenerateKundali(id: number): Observable<KundaliResponse> {
+    return this.http.post<KundaliResponse>(`/api/v1/jyotish/kundali/${id}/regenerate`, {});
   }
 
   getKundali(id: number): Observable<KundaliResponse> {

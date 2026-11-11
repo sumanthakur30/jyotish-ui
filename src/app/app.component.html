@@ -8,7 +8,7 @@
       </div>
     </a>
   </div>
-  <nav class="nav" aria-label="Main">
+  <nav class="nav" aria-label="Main" *ngIf="showDesk">
     <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{
       'nav.dashboard' | t
     }}</a>
@@ -39,32 +39,54 @@
         {{ 'lang.en' | t }}
       </button>
     </div>
-    <label for="tenant">{{ 'tenant.label' | t }}</label>
-    <input
-      id="tenant"
-      [(ngModel)]="tenantDraft"
-      name="tenant"
-      placeholder="JYOTISH-DEMO-01"
-    />
-    <button type="button" class="btn" (click)="saveTenant()">{{ 'tenant.set' | t }}</button>
-    <button type="button" class="btn ghost" (click)="refreshStatus()">{{ 'tenant.ping' | t }}</button>
+    <ng-container *ngIf="tenant.locked; else guestTenant">
+      <span class="session-chip">
+        {{ 'session.shop' | t }} {{ tenant.shopId }}
+        <span *ngIf="tenant.username"> · {{ tenant.username }}</span>
+      </span>
+      <button type="button" class="btn ghost" (click)="logout()">{{ 'session.logout' | t }}</button>
+    </ng-container>
+    <ng-template #guestTenant>
+      <form class="staff-inline" (submit)="staffLogin(); $event.preventDefault()">
+        <input
+          name="staffUser"
+          [(ngModel)]="loginUser"
+          [attr.placeholder]="'session.username' | t"
+          autocomplete="username"
+        />
+        <input
+          name="staffPass"
+          type="password"
+          [(ngModel)]="loginPass"
+          [attr.placeholder]="'session.password' | t"
+          autocomplete="current-password"
+        />
+        <button type="submit" class="btn primary" [disabled]="loginBusy">
+          {{ 'session.go' | t }}
+        </button>
+      </form>
+    </ng-template>
   </div>
 </header>
 
 <main class="shell">
   <p class="flash ok" *ngIf="message">{{ message }}</p>
   <p class="flash err" *ngIf="error">{{ error }}</p>
-  <section class="panel upgrade" *ngIf="showUpgradeBanner">
-    <p>{{ upgradeHint() }}</p>
+  <section class="panel login-gate" *ngIf="!showDesk">
+    <h2>{{ 'session.login' | t }}</h2>
+    <p>{{ 'session.needLogin' | t }}</p>
   </section>
-  <details class="status-strip" *ngIf="status as s">
-    <summary>
-      {{ s.service }} · {{ 'status.engine' | t: { version: s.engineVersion } }}
-    </summary>
-    <p>
-      {{ s.phase }}
-      <span *ngIf="s.entitlementEnabled"> · {{ 'status.entitlementsOn' | t }}</span>
-    </p>
-  </details>
-  <router-outlet></router-outlet>
+  <ng-container *ngIf="showDesk">
+    <section class="panel upgrade" *ngIf="showUpgradeBanner">
+      <p>{{ upgradeHint() }}</p>
+    </section>
+    <details class="status-strip" *ngIf="status as s">
+      <summary>
+        {{ 'status.connected' | t: { service: s.service, phase: s.phase } }}
+        · {{ 'status.engine' | t: { version: s.engineVersion } }}
+      </summary>
+      <p *ngIf="s.entitlementEnabled">{{ 'status.entitlementsOn' | t }}</p>
+    </details>
+    <router-outlet></router-outlet>
+  </ng-container>
 </main>

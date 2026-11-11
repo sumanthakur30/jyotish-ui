@@ -61,6 +61,17 @@ export class DashboardPageComponent implements OnInit {
     this.loadCrm();
   }
 
+  initials(name: string | undefined): string {
+    const parts = (name || '').trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) {
+      return '—';
+    }
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
   todayLabel(): string {
     const d = new Date();
     return d.toLocaleDateString(this.language.lang === 'hi' ? 'hi-IN' : 'en-IN', {
@@ -206,7 +217,9 @@ export class DashboardPageComponent implements OnInit {
       error: (err) => {
         this.appointments = [];
         this.apptBusy = false;
-        this.apptError = err?.error?.message || this.language.t('dash.apptError');
+        const msg = typeof err?.error?.message === 'string' ? err.error.message : '';
+        const generic = /couldn't complete that request/i.test(msg);
+        this.apptError = generic ? '' : msg || this.language.t('dash.apptError');
       },
     });
   }

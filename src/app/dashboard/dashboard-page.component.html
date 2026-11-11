@@ -1,6 +1,7 @@
 <div class="dash">
   <header class="dash-head">
     <div>
+      <p class="kicker">{{ 'app.tag' | t }}</p>
       <h1>{{ 'dash.title' | t }}</h1>
       <p class="sub">{{ todayLabel() }}</p>
     </div>
@@ -23,39 +24,39 @@
         <p class="place">{{ p.placeName || '—' }}</p>
         <dl class="limbs">
           <div>
-            <dt>{{ 'dash.tithi' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">☽</span> {{ 'dash.tithi' | t }}</dt>
             <dd>{{ limbName(p.tithi) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.vara' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">☀</span> {{ 'dash.vara' | t }}</dt>
             <dd>{{ limbName(p.vara) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.nakshatra' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">✦</span> {{ 'dash.nakshatra' | t }}</dt>
             <dd>{{ limbName(p.nakshatra) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.yoga' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">◇</span> {{ 'dash.yoga' | t }}</dt>
             <dd>{{ limbName(p.yoga) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.karana' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">●</span> {{ 'dash.karana' | t }}</dt>
             <dd>{{ limbName(p.karana) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.sunrise' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">▲</span> {{ 'dash.sunrise' | t }}</dt>
             <dd>{{ solarTime(p.sunrise) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.sunset' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">▼</span> {{ 'dash.sunset' | t }}</dt>
             <dd>{{ solarTime(p.sunset) }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.rahuKaal' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">◦</span> {{ 'dash.rahuKaal' | t }}</dt>
             <dd>{{ muhuratRange('RAHU_KAAL') }}</dd>
           </div>
           <div>
-            <dt>{{ 'dash.abhijit' | t }}</dt>
+            <dt><span class="glyph" aria-hidden="true">★</span> {{ 'dash.abhijit' | t }}</dt>
             <dd>{{ muhuratRange('ABHIJIT') }}</dd>
           </div>
         </dl>
@@ -75,11 +76,11 @@
           <span class="n">{{ todaysOpenAppointments().length }}</span>
           <span class="l">{{ 'dash.apptsToday' | t }}</span>
         </div>
-        <div class="stat">
+        <div class="stat pay">
           <span class="n">{{ pendingPayments().length }}</span>
           <span class="l">{{ 'dash.pendingPay' | t }}</span>
         </div>
-        <div class="stat" *ngIf="clientCount != null">
+        <div class="stat clients" *ngIf="clientCount != null">
           <span class="n">{{ clientCount }}</span>
           <span class="l">{{ 'dash.clients' | t }}</span>
         </div>
@@ -101,27 +102,28 @@
       <h2>{{ 'dash.quickActions' | t }}</h2>
       <div class="actions">
         <button type="button" class="action" (click)="openProfiles()">
-          {{ 'dash.action.newKundli' | t }}
+          <span class="tile" aria-hidden="true">ॐ</span>
+          <span>{{ 'dash.action.newKundli' | t }}</span>
         </button>
         <button type="button" class="action" (click)="openClients()">
-          {{ 'dash.action.newClient' | t }}
+          <span class="tile" aria-hidden="true">☺</span>
+          <span>{{ 'dash.action.newClient' | t }}</span>
         </button>
         <button type="button" class="action" (click)="openAppointments()">
-          {{ 'dash.action.newAppt' | t }}
+          <span class="tile" aria-hidden="true">◷</span>
+          <span>{{ 'dash.action.newAppt' | t }}</span>
         </button>
-        <button
-          type="button"
-          class="action"
-          *ngIf="entitlements.can('matching')"
-          (click)="openMatching()"
-        >
-          {{ 'dash.action.milan' | t }}
+        <button type="button" class="action" (click)="openMatching()">
+          <span class="tile" aria-hidden="true">⚭</span>
+          <span>{{ 'dash.action.milan' | t }}</span>
         </button>
         <button type="button" class="action" (click)="openPanchang()">
-          {{ 'dash.action.panchang' | t }}
+          <span class="tile" aria-hidden="true">☽</span>
+          <span>{{ 'dash.action.panchang' | t }}</span>
         </button>
         <button type="button" class="action" (click)="openPanchang()">
-          {{ 'dash.action.muhurat' | t }}
+          <span class="tile" aria-hidden="true">★</span>
+          <span>{{ 'dash.action.muhurat' | t }}</span>
         </button>
       </div>
     </section>
@@ -135,6 +137,7 @@
       <p class="flash err" *ngIf="recentError">{{ recentError }}</p>
       <ul class="recent-list" *ngIf="recent.length; else noRecent">
         <li *ngFor="let p of recent">
+          <span class="avatar" aria-hidden="true">{{ initials(p.displayName) }}</span>
           <div class="info">
             <strong>{{ p.displayName }}</strong>
             <span

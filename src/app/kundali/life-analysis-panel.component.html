@@ -22,6 +22,41 @@
   <p class="flash ok" *ngIf="flash">{{ flash }}</p>
   <p class="hint" *ngIf="busy">{{ 'life.loading' | t }}</p>
 
+  <div class="life-strip" *ngIf="!selected && dashboard as dash">
+    <h3 class="ask">{{ 'life.storyTitle' | t }}</h3>
+    <p class="hint">{{ 'life.storyHint' | t }}</p>
+    <div class="story-rail" *ngIf="storyChapters().length; else noStory">
+      <button
+        type="button"
+        class="story-chip"
+        *ngFor="let ch of storyChapters()"
+        [class.current]="ch.current"
+        [class.active]="activeStory()?.fromYear === ch.fromYear"
+        [class.past]="ch.past && !ch.current"
+        (click)="selectStory(ch)"
+      >
+        <span class="yrs">{{ ch.fromYear }}–{{ ch.toYear }}</span>
+        <span class="lord">{{ storyLord(ch) }}</span>
+        <span class="here" *ngIf="ch.current">{{ 'life.youAreHere' | t }}</span>
+      </button>
+    </div>
+    <ng-template #noStory>
+      <p class="hint">{{ 'life.noStory' | t }}</p>
+    </ng-template>
+    <article class="story-now" *ngIf="activeStory() as ch">
+      <p class="story-meaning">{{ storyMeaning(ch) }}</p>
+      <p class="story-focus" *ngIf="storyFocus(ch)">
+        <strong>{{ 'life.storyFocus' | t }}:</strong> {{ storyFocus(ch) }}
+      </p>
+    </article>
+    <h3 class="ask areas-ask">{{ 'life.whatToUnderstand' | t }}</h3>
+    <p class="strip-dasha" *ngIf="dash.calculatedTimeline?.currentDasha as cd">
+      <strong>{{ 'life.currentDasha' | t }}:</strong>
+      {{ cd.summaryLine }}
+    </p>
+    <p class="hint">{{ 'life.cardFactsHint' | t }}</p>
+  </div>
+
   <ul class="search-hits" *ngIf="searchHits.length">
     <li *ngFor="let h of searchHits">
       <button type="button" (click)="openHit(h)">
@@ -45,18 +80,32 @@
 
   <!-- Dashboard cards -->
   <div class="life-cards" *ngIf="!selected && dashboard as dash">
-    <button
-      type="button"
+    <article
       class="life-card"
       *ngFor="let c of dash.categories"
       (click)="openCategory(c.category)"
+      [class.lit]="cardHighlighted(c)"
       [attr.data-status]="c.status"
     >
-      <span class="card-title">{{ label(c) }}</span>
-      <span class="card-status" [attr.data-status]="c.status">{{ statusLabel(c.status) }}</span>
-      <span class="card-dasha" *ngIf="c.currentDashaLine">{{ c.currentDashaLine }}</span>
-      <span class="card-meta">{{ c.updatedAt ? fmtWhen(c.updatedAt) : '—' }}</span>
-    </button>
+      <span class="card-head">
+        <span class="card-title">{{ areaIcon(c.category) }} {{ label(c) }}</span>
+        <span class="card-status" [attr.data-status]="c.status">{{ notesStatusLabel(c.status) }}</span>
+      </span>
+      <p class="card-emphasis" *ngIf="emphasisLabel(c)">
+        <span class="stars" aria-hidden="true">{{ stars(c) }}</span>
+        {{ emphasisLabel(c) }}
+      </p>
+      <p class="card-meaning">{{ meaning(c) }}</p>
+      <details class="card-why" *ngIf="houseLines(c).length" (click)="$event.stopPropagation()">
+        <summary>{{ 'life.why' | t }}</summary>
+        <ul class="card-houses">
+          <li *ngFor="let line of houseLines(c)">{{ line }}</li>
+        </ul>
+        <p class="card-grahas" *ngIf="grahasLine(c)">{{ grahasLine(c) }}</p>
+      </details>
+      <p class="card-empty" *ngIf="!meaning(c) && !houseLines(c).length">{{ 'life.noChartFacts' | t }}</p>
+      <span class="card-cta">{{ 'life.understandMore' | t }} →</span>
+    </article>
   </div>
 
   <!-- Category detail -->
@@ -86,6 +135,11 @@
     <p class="health-banner" *ngIf="d.healthDisclaimerEn">
       {{ language.lang === 'hi' ? d.healthDisclaimerHi : d.healthDisclaimerEn }}
     </p>
+
+    <div class="meaning-banner" *ngIf="selectedMeaning() as m">
+      <h4>{{ 'life.whatThisMeans' | t }}</h4>
+      <p>{{ m }}</p>
+    </div>
 
     <div class="calc-periods-panel" *ngIf="d.calculatedTimeline as strip">
       <div class="calc-periods-head">

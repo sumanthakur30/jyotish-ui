@@ -160,21 +160,47 @@
           {{ 'chart.chalit' | t }}
         </button>
       </div>
-      <button type="button" class="btn ghost" (click)="toggleSignMode()">
-        {{ chartSignMode === 'number' ? ('chart.signAbbrev' | t) : ('chart.signNumber' | t) }}
-      </button>
+      <span class="chart-style">{{ 'chart.northIndian' | t }}</span>
+      <div class="toolbar-actions">
+        <button type="button" class="btn ghost" (click)="toggleSignMode()">
+          {{ chartSignMode === 'number' ? ('chart.signAbbrev' | t) : ('chart.signNumber' | t) }}
+        </button>
+        <button type="button" class="btn ghost" [disabled]="recalcBusy" (click)="recalculate()">
+          {{ recalcBusy ? ('kundali.recalculating' | t) : ('kundali.recalculate' | t) }}
+        </button>
+      </div>
     </div>
     <p class="hint" *ngIf="chartViewMode === 'CHALIT' && chalitBusy">Loading Bhava Chalit…</p>
     <p class="hint error" *ngIf="chalitError">{{ chalitError }}</p>
+    <p class="flash err" *ngIf="recalcError">{{ recalcError }}</p>
+
+    <div class="spashta-block">
+      <h2 class="timeline-h">{{ 'table.spashta' | t }}</h2>
+      <ng-container *ngTemplateOutlet="spashtaTable"></ng-container>
+    </div>
+
     <div class="overview-grid" *ngIf="overviewChart() as cv">
-      <app-kundali-chart
-        class="chart-stage"
-        [planets]="cv.planets"
-        [houses]="cv.houses"
-        [ascendant]="cv.ascendant"
-        [signMode]="chartSignMode"
-        [planetLabelMode]="language.lang === 'hi' ? 'full' : 'abbrev'"
-      ></app-kundali-chart>
+      <div class="dual-charts">
+        <app-kundali-chart
+          class="chart-stage"
+          [planets]="cv.planets"
+          [houses]="cv.houses"
+          [ascendant]="cv.ascendant"
+          [signMode]="chartSignMode"
+          [planetLabelMode]="language.lang === 'hi' ? 'full' : 'abbrev'"
+          [caption]="chartCaption(cv)"
+        ></app-kundali-chart>
+        <app-kundali-chart
+          *ngIf="overviewD9 as d9"
+          class="chart-stage"
+          [planets]="d9.planets"
+          [houses]="d9.houses"
+          [ascendant]="d9.ascendant"
+          [signMode]="chartSignMode"
+          [planetLabelMode]="language.lang === 'hi' ? 'full' : 'abbrev'"
+          [caption]="'chart.navamsa' | t"
+        ></app-kundali-chart>
+      </div>
       <aside class="key-panel">
         <h2>{{ 'kundali.keyPoints' | t }} · {{ cv.pivotLabel }}</h2>
         <dl class="facts">
@@ -218,7 +244,7 @@
         <details class="tech">
           <summary>{{ 'kundali.techDetails' | t }}</summary>
           <p class="hint">
-            {{ k.ayanamsaCode }} {{ fmtDeg(k.ayanamsaDeg) }} · {{ k.houseSystem }} · engine
+            {{ ayanamsaLabel(k.ayanamsaCode) }} {{ fmtDeg(k.ayanamsaDeg) }} · {{ k.houseSystem }} · engine
             {{ k.calculationEngineVersion }}
           </p>
           <p class="hint" *ngIf="k.notes">{{ k.notes }}</p>
@@ -230,8 +256,7 @@
     </div>
   </section>
 
-  <section class="panel" *ngIf="tab === 'planets'">
-    <h2 class="timeline-h">{{ 'table.spashta' | t }}</h2>
+  <ng-template #spashtaTable>
     <p class="hint" *ngIf="!hasOuterPlanets()">{{ 'chart.outerSoon' | t }}</p>
     <div class="table-scroll">
       <table class="table">
@@ -249,7 +274,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngIf="k.ascendant as a">
+          <tr *ngIf="kundali?.ascendant as a">
             <td>{{ 'table.ascendant' | t }}</td>
             <td>{{ signLabel(a.signName) }}</td>
             <td>{{ fmtDms(a.degreeInSign) }}</td>
@@ -260,7 +285,7 @@
             <td>{{ rashiLord(a.signName) }}</td>
             <td>{{ nakLord(a.nakshatraIndex) }}</td>
           </tr>
-          <tr *ngFor="let p of k.planets">
+          <tr *ngFor="let p of kundali?.planets">
             <td>{{ planetLabel(p.planetCode) }}</td>
             <td>{{ signLabel(p.signName) }}</td>
             <td>{{ fmtDms(p.degreeInSign) }}</td>
@@ -274,6 +299,11 @@
         </tbody>
       </table>
     </div>
+  </ng-template>
+
+  <section class="panel" *ngIf="tab === 'planets'">
+    <h2 class="timeline-h">{{ 'table.spashta' | t }}</h2>
+    <ng-container *ngTemplateOutlet="spashtaTable"></ng-container>
   </section>
 
   <section class="panel" *ngIf="tab === 'houses'">

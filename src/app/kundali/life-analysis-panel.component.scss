@@ -36,22 +36,181 @@
 
 .life-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr));
   gap: 0.75rem;
+}
+
+.life-strip {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.7rem 0.9rem;
+  background: var(--panel);
+}
+
+.life-strip p {
+  margin: 0.2rem 0;
+  font-size: 0.88rem;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  align-items: baseline;
+}
+
+.card-houses {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0.92;
+}
+
+.card-grahas {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  opacity: 0.78;
+}
+
+.card-empty {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.life-strip .ask {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.areas-ask {
+  margin-top: 1rem !important;
+}
+
+.story-rail {
+  display: flex;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding: 0.35rem 0 0.55rem;
+  scrollbar-width: thin;
+}
+
+.story-chip {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  min-width: 6.8rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.story-chip .yrs {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.story-chip .lord {
+  font-size: 0.8rem;
+}
+
+.story-chip .here {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #1b6b3a;
+}
+
+.story-chip.past {
+  opacity: 0.72;
+}
+
+.story-chip.current,
+.story-chip.active {
+  border-color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, var(--panel));
+}
+
+.story-now {
+  margin: 0.15rem 0 0.35rem;
+}
+
+.story-meaning {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.story-focus {
+  margin: 0;
+  font-size: 0.82rem;
+  opacity: 0.88;
+}
+
+.life-card.lit {
+  border-color: color-mix(in srgb, var(--ink) 45%, var(--line));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ink) 18%, transparent);
 }
 
 .life-card {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.4rem;
   text-align: left;
-  padding: 0.85rem 0.9rem;
+  padding: 0.9rem 1rem;
   border: 1px solid var(--line);
-  border-radius: 0.4rem;
+  border-radius: 0.45rem;
   background: var(--panel);
   color: inherit;
   font: inherit;
   cursor: pointer;
+}
+
+.card-meaning {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.card-emphasis {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.card-emphasis .stars {
+  letter-spacing: 0.04em;
+  margin-right: 0.35rem;
+}
+
+.card-why {
+  font-size: 0.78rem;
+}
+
+.card-cta {
+  font-size: 0.78rem;
+  font-weight: 650;
+  opacity: 0.75;
+}
+
+.meaning-banner {
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 0.85rem;
+}
+
+.meaning-banner h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
 }
 
 .life-card:hover {

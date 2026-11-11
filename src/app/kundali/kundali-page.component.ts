@@ -25,7 +25,7 @@ import { EntitlementStateService } from '../core/entitlement-state.service';
 import { LanguageService } from '../core/i18n/language.service';
 import { ViewModeService } from '../core/view-mode.service';
 import { planetFull, signFull, signLordCode, nakshatraLordCode, yogaCategoryLabel, yogaNameHi } from '../core/i18n/jyotish-labels';
-import { buildChartView, ChartViewMode } from './chart-view.util';
+import { buildChartView, ChartView, ChartViewMode } from './chart-view.util';
 
 @Component({
   selector: 'app-kundali-page',
@@ -58,6 +58,10 @@ export class KundaliPageComponent implements OnInit {
   chalitChart: VargaChartResponse | null = null;
   chalitBusy = false;
   chalitError = '';
+  /** Navamsa shown beside Lagna on the print-style overview. */
+  overviewD9: VargaChartResponse | null = null;
+  recalcBusy = false;
+  recalcError = '';
 
   chartCatalog: ChartCatalogItem[] = [];
   selectedVarga = 'D9';
@@ -136,23 +140,13 @@ export class KundaliPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
-    if (!id || Number.isNaN(id)) {
-      this.error = 'Missing kundali id.';
-      return;
-    }
-    this.busy = true;
-    this.api.getKundali(id).subscribe({
-      next: (k) => {
-        this.kundali = k;
-        this.chalitChart = null;
-        this.chalitError = '';
-        this.busy = false;
-      },
-      error: (err) => {
-        this.busy = false;
-        this.error = err?.error?.message || 'Could not load kundali.';
-      },
+    this.route.paramMap.subscribe((params) => {
+      const id = Number(params.get('id'));
+      if (!id || Number.isNaN(id)) {
+        this.error = 'Missing kundali id.';
+        return;
+      }
+      this.loadKundali(id);
     });
     this.viewMode.mode$.subscribe((mode) => {
       if (mode === 'simple') {
@@ -172,6 +166,74 @@ export class KundaliPageComponent implements OnInit {
           this.tab = 'overview';
         }
       }
+    });
+  }
+
+  private loadKundali(id: number): void {
+    this.busy = true;
+    this.error = '';
+    this.overviewD9 = null;
+    this.chalitChart = null;
+    this.chalitError = '';
+    this.vargaChart = null;
+    this.api.getKundali(id).subscribe({
+      next: (k) => {
+        this.kundali = k;
+        this.busy = false;
+        this.ensureOverviewNavamsa();
+      },
+      error: (err) => {
+        this.busy = false;
+        this.error = err?.error?.message || 'Could not load kundali.';
+      },
+    });
+  }
+
+  private ensureOverviewNavamsa(): void {
+    if (!this.kundali || this.overviewD9) {
+      return;
+    }
+    this.api.getChart(this.kundali.id, 'D9').subscribe({
+      next: (c) => {
+        this.overviewD9 = c;
+      },
+    });
+  }
+
+  chartCaption(cv: ChartView): string {
+    if (cv.mode === 'CHANDRA') {
+      return this.language.t('chart.chandraKundali');
+    }
+    if (cv.mode === 'SURYA') {
+      return this.language.t('chart.suryaKundali');
+    }
+    if (cv.mode === 'CHALIT') {
+      return this.language.t('chart.chalitKundali');
+    }
+    return this.language.t('chart.lagnaKundali');
+  }
+
+  recalculate(): void {
+    if (!this.kundali || this.recalcBusy) {
+      return;
+    }
+    this.recalcBusy = true;
+    this.recalcError = '';
+    this.api.regenerateKundali(this.kundali.id).subscribe({
+      next: (fresh) => {
+        this.kundali = fresh;
+        this.overviewD9 = null;
+        this.chalitChart = null;
+        this.vargaChart = null;
+        this.yogas = null;
+        this.dasha = null;
+        this.ensureOverviewNavamsa();
+        this.recalcBusy = false;
+      },
+      error: (err) => {
+        this.recalcBusy = false;
+        this.recalcError = err?.error?.message || this.language.t('kundali.recalculateFailed');
+      },
     });
   }
 
@@ -943,6 +1005,17 @@ export class KundaliPageComponent implements OnInit {
 
   signLabel(name: string): string {
     return signFull(name, this.language.lang);
+  }
+
+  ayanamsaLabel(code: string | null | undefined): string {
+    const c = (code || 'LAHIRI').toUpperCase();
+    if (c === 'RAMAN') {
+      return 'Raman';
+    }
+    if (c === 'KP' || c === 'KRISHNAMURTI') {
+      return 'KP';
+    }
+    return this.language.lang === 'hi' ? 'एन.सी. लाहिरी' : 'N.C. Lahiri';
   }
 
   nakshatraLordLabel(): string {

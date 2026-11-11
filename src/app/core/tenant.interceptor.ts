@@ -22,6 +22,9 @@ export class TenantInterceptor implements HttpInterceptor {
     if (shopId) {
       headers['X-Shop-Id'] = shopId;
     }
+    if (this.tenant.accessToken && !this.tenant.tokenExpired()) {
+      headers['Authorization'] = `Bearer ${this.tenant.accessToken}`;
+    }
     return next.handle(req.clone({ setHeaders: headers }));
   }
 }

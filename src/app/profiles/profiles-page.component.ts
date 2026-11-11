@@ -40,9 +40,11 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
 
   placeQuery = '';
   placeHits: PlaceSuggestion[] = [];
+  placeActive = -1;
   placeSearchBusy = false;
   placeSearchAttempted = false;
   private placeSearchTimer: ReturnType<typeof setTimeout> | null = null;
+  private placeSearchSeq = 0;
 
   constructor(
     private readonly api: JyotishApiService,
@@ -90,22 +92,71 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     if (this.placeSearchTimer != null) {
       clearTimeout(this.placeSearchTimer);
     }
-    this.placeSearchTimer = setTimeout(() => this.searchPlaces(), 250);
+    const q = (this.placeQuery || '').trim();
+    if (q.length < 2) {
+      this.placeHits = [];
+      this.placeActive = -1;
+      this.placeSearchBusy = false;
+      this.placeSearchAttempted = false;
+      this.placeSearchSeq++;
+      return;
+    }
+    this.placeSearchTimer = setTimeout(() => this.searchPlaces(), 450);
+  }
+
+  onPlaceKeydown(event: KeyboardEvent): void {
+    if (event.key === 'ArrowDown' && this.placeHits.length) {
+      event.preventDefault();
+      this.placeActive = Math.min(this.placeHits.length - 1, this.placeActive + 1);
+      return;
+    }
+    if (event.key === 'ArrowUp' && this.placeHits.length) {
+      event.preventDefault();
+      this.placeActive = Math.max(0, this.placeActive - 1);
+      return;
+    }
+    if (event.key === 'Escape') {
+      this.placeHits = [];
+      this.placeActive = -1;
+      return;
+    }
+    if (event.key === 'Enter' && this.placeActive >= 0 && this.placeHits[this.placeActive]) {
+      event.preventDefault();
+      this.pickPlace(this.placeHits[this.placeActive]);
+    }
   }
 
   searchPlaces(): void {
     const q = (this.placeQuery || '').trim();
+    if (q.length < 2) {
+      this.placeHits = [];
+      this.placeActive = -1;
+      this.placeSearchBusy = false;
+      this.placeSearchAttempted = false;
+      return;
+    }
+    const seq = ++this.placeSearchSeq;
     this.placeSearchAttempted = true;
     this.placeSearchBusy = true;
     this.api.searchPlaces(q).subscribe({
       next: (res) => {
+        if (seq !== this.placeSearchSeq) {
+          return;
+        }
         this.placeHits = res.items || [];
+        this.placeActive = this.placeHits.length ? 0 : -1;
         this.placeSearchBusy = false;
       },
-      error: (err) => {
+      error: () => {
+        if (seq !== this.placeSearchSeq) {
+          return;
+        }
         this.placeHits = [];
+        this.placeActive = -1;
         this.placeSearchBusy = false;
-        this.fail(err);
+        this.error =
+          'Location search is unavailable. Enter the place and coordinates manually.';
+        this.message = '';
       },
     });
   }
@@ -115,9 +166,10 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     this.countryCode = p.countryCode;
     this.latitude = Number(p.latitude);
     this.longitude = Number(p.longitude);
-    this.timeZone = p.timeZone;
+    this.timeZone = p.timeZone || '';
     this.coordsManual = false;
     this.placeHits = [];
+    this.placeActive = -1;
     this.placeQuery = p.placeName;
     this.placeSearchAttempted = false;
     this.error = '';
@@ -145,6 +197,7 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     this.notes = '';
     this.placeQuery = '';
     this.placeHits = [];
+    this.placeActive = -1;
     this.placeSearchAttempted = false;
     this.placeSearchBusy = false;
   }
@@ -172,6 +225,7 @@ export class ProfilesPageComponent implements OnInit, OnDestroy {
     this.notes = p.notes || '';
     this.placeQuery = p.location.placeName;
     this.placeHits = [];
+    this.placeActive = -1;
     this.placeSearchAttempted = false;
   }
 

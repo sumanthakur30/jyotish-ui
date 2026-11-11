@@ -115,6 +115,49 @@ export class SimpleKundaliHomeComponent implements OnChanges {
     return a.relevantPlanetLinesEn || [];
   }
 
+  emphasisLabel(a: SimpleLifeAreaCard): string {
+    if (this.language.lang === 'hi') {
+      return a.emphasisLabelHi || '';
+    }
+    return a.emphasisLabelEn || '';
+  }
+
+  stars(a: SimpleLifeAreaCard): string {
+    const n = Math.max(0, Math.min(5, a.emphasisLevel ?? 0));
+    return '★'.repeat(n) + '☆'.repeat(5 - n);
+  }
+
+  areaIcon(code: string): string {
+    switch ((code || '').toUpperCase()) {
+      case 'CAREER':
+        return '💼';
+      case 'JOB':
+        return '👔';
+      case 'BUSINESS':
+        return '💰';
+      case 'FINANCE':
+        return '🪙';
+      case 'MARRIAGE':
+        return '❤️';
+      case 'FAMILY':
+        return '👨‍👩‍👧';
+      case 'CHILDREN':
+        return '👶';
+      case 'EDUCATION':
+        return '🎓';
+      case 'PROPERTY':
+        return '🏠';
+      case 'FOREIGN':
+        return '✈️';
+      case 'SPIRITUALITY':
+        return '🧘';
+      case 'HEALTH':
+        return '🩺';
+      default:
+        return '✨';
+    }
+  }
+
   upcomingLabel(u: SimpleUpcomingItem): string {
     return this.language.lang === 'hi' ? u.labelHi : u.labelEn;
   }

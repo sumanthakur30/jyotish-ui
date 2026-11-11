@@ -74,9 +74,13 @@
         <input
           [(ngModel)]="placeQuery"
           name="placeQuery"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="place-suggestions"
+          [attr.aria-expanded]="placeHits.length > 0"
           [placeholder]="'profile.searchPh' | t"
           (ngModelChange)="onPlaceQueryChange()"
-          (keyup.enter)="searchPlaces()"
+          (keydown)="onPlaceKeydown($event)"
         />
         <button type="button" class="btn" [disabled]="placeSearchBusy" (click)="searchPlaces()">
           {{ placeSearchBusy ? ('common.searching' | t) : ('common.search' | t) }}
@@ -85,10 +89,17 @@
     </label>
   </div>
   <p class="hint place-help">{{ 'profile.placeHelp' | t }}</p>
-  <ul class="hits" *ngIf="placeHits.length">
-    <li *ngFor="let p of placeHits">
-      <button type="button" class="linkish" (click)="pickPlace(p)">
-        {{ p.placeName }} · {{ p.latitude }}, {{ p.longitude }} · {{ p.timeZone }}
+  <p class="hint" *ngIf="placeSearchBusy">{{ 'profile.placeSearching' | t }}</p>
+  <ul class="hits" id="place-suggestions" role="listbox" *ngIf="placeHits.length">
+    <li *ngFor="let p of placeHits; let i = index" role="presentation" [class.active]="i === placeActive">
+      <button
+        type="button"
+        class="linkish"
+        role="option"
+        [attr.aria-selected]="i === placeActive"
+        (click)="pickPlace(p)"
+      >
+        {{ p.placeName }}<span class="meta" *ngIf="p.timeZone"> · {{ p.timeZone }}</span>
       </button>
     </li>
   </ul>
